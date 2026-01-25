@@ -243,20 +243,124 @@
     for (let i = 0; i < 3; i++) { gameState.animals.cows.push({ id: i + 1, readyAt: Date.now(), notified: false }); gameState.animals.sheep.push({ id: i + 1, readyAt: Date.now(), notified: false }); gameState.animals.pigs.push({ id: i + 1, readyAt: Date.now(), notified: false }); }
     for (let i = 0; i < 9; i++) gameState.hives.push({ id: i + 1, readyAt: Date.now(), notified: false });
 
-    function sendToPortals(cmd) { if (typeof PortalsSdk !== 'undefined') PortalsSdk.sendMessage(cmd); console.log('To Portals:', cmd); }
-    function closeMenu() { sendToPortals('close_menu'); }
-    function setVariable(n, v) { sendToPortals(`setvar_${n}_${v}`); }
-    function showObject(n) { sendToPortals(`show_${n}`); }
-    function hideObject(n) { sendToPortals(`hide_${n}`); }
-    function playSound(s) { sendToPortals(`sound_${s}`); }
+    // Trigger a Portals task
+    function triggerTask(taskName, targetState = 'SetNotActiveToActive') {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({
+          TaskName: taskName,
+          TaskTargetState: targetState
+        }));
+      }
+      console.log('Trigger Task:', taskName, targetState);
+    }
 
-    if (typeof PortalsSdk !== 'undefined') { PortalsSdk.setMessageListener(function(msg) { handlePortalsMessage(msg); }); }
+    // Legacy functions - now just log (Portals handles show/hide via tasks)
+    function sendToPortals(cmd) { console.log('To Portals:', cmd); }
+    function closeMenu() { console.log('Close menu requested'); }
+    function setVariable(n, v) { console.log('Set variable:', n, v); }
+    function showObject(n) { console.log('Show object:', n); }
+    function hideObject(n) { console.log('Hide object:', n); }
+    function playSound(s) { console.log('Play sound:', s); }
+
+    // Set up Portals message listener
+    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.onMessage) {
+      PortalsSdk.onMessage((msg) => { handlePortalsMessage(msg); });
+    }
+
     function handlePortalsMessage(msg) {
+      console.log('From Portals:', msg);
       if (typeof msg !== 'string') return;
-      const parts = msg.split('_'); const cmd = parts[0];
-      if (cmd === 'init') { if (parts.length >= 4) { gameState.gold = parseInt(parts[1]) || 100; gameState.level = parseInt(parts[2]) || 1; gameState.xp = parseInt(parts[3]) || 0; } loadFromStorage(); updateAllUI(); }
-      else if (cmd === 'harvest') harvestPlot(parseInt(parts[2]));
-      else if (cmd === 'collect') { const t = parts[1], id = parseInt(parts[2]); if (t === 'cow') collectFromCow(id); else if (t === 'sheep') collectFromSheep(id); else if (t === 'pig') collectFromPig(id); else if (t === 'hive') collectFromHive(id); }
+      const parts = msg.split('_');
+      const cmd = parts[0];
+
+      // Init message: init_gold_level_xp
+      if (cmd === 'init') {
+        if (parts.length >= 4) {
+          gameState.gold = parseInt(parts[1]) || 100;
+          gameState.level = parseInt(parts[2]) || 1;
+          gameState.xp = parseInt(parts[3]) || 0;
+        }
+        loadFromStorage();
+        updateAllUI();
+      }
+      // Interact with plot: interact_plot_1
+      else if (cmd === 'interact' && parts[1] === 'plot') {
+        const plotId = parseInt(parts[2]);
+        const plot = gameState.plots[plotId - 1];
+        if (plot.state === 'ready') {
+          // Harvest the crop
+          harvestPlotFromTrigger(plotId);
+        } else if (plot.state === 'empty') {
+          // Could show planting UI or notify
+          notify('Select a crop to plant from the Crops tab', 'info');
+        } else {
+          notify('Crop still growing...', 'info');
+        }
+      }
+      // Interact with animal: interact_cow_1
+      else if (cmd === 'interact') {
+        const animalType = parts[1];
+        const id = parseInt(parts[2]);
+        if (animalType === 'cow') collectFromCow(id);
+        else if (animalType === 'sheep') collectFromSheep(id);
+        else if (animalType === 'pig') collectFromPig(id);
+        else if (animalType === 'chicken') collectFromChicken(id);
+        else if (animalType === 'beehive') collectFromHive(id);
+      }
+      // Confirmations from Portals
+      else if (cmd === 'plant' && parts[1] === 'confirmed') {
+        const plotId = parseInt(parts[2]);
+        console.log('Plant confirmed for plot', plotId);
+      }
+      else if (cmd === 'crop' && parts[1] === 'ready') {
+        const plotId = parseInt(parts[2]);
+        const plot = gameState.plots[plotId - 1];
+        if (plot.state === 'growing') {
+          plot.state = 'ready';
+          notify(`Plot ${plotId} is ready to harvest!`, 'success');
+          renderCrops();
+        }
+      }
+      else if (cmd === 'harvest' && parts[1] === 'complete') {
+        const plotId = parseInt(parts[2]);
+        console.log('Harvest confirmed for plot', plotId);
+      }
+    }
+
+    // Harvest triggered by 3D trigger cube
+    function harvestPlotFromTrigger(plotId) {
+      const plot = gameState.plots[plotId - 1];
+      if (plot.state !== 'ready') { notify('Not ready!', 'error'); return false; }
+
+      // Trigger the harvest task in Portals
+      triggerTask(`Harvest_Plot_${plotId}`);
+
+      // Process the harvest locally
+      const crop = CONFIG.crops[plot.cropType];
+      let amount = crop.yield;
+      if (gameState.equipment.basket) amount = Math.floor(amount * 1.5);
+      gameState.inventory[plot.cropType] += amount;
+      addXP(5);
+
+      plot.state = 'empty';
+      plot.cropType = null;
+      plot.plantedAt = null;
+      plot.readyAt = null;
+
+      notify(`+${amount} ${crop.name}!`, 'success');
+
+      if (gameState.settings.autoReplant) {
+        const p = gameState.settings.priorityCrop;
+        if (gameState.inventory[`seeds_${p}`] > 0 && gameState.level >= CONFIG.crops[p].unlockLevel) {
+          setTimeout(() => plantCrop(plotId, p), 300);
+        }
+      }
+
+      saveGame();
+      renderCrops();
+      renderInventory();
+      renderDashboard();
+      return true;
     }
 
     function saveGame() { localStorage.setItem('farmville_state', JSON.stringify(gameState)); setVariable('Player_Gold', gameState.gold); setVariable('Player_Level', gameState.level); setVariable('Player_XP', gameState.xp); notify('Game saved!', 'success'); }
@@ -267,9 +371,22 @@
       if (plot.state !== 'empty') { notify('Plot not empty!', 'error'); return false; }
       if (gameState.inventory[seedKey] < 1) { notify(`No ${crop.name} seeds!`, 'error'); return false; }
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return false; }
-      gameState.inventory[seedKey]--; plot.state = 'growing'; plot.cropType = cropType; plot.plantedAt = Date.now(); plot.readyAt = Date.now() + (crop.growTime * 1000);
-      hideObject(`Plot_${plotId}_Empty`); showObject(`Plot_${plotId}_${crop.name}`); playSound('plant.mp3'); notify(`Planted ${crop.name}!`, 'success');
-      saveGame(); renderCrops(); renderInventory(); return true;
+
+      // Trigger Portals task
+      triggerTask(`Plant_Plot_${plotId}`);
+
+      // Update local state
+      gameState.inventory[seedKey]--;
+      plot.state = 'growing';
+      plot.cropType = cropType;
+      plot.plantedAt = Date.now();
+      plot.readyAt = Date.now() + (crop.growTime * 1000);
+
+      notify(`Planted ${crop.name}!`, 'success');
+      saveGame();
+      renderCrops();
+      renderInventory();
+      return true;
     }
 
     function harvestPlot(plotId) {
@@ -284,10 +401,72 @@
 
     function plantAllEmpty() { const c = gameState.settings.priorityCrop; let n = 0; gameState.plots.forEach((p, i) => { if (p.state === 'empty' && gameState.inventory[`seeds_${c}`] > 0) if (plantCrop(i + 1, c)) n++; }); if (n > 0) notify(`Planted ${n} crops!`, 'success'); else notify('No seeds or plots!', 'error'); }
 
-    function collectFromCow(id) { const c = gameState.animals.cows[id - 1]; if (Date.now() < c.readyAt) { notify('Not ready!', 'error'); return; } gameState.inventory.milk++; c.readyAt = Date.now() + 90000; c.notified = false; addXP(3); hideObject(`Cow_${id}_Sparkle`); playSound('milk.mp3'); notify('+1 Milk!', 'success'); saveGame(); renderAnimals(); renderInventory(); }
-    function collectFromSheep(id) { const s = gameState.animals.sheep[id - 1]; if (Date.now() < s.readyAt) { notify('Not ready!', 'error'); return; } gameState.inventory.wool++; s.readyAt = Date.now() + 120000; s.notified = false; addXP(3); hideObject(`Sheep_${id}_Sparkle`); playSound('shear.mp3'); notify('+1 Wool!', 'success'); saveGame(); renderAnimals(); renderInventory(); }
-    function collectFromPig(id) { if (gameState.inventory.corn < 1) { notify('Need corn!', 'error'); return; } gameState.inventory.corn--; gameState.inventory.fertilizer++; addXP(2); playSound('pig_eat.mp3'); notify('+1 Fertilizer!', 'success'); saveGame(); renderAnimals(); renderInventory(); }
-    function collectFromHive(id) { const h = gameState.hives[id - 1]; if (Date.now() < h.readyAt) { notify('Not ready!', 'error'); return; } gameState.inventory.honey++; h.readyAt = Date.now() + 180000; h.notified = false; if (!gameState.equipment.beesuit) { sendToPortals('damage_10'); notify('+1 Honey (Ouch!)', 'success'); } else { addXP(5); notify('+1 Honey!', 'success'); } hideObject(`Hive_${id}_Glow`); playSound('bees.mp3'); saveGame(); renderAnimals(); renderInventory(); }
+    function collectFromCow(id) {
+      const c = gameState.animals.cows[id - 1];
+      if (Date.now() < c.readyAt) { notify('Not ready!', 'error'); return; }
+      triggerTask(`Collect_Cow_${id}`);
+      gameState.inventory.milk++;
+      c.readyAt = Date.now() + 90000;
+      c.notified = false;
+      addXP(3);
+      notify('+1 Milk!', 'success');
+      saveGame();
+      renderAnimals();
+      renderInventory();
+    }
+
+    function collectFromSheep(id) {
+      const s = gameState.animals.sheep[id - 1];
+      if (Date.now() < s.readyAt) { notify('Not ready!', 'error'); return; }
+      triggerTask(`Collect_Sheep_${id}`);
+      gameState.inventory.wool++;
+      s.readyAt = Date.now() + 120000;
+      s.notified = false;
+      addXP(3);
+      notify('+1 Wool!', 'success');
+      saveGame();
+      renderAnimals();
+      renderInventory();
+    }
+
+    function collectFromPig(id) {
+      if (gameState.inventory.corn < 1) { notify('Need corn!', 'error'); return; }
+      triggerTask(`Collect_Pig_${id}`);
+      gameState.inventory.corn--;
+      gameState.inventory.fertilizer++;
+      addXP(2);
+      notify('+1 Fertilizer!', 'success');
+      saveGame();
+      renderAnimals();
+      renderInventory();
+    }
+
+    function collectFromChicken(id) {
+      const c = gameState.animals.chickens ? gameState.animals.chickens[id - 1] : null;
+      if (c && Date.now() < c.readyAt) { notify('Not ready!', 'error'); return; }
+      triggerTask(`Collect_Chicken_${id}`);
+      gameState.inventory.egg = (gameState.inventory.egg || 0) + 1;
+      if (c) { c.readyAt = Date.now() + 120000; c.notified = false; }
+      addXP(2);
+      notify('+1 Egg!', 'success');
+      saveGame();
+      renderAnimals();
+      renderInventory();
+    }
+
+    function collectFromHive(id) {
+      const h = gameState.hives[id - 1];
+      if (Date.now() < h.readyAt) { notify('Not ready!', 'error'); return; }
+      triggerTask(`Collect_Beehive_${id}`);
+      gameState.inventory.honey++;
+      h.readyAt = Date.now() + 180000;
+      h.notified = false;
+      addXP(5);
+      notify('+1 Honey!', 'success');
+      saveGame();
+      renderAnimals();
+      renderInventory();
+    }
 
     function buySeeds(cropType, qty) { const c = CONFIG.crops[cropType], cost = c.seedCost * qty; if (gameState.gold < cost) { notify('Not enough gold!', 'error'); return; } if (gameState.level < c.unlockLevel) { notify(`Unlock at Lv.${c.unlockLevel}`, 'error'); return; } gameState.gold -= cost; gameState.inventory[`seeds_${cropType}`] += qty; playSound('purchase.mp3'); notify(`Bought ${qty} ${c.name} seeds!`, 'success'); saveGame(); updateHeader(); renderMarket(); renderInventory(); }
     function sellItem(item, qty) { if (gameState.inventory[item] < qty) { notify('Not enough!', 'error'); return; } const prices = { wheat: 5, corn: 8, carrots: 10, tomatoes: 15, potatoes: 12, pumpkins: 30, milk: 12, wool: 15, honey: 25, fertilizer: 5, bread: 35, cheese: 45, stew: 50, pie: 100, mead: 100, blanket: 60 }; const p = prices[item] || 5; gameState.inventory[item] -= qty; gameState.gold += p * qty; playSound('coins.mp3'); notify(`Sold for ${p * qty}g!`, 'success'); saveGame(); updateHeader(); renderMarket(); renderInventory(); }
@@ -375,12 +554,40 @@
     function notify(msg, type = 'success') { const c = document.getElementById('notifications'), n = document.createElement('div'); n.className = `notification ${type}`; n.innerHTML = `<span class="notification-icon">${type === 'success' ? '&#x2705;' : '&#x274C;'}</span><span class="notification-text">${msg}</span>`; c.appendChild(n); setTimeout(() => n.remove(), 3000); }
 
     function gameLoop() {
-      gameState.plots.forEach((p, i) => { if (p.state === 'growing' && Date.now() >= p.readyAt) { p.state = 'ready'; showObject(`Plot_${i + 1}_Ready`); playSound('crop_ready.mp3'); } });
-      gameState.animals.cows.forEach((c, i) => { if (Date.now() >= c.readyAt && !c.notified) { showObject(`Cow_${i + 1}_Sparkle`); c.notified = true; } });
-      gameState.animals.sheep.forEach((s, i) => { if (Date.now() >= s.readyAt && !s.notified) { showObject(`Sheep_${i + 1}_Sparkle`); s.notified = true; } });
-      gameState.hives.forEach((h, i) => { if (Date.now() >= h.readyAt && !h.notified) { showObject(`Hive_${i + 1}_Glow`); h.notified = true; } });
+      // Check crops - trigger Ready task when timer completes
+      gameState.plots.forEach((p, i) => {
+        if (p.state === 'growing' && Date.now() >= p.readyAt) {
+          p.state = 'ready';
+          triggerTask(`Ready_Plot_${i + 1}`);
+          notify(`Plot ${i + 1} is ready!`, 'success');
+        }
+      });
+
+      // Check animals - trigger Ready tasks when cooldowns complete
+      gameState.animals.cows.forEach((c, i) => {
+        if (Date.now() >= c.readyAt && !c.notified) {
+          triggerTask(`Ready_Cow_${i + 1}`);
+          c.notified = true;
+        }
+      });
+      gameState.animals.sheep.forEach((s, i) => {
+        if (Date.now() >= s.readyAt && !s.notified) {
+          triggerTask(`Ready_Sheep_${i + 1}`);
+          s.notified = true;
+        }
+      });
+      gameState.hives.forEach((h, i) => {
+        if (Date.now() >= h.readyAt && !h.notified) {
+          triggerTask(`Ready_Beehive_${i + 1}`);
+          h.notified = true;
+        }
+      });
+
+      // Update UI
       const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
-      if (activeTab === 'dashboard') renderDashboard(); else if (activeTab === 'crops') renderCrops(); else if (activeTab === 'animals') renderAnimals();
+      if (activeTab === 'dashboard') renderDashboard();
+      else if (activeTab === 'crops') renderCrops();
+      else if (activeTab === 'animals') renderAnimals();
     }
 
     function init() { loadFromStorage(); updateAllUI(); setInterval(gameLoop, 1000); setInterval(() => { localStorage.setItem('farmville_state', JSON.stringify(gameState)); }, 30000); console.log('Farmville initialized!'); }
