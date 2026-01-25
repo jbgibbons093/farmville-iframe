@@ -130,11 +130,6 @@
       document.getElementById('seeds-grid').innerHTML = html;
     }
 
-    // Message listener
-    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
-      PortalsSdk.setMessageListener(handleMessage);
-    }
-
     function handleMessage(msg) {
       console.log('[Hughberry SeedStore] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('init_')) {
@@ -144,7 +139,6 @@
         render();
       }
       if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
-        // Parse inventory sync
         parseSync(msg);
         render();
       }
@@ -163,9 +157,28 @@
       }
     }
 
-    // Initialize with empty state - populated by Sync_Inventory from Portals
+    // Setup message listener with retry for SDK initialization
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(handleMessage);
+        console.log('[Hughberry SeedStore] SDK listener registered');
+      } else {
+        console.log('[Hughberry SeedStore] Waiting for SDK...');
+        setTimeout(setupMessageListener, 100);
+      }
+    }
+
+    // Also listen via window.postMessage as fallback
+    window.addEventListener('message', function(event) {
+      if (event.data) {
+        handleMessage(event.data);
+      }
+    });
+
+    // Initialize
     gameState.gold = 0;
     render();
+    setupMessageListener();
   </script>
 </body>
 </html>
