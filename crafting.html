@@ -162,11 +162,6 @@
       document.getElementById('recipes-grid').innerHTML = html;
     }
 
-    // Message listener
-    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
-      PortalsSdk.setMessageListener(handleMessage);
-    }
-
     function handleMessage(msg) {
       console.log('[Hughberry Crafting] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
@@ -176,7 +171,6 @@
     }
 
     function parseSync(msg) {
-      // Parse inventory values from sync message
       const mapping = {
         'Crop_Wheat': 'wheat', 'Crop_Carrot': 'carrot', 'Crop_Corn': 'corn',
         'Crop_Potato': 'potato', 'Crop_Tomato': 'tomato', 'Crop_Pumpkin': 'pumpkin',
@@ -207,9 +201,45 @@
       }
     }
 
-    // Initialize with empty inventory - populated by Sync_Inventory from Portals
+    // Setup message listener with retry for SDK initialization
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(handleMessage);
+        console.log('[Hughberry Crafting] SDK listener registered');
+      } else {
+        console.log('[Hughberry Crafting] Waiting for SDK...');
+        setTimeout(setupMessageListener, 100);
+      }
+    }
+
+    // Also listen via window.postMessage as fallback
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'string') {
+        console.log('[Hughberry Crafting] postMessage string:', event.data);
+        handleMessage(event.data);
+      }
+      else if (event.data && event.data.portalsMessage) {
+        console.log('[Hughberry Crafting] postMessage portalsMessage:', event.data.portalsMessage);
+        handleMessage(event.data.portalsMessage);
+      }
+      else if (event.data && event.data.message && typeof event.data.message === 'string') {
+        console.log('[Hughberry Crafting] postMessage message:', event.data.message);
+        handleMessage(event.data.message);
+      }
+    });
+
+    // Initialize
     gameState.inventory = {};
     render();
+    setupMessageListener();
+
+    // Request inventory sync from Portals when iframe loads
+    setTimeout(function() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Sync_Inventory', TaskTargetState: 'SetNotActiveToActive' }));
+      }
+      console.log('[Hughberry Crafting] Requested Sync_Inventory');
+    }, 500);
   </script>
 </body>
 </html>

@@ -180,11 +180,6 @@
       });
     });
 
-    // Message listener
-    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
-      PortalsSdk.setMessageListener(handleMessage);
-    }
-
     function handleMessage(msg) {
       console.log('[Hughberry SellGoods] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
@@ -194,17 +189,83 @@
     }
 
     function parseSync(msg) {
-      // Basic sync parsing - would need full implementation
+      const mapping = {
+        'Gold': 'gold', 'Crop_Wheat': 'wheat', 'Crop_Carrot': 'carrot', 'Crop_Corn': 'corn',
+        'Crop_Potato': 'potato', 'Crop_Tomato': 'tomato', 'Crop_Pumpkin': 'pumpkin',
+        'Milk': 'milk', 'Wool': 'wool', 'Goat_Meat': 'goat_meat',
+        'Truffle': 'truffle', 'Egg': 'egg', 'Flour': 'flour', 'Bread': 'bread',
+        'Cheese': 'cheese', 'Stew': 'stew', 'Ragout': 'ragout', 'Pie': 'pie',
+        'Meat_Pie': 'meat_pie', 'Blanket': 'blanket', 'Butter': 'butter', 'Cake': 'cake', 'Mead': 'mead'
+      };
+
       const parts = msg.replace('Sync_Inventory_', '').split('_');
-      for (let i = 0; i < parts.length - 1; i += 2) {
-        if (parts[i] === 'Gold') gameState.gold = parseInt(parts[i+1]) || 0;
+      let i = 0;
+      while (i < parts.length) {
+        // Try 2-word match first
+        if (i + 2 < parts.length) {
+          const twoWord = parts[i] + '_' + parts[i+1];
+          if (mapping[twoWord]) {
+            if (mapping[twoWord] === 'gold') {
+              gameState.gold = parseInt(parts[i+2]) || 0;
+            } else {
+              gameState.inventory[mapping[twoWord]] = parseInt(parts[i+2]) || 0;
+            }
+            i += 3;
+            continue;
+          }
+        }
+        // Try 1-word match
+        if (i + 1 < parts.length && mapping[parts[i]]) {
+          if (mapping[parts[i]] === 'gold') {
+            gameState.gold = parseInt(parts[i+1]) || 0;
+          } else {
+            gameState.inventory[mapping[parts[i]]] = parseInt(parts[i+1]) || 0;
+          }
+          i += 2;
+          continue;
+        }
+        i++;
       }
     }
 
-    // Initialize with empty inventory - populated by Sync_Inventory from Portals
+    // Setup message listener with retry for SDK initialization
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(handleMessage);
+        console.log('[Hughberry SellGoods] SDK listener registered');
+      } else {
+        console.log('[Hughberry SellGoods] Waiting for SDK...');
+        setTimeout(setupMessageListener, 100);
+      }
+    }
+
+    // Also listen via window.postMessage as fallback
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'string') {
+        console.log('[Hughberry SellGoods] postMessage string:', event.data);
+        handleMessage(event.data);
+      }
+      else if (event.data && event.data.portalsMessage) {
+        console.log('[Hughberry SellGoods] postMessage portalsMessage:', event.data.portalsMessage);
+        handleMessage(event.data.portalsMessage);
+      }
+      else if (event.data && event.data.message && typeof event.data.message === 'string') {
+        console.log('[Hughberry SellGoods] postMessage message:', event.data.message);
+        handleMessage(event.data.message);
+      }
+    });
+
+    // Initialize
     gameState.gold = 0;
     gameState.inventory = {};
     render();
+    setupMessageListener();
+
+    // Request inventory sync from Portals when iframe loads
+    setTimeout(function() {
+      triggerTask('Sync_Inventory');
+      console.log('[Hughberry SellGoods] Requested Sync_Inventory');
+    }, 500);
   </script>
 </body>
 </html>

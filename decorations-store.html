@@ -51,9 +51,11 @@
   <script>
     let gameState = { gold: 0 };
 
-    // Message listener
-    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
-      PortalsSdk.setMessageListener(handleMessage);
+    function triggerTask(taskName) {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
+      }
+      console.log('[Hughberry Decorations] Task:', taskName);
     }
 
     function handleMessage(msg) {
@@ -67,9 +69,43 @@
       }
     }
 
-    // Initialize with empty state - populated by Sync_Inventory from Portals
+    // Setup message listener with retry for SDK initialization
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(handleMessage);
+        console.log('[Hughberry Decorations] SDK listener registered');
+      } else {
+        console.log('[Hughberry Decorations] Waiting for SDK...');
+        setTimeout(setupMessageListener, 100);
+      }
+    }
+
+    // Also listen via window.postMessage as fallback
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'string') {
+        console.log('[Hughberry Decorations] postMessage string:', event.data);
+        handleMessage(event.data);
+      }
+      else if (event.data && event.data.portalsMessage) {
+        console.log('[Hughberry Decorations] postMessage portalsMessage:', event.data.portalsMessage);
+        handleMessage(event.data.portalsMessage);
+      }
+      else if (event.data && event.data.message && typeof event.data.message === 'string') {
+        console.log('[Hughberry Decorations] postMessage message:', event.data.message);
+        handleMessage(event.data.message);
+      }
+    });
+
+    // Initialize
     gameState.gold = 0;
     document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
+    setupMessageListener();
+
+    // Request inventory sync from Portals when iframe loads
+    setTimeout(function() {
+      triggerTask('Sync_Inventory');
+      console.log('[Hughberry Decorations] Requested Sync_Inventory');
+    }, 500);
   </script>
 </body>
 </html>

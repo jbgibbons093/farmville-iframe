@@ -361,11 +361,40 @@
       saveGameQuiet();
     }
 
-    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
-      PortalsSdk.setMessageListener(handlePortalsMessage);
-    } else {
-      window.addEventListener('message', (e) => handlePortalsMessage(e.data));
+    // Setup message listener with retry for SDK initialization
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(handlePortalsMessage);
+        console.log('[Hughberry] SDK listener registered');
+      } else {
+        console.log('[Hughberry] Waiting for SDK...');
+        setTimeout(setupMessageListener, 100);
+      }
     }
+
+    // Also listen via window.postMessage as fallback
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'string') {
+        console.log('[Hughberry] postMessage string:', event.data);
+        handlePortalsMessage(event.data);
+      }
+      else if (event.data && event.data.portalsMessage) {
+        console.log('[Hughberry] postMessage portalsMessage:', event.data.portalsMessage);
+        handlePortalsMessage(event.data.portalsMessage);
+      }
+      else if (event.data && event.data.message && typeof event.data.message === 'string') {
+        console.log('[Hughberry] postMessage message:', event.data.message);
+        handlePortalsMessage(event.data.message);
+      }
+    });
+
+    setupMessageListener();
+
+    // Request inventory sync from Portals when iframe loads
+    setTimeout(function() {
+      triggerTask('Sync_Inventory');
+      console.log('[Hughberry] Requested Sync_Inventory');
+    }, 500);
 
     function handlePortalsMessage(msg) {
       console.log('[Hughberry] Received:', msg);
