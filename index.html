@@ -262,13 +262,17 @@
     function hideObject(n) { console.log('Hide object:', n); }
     function playSound(s) { console.log('Play sound:', s); }
 
-    // Set up Portals message listener
-    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.onMessage) {
-      PortalsSdk.onMessage((msg) => { handlePortalsMessage(msg); });
+    // Set up Portals message listener (same pattern as working TDM leaderboard)
+    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+      PortalsSdk.setMessageListener(handlePortalsMessage);
+      console.log('[Farmville] SDK listener registered');
+    } else {
+      window.addEventListener('message', (e) => handlePortalsMessage(e.data));
+      console.log('[Farmville] Using fallback listener');
     }
 
     function handlePortalsMessage(msg) {
-      console.log('From Portals:', msg);
+      console.log('[Farmville] Received:', msg);
       if (typeof msg !== 'string') return;
       const parts = msg.split('_');
       const cmd = parts[0];
@@ -286,16 +290,9 @@
       // Interact with plot: interact_plot_1
       else if (cmd === 'interact' && parts[1] === 'plot') {
         const plotId = parseInt(parts[2]);
-        const plot = gameState.plots[plotId - 1];
-        if (plot.state === 'ready') {
-          // Harvest the crop
-          harvestPlotFromTrigger(plotId);
-        } else if (plot.state === 'empty') {
-          // Could show planting UI or notify
-          notify('Select a crop to plant from the Crops tab', 'info');
-        } else {
-          notify('Crop still growing...', 'info');
-        }
+        console.log('Interact with plot', plotId, 'local state:', gameState.plots[plotId - 1].state);
+        // Trust Portals - if we got interact message, the crop is ready (Portals verified via state variable)
+        harvestPlotFromTrigger(plotId);
       }
       // Interact with animal: interact_cow_1
       else if (cmd === 'interact') {
@@ -327,28 +324,36 @@
       }
     }
 
-    // Harvest triggered by 3D trigger cube
+    // Harvest triggered by 3D trigger cube (from Portals interact message)
     function harvestPlotFromTrigger(plotId) {
       const plot = gameState.plots[plotId - 1];
-      if (plot.state !== 'ready') { notify('Not ready!', 'error'); return false; }
+      console.log('harvestPlotFromTrigger called for plot', plotId, 'cropType:', plot.cropType, 'state:', plot.state);
 
-      // Trigger the harvest task in Portals
-      triggerTask(`Harvest_Plot_${plotId}`);
+      // Get crop info - use stored cropType or default to wheat for testing
+      const cropType = plot.cropType || 'wheat';
+      const crop = CONFIG.crops[cropType];
 
-      // Process the harvest locally
-      const crop = CONFIG.crops[plot.cropType];
-      let amount = crop.yield;
-      if (gameState.equipment.basket) amount = Math.floor(amount * 1.5);
-      gameState.inventory[plot.cropType] += amount;
+      if (!crop) {
+        console.log('No crop found, using wheat as default');
+        notify('+3 Wheat! (harvested)', 'success');
+        gameState.inventory.wheat += 3;
+      } else {
+        let amount = crop.yield;
+        if (gameState.equipment.basket) amount = Math.floor(amount * 1.5);
+        gameState.inventory[cropType] += amount;
+        notify(`+${amount} ${crop.name}!`, 'success');
+        console.log('Harvested', amount, crop.name);
+      }
+
       addXP(5);
 
+      // Reset plot state
       plot.state = 'empty';
       plot.cropType = null;
       plot.plantedAt = null;
       plot.readyAt = null;
 
-      notify(`+${amount} ${crop.name}!`, 'success');
-
+      // Auto-replant if enabled
       if (gameState.settings.autoReplant) {
         const p = gameState.settings.priorityCrop;
         if (gameState.inventory[`seeds_${p}`] > 0 && gameState.level >= CONFIG.crops[p].unlockLevel) {
@@ -590,7 +595,13 @@
       else if (activeTab === 'animals') renderAnimals();
     }
 
-    function init() { loadFromStorage(); updateAllUI(); setInterval(gameLoop, 1000); setInterval(() => { localStorage.setItem('farmville_state', JSON.stringify(gameState)); }, 30000); console.log('Farmville initialized!'); }
+    function init() {
+      loadFromStorage();
+      updateAllUI();
+      setInterval(gameLoop, 1000);
+      setInterval(() => { localStorage.setItem('farmville_state', JSON.stringify(gameState)); }, 30000);
+      console.log('[Farmville] Initialized');
+    }
     window.onload = init;
   </script>
 </body>
