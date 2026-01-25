@@ -192,6 +192,12 @@
     gameState.gold = 0;
     render();
     setupMessageListener();
+
+    // Request inventory sync from Portals when iframe loads
+    setTimeout(function() {
+      triggerTask('Sync_Inventory');
+      console.log('[Hughberry SeedStore] Requested Sync_Inventory');
+    }, 500);
   </script>
 </body>
 </html>
