@@ -88,6 +88,7 @@
     .plot-btn:hover { background: linear-gradient(180deg, #7a5a30 0%, #5a3820 100%); }
     .plot-btn.harvest { background: linear-gradient(180deg, #f39c12 0%, #d68910 100%); border-color: #f1c40f; }
     .plot-select { width: 100%; padding: 4px; font-size: 10px; margin-bottom: 4px; background: #2a2015; border: 1px solid #5a4530; color: #fff; border-radius: 4px; }
+    .plot-hint { font-size: 10px; color: #FFD700; font-weight: 600; text-align: center; padding: 5px; background: rgba(255,215,0,0.1); border-radius: 5px; }
 
     /* Inventory */
     .inventory-section { margin-bottom: 25px; }
@@ -509,7 +510,7 @@
         const num = i + 1;
         if (plot.state === 'empty') html += `<div class="plot-card empty"><span class="plot-number">#${num}</span><div class="plot-icon">&#x1F532;</div><div class="plot-name">Empty</div><select class="plot-select" id="sel-${num}">${Object.entries(CONFIG.crops).map(([k, v]) => gameState.level >= v.unlockLevel ? `<option value="${k}">${v.icon} ${v.name}</option>` : '').join('')}</select><button class="plot-btn" onclick="plantFromSelect(${num})">Plant</button></div>`;
         else if (plot.state === 'growing') { const c = CONFIG.crops[plot.cropType], r = Math.max(0, (plot.readyAt - Date.now()) / 1000), p = ((c.growTime - r) / c.growTime) * 100; html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(r)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${p}%"></div></div></div>`; }
-        else { const c = CONFIG.crops[plot.cropType]; html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><button class="plot-btn harvest" onclick="harvestPlot(${num})">Harvest</button></div>`; }
+        else { const c = CONFIG.crops[plot.cropType]; html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`; }
       });
       html += '</div>'; document.getElementById('tab-crops').innerHTML = html;
     }
