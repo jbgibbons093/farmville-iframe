@@ -198,6 +198,13 @@
     }
 
     function parseSync(msg) {
+      const recipeMapping = {
+        'RecipeFlour': 'recipe_flour', 'RecipeBread': 'recipe_bread', 'RecipeCheese': 'recipe_cheese',
+        'RecipeStew': 'recipe_stew', 'RecipeRagout': 'recipe_ragout', 'RecipePie': 'recipe_pie',
+        'RecipeBlanket': 'recipe_blanket', 'RecipeButter': 'recipe_butter', 'RecipeCake': 'recipe_cake',
+        'RecipeMead': 'recipe_mead', 'RecipeMeatPie': 'recipe_meat_pie'
+      };
+
       const parts = msg.replace('Sync_Inventory_', '').split('_');
       let i = 0;
       while (i < parts.length) {
@@ -208,18 +215,17 @@
           gameState.level = parseInt(parts[i+1]) || 1;
           i += 2;
         } else if (parts[i] === 'Has' && i + 2 < parts.length) {
+          // Handle equipment: Has_Beesuit, Has_Basket
           const itemId = parts[i+1].toLowerCase();
           const hasIt = parseInt(parts[i+2]) > 0;
-          // Check if it's equipment or recipe
           if (itemId === 'beesuit' || itemId === 'basket') {
             gameState.equipment[itemId] = hasIt;
-          } else if (itemId.startsWith('recipe')) {
-            gameState.recipes['recipe_' + itemId.replace('recipe', '')] = hasIt;
-          } else {
-            // Try recipe_ prefix format
-            gameState.recipes['recipe_' + itemId] = hasIt;
           }
           i += 3;
+        } else if (recipeMapping[parts[i]] && i + 1 < parts.length) {
+          // Handle recipes: RecipeFlour, RecipeBread, etc.
+          gameState.recipes[recipeMapping[parts[i]]] = parseInt(parts[i+1]) > 0;
+          i += 2;
         } else {
           i++;
         }

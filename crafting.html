@@ -196,26 +196,17 @@
       };
 
       const recipeMapping = {
-        'Recipe_Flour': 'recipe_flour', 'Recipe_Bread': 'recipe_bread', 'Recipe_Cheese': 'recipe_cheese',
-        'Recipe_Stew': 'recipe_stew', 'Recipe_Ragout': 'recipe_ragout', 'Recipe_Pie': 'recipe_pie',
-        'Recipe_Blanket': 'recipe_blanket', 'Recipe_Butter': 'recipe_butter', 'Recipe_Cake': 'recipe_cake',
-        'Recipe_Mead': 'recipe_mead'
+        'RecipeFlour': 'recipe_flour', 'RecipeBread': 'recipe_bread', 'RecipeCheese': 'recipe_cheese',
+        'RecipeStew': 'recipe_stew', 'RecipeRagout': 'recipe_ragout', 'RecipePie': 'recipe_pie',
+        'RecipeBlanket': 'recipe_blanket', 'RecipeButter': 'recipe_butter', 'RecipeCake': 'recipe_cake',
+        'RecipeMead': 'recipe_mead', 'RecipeMeatPie': 'recipe_meat_pie'
       };
 
       const parts = msg.replace('Sync_Inventory_', '').split('_');
+      console.log('[Hughberry Crafting] Parsing parts:', parts);
       let i = 0;
       while (i < parts.length) {
-        // Handle Has_ prefix for recipes
-        if (parts[i] === 'Has' && i + 2 < parts.length) {
-          const itemKey = parts[i+1];
-          const hasIt = parseInt(parts[i+2]) > 0;
-          // Check for recipe
-          const recipeKey = 'recipe_' + itemKey.toLowerCase();
-          gameState.recipes[recipeKey] = hasIt;
-          i += 3;
-          continue;
-        }
-        // Try 2-word match first for inventory/recipes
+        // Try 2-word match first for inventory
         if (i + 2 < parts.length) {
           const twoWord = parts[i] + '_' + parts[i+1];
           if (mapping[twoWord]) {
@@ -223,13 +214,17 @@
             i += 3;
             continue;
           }
-          if (recipeMapping[twoWord]) {
-            gameState.recipes[recipeMapping[twoWord]] = parseInt(parts[i+2]) > 0;
-            i += 3;
-            continue;
-          }
         }
-        // Try 1-word match
+        // Try 1-word match for recipes (new format: RecipeFlour, RecipeBread, etc.)
+        if (i + 1 < parts.length && recipeMapping[parts[i]]) {
+          const recipeKey = recipeMapping[parts[i]];
+          const hasRecipe = parseInt(parts[i+1]) > 0;
+          gameState.recipes[recipeKey] = hasRecipe;
+          console.log('[Hughberry Crafting] Recipe found:', parts[i], '->', recipeKey, '=', hasRecipe);
+          i += 2;
+          continue;
+        }
+        // Try 1-word match for inventory
         if (i + 1 < parts.length && mapping[parts[i]]) {
           gameState.inventory[mapping[parts[i]]] = parseInt(parts[i+1]) || 0;
           i += 2;
@@ -237,6 +232,7 @@
         }
         i++;
       }
+      console.log('[Hughberry Crafting] Final recipes state:', JSON.stringify(gameState.recipes));
     }
 
     // Setup message listener with retry for SDK initialization
