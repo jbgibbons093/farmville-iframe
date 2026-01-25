@@ -28,12 +28,12 @@
     .close-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #7a1f14; }
 
     .nav-tabs { display: flex; background: rgba(0,0,0,0.3); border-bottom: 2px solid #5a4030; }
-    .nav-tab { flex: 1; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s; border-right: 1px solid #3a2a1a; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav-tab { flex: 1; padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.2s; border-right: 1px solid #3a2a1a; display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .nav-tab:last-child { border-right: none; }
     .nav-tab:hover { background: rgba(139, 69, 19, 0.3); }
     .nav-tab.active { background: linear-gradient(180deg, #5a4020 0%, #3a2810 100%); border-bottom: 3px solid #FFD700; margin-bottom: -2px; }
-    .nav-tab-icon { font-size: 24px; }
-    .nav-tab-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #ccc; }
+    .nav-tab-icon { font-size: 20px; }
+    .nav-tab-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #ccc; }
     .nav-tab.active .nav-tab-label { color: #FFD700; }
 
     .content-area { flex: 1; overflow-y: auto; padding: 20px; }
@@ -41,20 +41,28 @@
     .tab-content.active { display: block; }
     @keyframes fadeInContent { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .section-title { font-size: 18px; font-weight: 700; color: #FFD700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    .section-title { font-size: 16px; font-weight: 700; color: #FFD700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
     .section-title::after { content: ''; flex: 1; height: 2px; background: linear-gradient(90deg, #5a4530, transparent); }
 
     /* Dashboard */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
     .dashboard-card { background: linear-gradient(145deg, rgba(60, 45, 30, 0.8) 0%, rgba(40, 30, 20, 0.8) 100%); border: 2px solid #5a4530; border-radius: 12px; padding: 15px; }
-    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #5a4530; }
-    .card-icon { font-size: 28px; }
-    .card-title { font-size: 16px; font-weight: 700; color: #FFD700; }
-    .quick-stats { display: flex; flex-wrap: wrap; gap: 8px; }
-    .quick-stat { background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; gap: 6px; flex: 1; min-width: 80px; }
-    .quick-stat-icon { font-size: 18px; }
-    .quick-stat-value { font-size: 16px; font-weight: 700; }
-    .quick-stat-label { font-size: 10px; color: #888; }
+    .dashboard-card.highlight { border-color: #FFD700; box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #5a4530; }
+    .card-icon { font-size: 24px; }
+    .card-title { font-size: 14px; font-weight: 700; color: #FFD700; }
+    .quick-stats { display: flex; flex-wrap: wrap; gap: 6px; }
+    .quick-stat { background: rgba(0,0,0,0.3); padding: 6px 10px; border-radius: 6px; display: flex; align-items: center; gap: 5px; flex: 1; min-width: 70px; }
+    .quick-stat-icon { font-size: 16px; }
+    .quick-stat-value { font-size: 14px; font-weight: 700; }
+    .quick-stat-label { font-size: 9px; color: #888; }
+    .level-display { text-align: center; padding: 10px; }
+    .level-number { font-family: 'Luckiest Guy', cursive; font-size: 48px; color: #FFD700; text-shadow: 2px 2px 0 #8B4513; }
+    .level-label { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+    .xp-progress { margin-top: 10px; }
+    .xp-progress-bar { height: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; overflow: hidden; border: 2px solid #5a4030; }
+    .xp-progress-fill { height: 100%; background: linear-gradient(90deg, #4a90d9, #67b8f7); transition: width 0.5s ease; }
+    .xp-text { font-size: 11px; color: #67b8f7; margin-top: 4px; text-align: center; }
 
     /* Crops */
     .crops-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
@@ -70,49 +78,70 @@
     .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #196f3d; }
     .action-btn.secondary { background: linear-gradient(180deg, #8B4513 0%, #5a2d0a 100%); border-color: #a0522d; box-shadow: 0 3px 0 #3d1f08; }
 
-    .crops-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .crops-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
     @media (max-width: 800px) { .crops-grid { grid-template-columns: repeat(4, 1fr); } }
-    .plot-card { background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%); border: 2px solid #4a3a2a; border-radius: 10px; padding: 10px; text-align: center; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: all 0.2s; }
+    .plot-card { background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%); border: 2px solid #4a3a2a; border-radius: 10px; padding: 8px; text-align: center; min-height: 110px; display: flex; flex-direction: column; justify-content: space-between; position: relative; transition: all 0.2s; }
     .plot-card.empty { border-color: #3a3a3a; background: linear-gradient(145deg, rgba(40,40,40,0.7) 0%, rgba(30,30,30,0.7) 100%); }
     .plot-card.growing { border-color: #27ae60; }
     .plot-card.ready { border-color: #FFD700; box-shadow: 0 0 15px rgba(255,215,0,0.4); animation: pulseGold 2s infinite; }
     @keyframes pulseGold { 0%, 100% { box-shadow: 0 0 15px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 25px rgba(255,215,0,0.7); } }
-    .plot-number { position: absolute; top: 4px; left: 6px; font-size: 10px; color: #666; font-weight: 700; }
-    .plot-icon { font-size: 32px; margin: 6px 0; }
-    .plot-name { font-size: 12px; font-weight: 700; }
-    .plot-status { font-size: 10px; color: #888; margin: 4px 0; }
+    .plot-number { position: absolute; top: 3px; left: 5px; font-size: 9px; color: #666; font-weight: 700; }
+    .plot-icon { font-size: 28px; margin: 4px 0; }
+    .plot-name { font-size: 11px; font-weight: 700; }
+    .plot-status { font-size: 10px; color: #888; margin: 2px 0; }
     .plot-status.ready { color: #FFD700; font-weight: 700; }
-    .plot-progress { height: 5px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden; margin: 4px 0; }
-    .plot-progress-fill { height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); transition: width 0.5s ease; }
-    .plot-btn { background: linear-gradient(180deg, #5a4020 0%, #3a2810 100%); border: 2px solid #8B4513; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer; width: 100%; }
+    .plot-progress { height: 4px; background: rgba(0,0,0,0.4); border-radius: 2px; overflow: hidden; margin: 3px 0; }
+    .plot-progress-fill { height: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71); transition: width 0.3s ease; }
+    .plot-btn { background: linear-gradient(180deg, #5a4020 0%, #3a2810 100%); border: 2px solid #8B4513; color: #fff; padding: 4px 8px; border-radius: 5px; font-size: 9px; font-weight: 700; cursor: pointer; width: 100%; }
     .plot-btn:hover { background: linear-gradient(180deg, #7a5a30 0%, #5a3820 100%); }
-    .plot-btn.harvest { background: linear-gradient(180deg, #f39c12 0%, #d68910 100%); border-color: #f1c40f; }
-    .plot-select { width: 100%; padding: 4px; font-size: 10px; margin-bottom: 4px; background: #2a2015; border: 1px solid #5a4530; color: #fff; border-radius: 4px; }
-    .plot-hint { font-size: 10px; color: #FFD700; font-weight: 600; text-align: center; padding: 5px; background: rgba(255,215,0,0.1); border-radius: 5px; }
+    .plot-select { width: 100%; padding: 3px; font-size: 9px; margin-bottom: 3px; background: #2a2015; border: 1px solid #5a4530; color: #fff; border-radius: 4px; }
+    .plot-hint { font-size: 9px; color: #FFD700; font-weight: 600; text-align: center; padding: 4px; background: rgba(255,215,0,0.1); border-radius: 4px; }
 
     /* Inventory */
-    .inventory-section { margin-bottom: 25px; }
-    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
-    .inv-item { background: linear-gradient(145deg, rgba(50, 40, 25, 0.8) 0%, rgba(35, 28, 18, 0.8) 100%); border: 2px solid #4a3a2a; border-radius: 10px; padding: 12px 8px; text-align: center; transition: all 0.2s; }
+    .inventory-section { margin-bottom: 20px; }
+    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
+    .inv-item { background: linear-gradient(145deg, rgba(50, 40, 25, 0.8) 0%, rgba(35, 28, 18, 0.8) 100%); border: 2px solid #4a3a2a; border-radius: 10px; padding: 10px 6px; text-align: center; transition: all 0.2s; }
     .inv-item:hover { border-color: #8B4513; transform: translateY(-2px); }
     .inv-item.zero { opacity: 0.4; }
-    .inv-icon { font-size: 28px; margin-bottom: 6px; }
-    .inv-name { font-size: 10px; color: #aaa; margin-bottom: 4px; }
-    .inv-qty { font-size: 16px; font-weight: 800; color: #FFD700; }
-
+    .inv-icon { font-size: 24px; margin-bottom: 4px; }
+    .inv-name { font-size: 9px; color: #aaa; margin-bottom: 2px; }
+    .inv-qty { font-size: 14px; font-weight: 800; color: #FFD700; }
 
     /* Animals */
-    .animals-section { margin-bottom: 25px; }
-    .animals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-    .animal-card { background: linear-gradient(145deg, rgba(50, 40, 25, 0.8) 0%, rgba(35, 28, 18, 0.8) 100%); border: 2px solid #4a3a2a; border-radius: 10px; padding: 12px; text-align: center; }
+    .animals-section { margin-bottom: 20px; }
+    .animals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .animal-card { background: linear-gradient(145deg, rgba(50, 40, 25, 0.8) 0%, rgba(35, 28, 18, 0.8) 100%); border: 2px solid #4a3a2a; border-radius: 10px; padding: 10px; text-align: center; }
     .animal-card.ready { border-color: #FFD700; box-shadow: 0 0 12px rgba(255,215,0,0.3); }
-    .animal-icon { font-size: 40px; margin-bottom: 8px; }
-    .animal-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-    .animal-status { font-size: 12px; margin-bottom: 8px; }
+    .animal-card.locked { opacity: 0.5; border-color: #666; }
+    .animal-icon { font-size: 36px; margin-bottom: 6px; }
+    .animal-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .animal-status { font-size: 11px; margin-bottom: 6px; }
     .animal-status.ready { color: #2ecc71; font-weight: 700; }
     .animal-status.cooldown { color: #f39c12; }
-    .animal-btn { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 2px solid #2ecc71; color: #fff; padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .animal-btn { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 2px solid #2ecc71; color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
     .animal-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #4a4a4a; border-color: #666; }
+    .locked-text { font-size: 10px; color: #e74c3c; font-weight: 600; }
+
+    /* XP & Unlocks */
+    .xp-history { max-height: 300px; overflow-y: auto; }
+    .xp-entry { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 6px; }
+    .xp-entry-activity { font-size: 13px; }
+    .xp-entry-amount { font-size: 14px; font-weight: 700; color: #67b8f7; }
+    .xp-summary { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .xp-summary-item { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; border: 2px solid #4a3a2a; }
+    .xp-summary-value { font-size: 20px; font-weight: 800; color: #67b8f7; }
+    .xp-summary-label { font-size: 11px; color: #aaa; }
+
+    .unlock-list { display: flex; flex-direction: column; gap: 10px; }
+    .unlock-item { display: flex; align-items: center; gap: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 2px solid #4a3a2a; }
+    .unlock-item.unlocked { border-color: #27ae60; background: rgba(39, 174, 96, 0.1); }
+    .unlock-item.current { border-color: #FFD700; background: rgba(255, 215, 0, 0.1); }
+    .unlock-level { font-family: 'Luckiest Guy', cursive; font-size: 24px; color: #FFD700; min-width: 50px; text-align: center; }
+    .unlock-level.unlocked { color: #27ae60; }
+    .unlock-content { flex: 1; }
+    .unlock-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .unlock-desc { font-size: 12px; color: #aaa; }
+    .unlock-status { font-size: 20px; }
 
     .menu-footer { background: rgba(0,0,0,0.4); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #5a4030; }
     .footer-hint { font-size: 12px; color: #888; }
@@ -148,15 +177,19 @@
         <div class="nav-tab" data-tab="crops"><span class="nav-tab-icon">&#x1F33E;</span><span class="nav-tab-label">Crops</span></div>
         <div class="nav-tab" data-tab="inventory"><span class="nav-tab-icon">&#x1F392;</span><span class="nav-tab-label">Items</span></div>
         <div class="nav-tab" data-tab="animals"><span class="nav-tab-icon">&#x1F404;</span><span class="nav-tab-label">Animals</span></div>
+        <div class="nav-tab" data-tab="xp"><span class="nav-tab-icon">&#x2B50;</span><span class="nav-tab-label">XP</span></div>
+        <div class="nav-tab" data-tab="unlocks"><span class="nav-tab-icon">&#x1F513;</span><span class="nav-tab-label">Unlocks</span></div>
       </div>
       <div class="content-area">
         <div class="tab-content active" id="tab-dashboard"></div>
         <div class="tab-content" id="tab-crops"></div>
         <div class="tab-content" id="tab-inventory"></div>
         <div class="tab-content" id="tab-animals"></div>
+        <div class="tab-content" id="tab-xp"></div>
+        <div class="tab-content" id="tab-unlocks"></div>
       </div>
       <div class="menu-footer">
-        <div class="footer-hint">Press <kbd>Tab</kbd> to close | <kbd>1-4</kbd> Quick nav</div>
+        <div class="footer-hint">Press <kbd>Tab</kbd> to close | <kbd>1-6</kbd> Quick nav</div>
         <button class="action-btn secondary" onclick="saveGame()">&#x1F4BE; Save</button>
       </div>
     </div>
@@ -167,21 +200,20 @@
   <script>
     const CONFIG = {
       crops: {
-        wheat: { id: 1, name: 'Wheat', icon: '&#x1F33E;', growTime: 30, yield: 1, sellPrice: 5, seedCost: 2, unlockLevel: 1 },
-        carrot: { id: 2, name: 'Carrot', icon: '&#x1F955;', growTime: 45, yield: 1, sellPrice: 8, seedCost: 3, unlockLevel: 1 },
-        corn: { id: 3, name: 'Corn', icon: '&#x1F33D;', growTime: 60, yield: 1, sellPrice: 10, seedCost: 5, unlockLevel: 2 },
-        potato: { id: 4, name: 'Potato', icon: '&#x1F954;', growTime: 75, yield: 1, sellPrice: 12, seedCost: 6, unlockLevel: 2 },
-        tomato: { id: 5, name: 'Tomato', icon: '&#x1F345;', growTime: 90, yield: 1, sellPrice: 15, seedCost: 8, unlockLevel: 3 },
-        pumpkin: { id: 6, name: 'Pumpkin', icon: '&#x1F383;', growTime: 120, yield: 1, sellPrice: 30, seedCost: 15, unlockLevel: 5 }
+        wheat: { id: 1, name: 'Wheat', icon: '&#x1F33E;', growTime: 30, yield: 1, sellPrice: 5, seedCost: 2, unlockLevel: 1, plantXP: 2, harvestXP: 5 },
+        carrot: { id: 2, name: 'Carrot', icon: '&#x1F955;', growTime: 45, yield: 1, sellPrice: 8, seedCost: 3, unlockLevel: 1, plantXP: 2, harvestXP: 5 },
+        corn: { id: 3, name: 'Corn', icon: '&#x1F33D;', growTime: 60, yield: 1, sellPrice: 10, seedCost: 5, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
+        potato: { id: 4, name: 'Potato', icon: '&#x1F954;', growTime: 75, yield: 1, sellPrice: 12, seedCost: 6, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
+        tomato: { id: 5, name: 'Tomato', icon: '&#x1F345;', growTime: 90, yield: 1, sellPrice: 15, seedCost: 8, unlockLevel: 3, plantXP: 4, harvestXP: 10 },
+        pumpkin: { id: 6, name: 'Pumpkin', icon: '&#x1F383;', growTime: 120, yield: 1, sellPrice: 30, seedCost: 15, unlockLevel: 5, plantXP: 5, harvestXP: 15 }
       },
       animals: {
-        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6 },
-        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5 },
-        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5 },
-        pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6 },
-        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5 }
+        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 1, collectXP: 5 },
+        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5, unlockLevel: 1, collectXP: 3 },
+        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 2, collectXP: 6 },
+        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 3, collectXP: 8 },
+        pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 4, collectXP: 10 }
       },
-      // Crafting recipes
       recipes: [
         { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 20, xp: 10, taskName: 'Craft_Flour' },
         { id: 'bread', name: 'Bread', icon: '&#x1F956;', ingredients: { flour: 1, egg: 1 }, sellPrice: 35, xp: 15, taskName: 'Craft_Bread' },
@@ -195,35 +227,32 @@
         { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' }
       ],
       equipment: [
-        { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'No bee sting damage' },
-        { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: '+50% crop yield' }
+        { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'No bee sting damage', unlockLevel: 6 },
+        { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: '+50% crop yield', unlockLevel: 4 }
       ],
-      levelThresholds: [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500]
+      levelThresholds: [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500],
+      unlocks: [
+        { level: 1, title: 'Getting Started', desc: 'Plant Wheat & Carrots, tend Cows & Chickens', items: ['Wheat', 'Carrot', 'Cows', 'Chickens'] },
+        { level: 2, title: 'Expanding Fields', desc: 'Plant Corn & Potatoes, tend Sheep', items: ['Corn', 'Potato', 'Sheep'] },
+        { level: 3, title: 'Growing Farm', desc: 'Plant Tomatoes, tend Goats for meat', items: ['Tomato', 'Goats'] },
+        { level: 4, title: 'Advanced Farming', desc: 'Tend Pigs for truffles, buy Harvest Basket', items: ['Pigs', 'Harvest Basket'] },
+        { level: 5, title: 'Master Farmer', desc: 'Plant Pumpkins for big profits', items: ['Pumpkin'] },
+        { level: 6, title: 'Expert', desc: 'Buy Bee Suit for beekeeping', items: ['Bee Suit', 'Beekeeping'] }
+      ]
     };
 
     let gameState = {
       gold: 100, xp: 0, level: 1,
-      // Inventory: crops, seeds, animal products, crafted items
+      xpHistory: { planting: 0, harvesting: 0, animals: 0, crafting: 0, selling: 0 },
       inventory: {
-        // Crops (6 types)
         wheat: 0, carrot: 0, corn: 0, potato: 0, tomato: 0, pumpkin: 0,
-        // Seeds (6 types)
         seeds_wheat: 5, seeds_carrot: 3, seeds_corn: 0, seeds_potato: 0, seeds_tomato: 0, seeds_pumpkin: 0,
-        // Animal products (5 types: cows→milk, sheep→wool, goats→goat_meat, pigs→truffle, chickens→egg)
         milk: 0, wool: 0, goat_meat: 0, truffle: 0, egg: 0,
-        // Crafted items (10 types)
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0
       },
       equipment: { beesuit: false, basket: false },
       plots: [],
-      // Animals now follow the same pattern as plots: state-based with activity start
-      animals: {
-        cows: [],      // 6 cows
-        sheep: [],     // 5 sheep
-        goats: [],     // 5 goats
-        pigs: [],      // 6 pigs
-        chickens: []   // 5 chickens
-      },
+      animals: { cows: [], sheep: [], goats: [], pigs: [], chickens: [] },
       settings: { autoReplant: false, priorityCrop: 'wheat' }
     };
 
@@ -232,30 +261,32 @@
       gameState.plots.push({ id: i + 1, state: 'empty', cropType: null, plantedAt: null, readyAt: null });
     }
 
-    // Initialize animals with state system (like plots)
-    // States: 'idle' (can start activity), 'producing' (timer running), 'ready' (go collect in 3D)
-    for (let i = 0; i < 6; i++) {
-      gameState.animals.cows.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-      gameState.animals.pigs.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
+    // Initialize animals
+    function initAnimals() {
+      gameState.animals.cows = [];
+      gameState.animals.sheep = [];
+      gameState.animals.goats = [];
+      gameState.animals.pigs = [];
+      gameState.animals.chickens = [];
+      for (let i = 0; i < 6; i++) {
+        gameState.animals.cows.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
+        gameState.animals.pigs.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
+      }
+      for (let i = 0; i < 5; i++) {
+        gameState.animals.sheep.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
+        gameState.animals.goats.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
+        gameState.animals.chickens.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
+      }
     }
-    for (let i = 0; i < 5; i++) {
-      gameState.animals.sheep.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-      gameState.animals.goats.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-      gameState.animals.chickens.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-    }
+    initAnimals();
 
-    // Trigger a Portals task
     function triggerTask(taskName, targetState = 'SetNotActiveToActive') {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({
-          TaskName: taskName,
-          TaskTargetState: targetState
-        }));
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: targetState }));
       }
       console.log('Trigger Task:', taskName, targetState);
     }
 
-    // Legacy functions - now just log (Portals handles show/hide via tasks)
     function sendToPortals(cmd) { console.log('To Portals:', cmd); }
     function closeMenu() { console.log('Close menu requested'); }
     function setVariable(n, v) { console.log('Set variable:', n, v); }
@@ -263,13 +294,7 @@
     function hideObject(n) { console.log('Hide object:', n); }
     function playSound(s) { console.log('Play sound:', s); }
 
-    // Parse Sync_Inventory message and update game state
-    // Variable names from v8: Gold, Level, XP, Seeds_Wheat, Seeds_Carrot, Seeds_Corn, Seeds_Potato, Seeds_Tomato, Seeds_Pumpkin,
-    // Crop_Wheat, Crop_Carrot, Crop_Corn, Crop_Potato, Crop_Tomato, Crop_Pumpkin,
-    // Milk, Wool, Truffle, Egg, Honey, Flour, Bread, Cheese, Stew, Pie, Mead, Blanket, Butter, Cake,
-    // Has_Beesuit, Has_Basket
     function parseAndSyncInventory(msg) {
-      // Map Portals variable names to gameState keys
       const varMapping = {
         'Gold': { target: 'gold', isRoot: true },
         'Level': { target: 'level', isRoot: true },
@@ -305,70 +330,41 @@
         'Has_Basket': { target: 'basket', isEquipment: true }
       };
 
-      // Parse the message - look for known variable names followed by values
-      // Try to extract key-value pairs
       const parts = msg.replace('Sync_Inventory_', '').split('_');
-
       let i = 0;
       while (i < parts.length) {
-        // Try to match 1-word and 2-word variable names
         let matched = false;
-
-        // Try 2-word match first (e.g., Seeds_Wheat)
         if (i + 2 < parts.length) {
           const twoWordKey = parts[i] + '_' + parts[i + 1];
           if (varMapping[twoWordKey]) {
             const value = parseInt(parts[i + 2]) || 0;
             const mapping = varMapping[twoWordKey];
-            if (mapping.isEquipment) {
-              gameState.equipment[mapping.target] = value > 0;
-            } else if (mapping.isRoot) {
-              gameState[mapping.target] = value;
-            } else {
-              gameState.inventory[mapping.target] = value;
-            }
-            console.log(`[Sync] ${twoWordKey} = ${value}`);
-            i += 3;
-            matched = true;
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            else if (mapping.isRoot) gameState[mapping.target] = value;
+            else gameState.inventory[mapping.target] = value;
+            i += 3; matched = true;
           }
         }
-
-        // Try 1-word match
         if (!matched && i + 1 < parts.length) {
           const oneWordKey = parts[i];
           if (varMapping[oneWordKey]) {
             const value = parseInt(parts[i + 1]) || 0;
             const mapping = varMapping[oneWordKey];
-            if (mapping.isEquipment) {
-              gameState.equipment[mapping.target] = value > 0;
-            } else if (mapping.isRoot) {
-              gameState[mapping.target] = value;
-            } else {
-              gameState.inventory[mapping.target] = value;
-            }
-            console.log(`[Sync] ${oneWordKey} = ${value}`);
-            i += 2;
-            matched = true;
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            else if (mapping.isRoot) gameState[mapping.target] = value;
+            else gameState.inventory[mapping.target] = value;
+            i += 2; matched = true;
           }
         }
-
-        // If no match, skip this part
-        if (!matched) {
-          i++;
-        }
+        if (!matched) i++;
       }
-
-      console.log('[Farmville] Inventory synced from Portals');
-      saveGame();
+      saveGameQuiet();
     }
 
-    // Set up Portals message listener (same pattern as working TDM leaderboard)
     if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
       PortalsSdk.setMessageListener(handlePortalsMessage);
-      console.log('[Farmville] SDK listener registered');
     } else {
       window.addEventListener('message', (e) => handlePortalsMessage(e.data));
-      console.log('[Farmville] Using fallback listener');
     }
 
     function handlePortalsMessage(msg) {
@@ -377,7 +373,6 @@
       const parts = msg.split('_');
       const cmd = parts[0];
 
-      // Init message: init_gold_level_xp
       if (cmd === 'init') {
         if (parts.length >= 4) {
           gameState.gold = parseInt(parts[1]) || 100;
@@ -387,94 +382,50 @@
         loadFromStorage();
         updateAllUI();
       }
-      // Sync_Inventory message - receive all inventory values from Portals
-      // Format: Sync_Inventory followed by key-value pairs separated by underscores
-      // Example: Sync_Inventory_Gold_100_Level_5_XP_250_Seeds_Wheat_10_Crop_Wheat_5...
       else if (msg.startsWith('Sync_Inventory')) {
-        console.log('[Farmville] Sync inventory received:', msg);
         parseAndSyncInventory(msg);
         updateAllUI();
       }
-      // Interact with plot: interact_plot_1
       else if (cmd === 'interact' && parts[1] === 'plot') {
-        const plotId = parseInt(parts[2]);
-        console.log('[Farmville] Interact with plot', plotId, 'local state:', gameState.plots[plotId - 1].state);
-        harvestPlotFromTrigger(plotId);
+        harvestPlotFromTrigger(parseInt(parts[2]));
       }
-      // Interact with animal: interact_cow_1, interact_sheep_1, etc.
       else if (cmd === 'interact') {
-        const animalType = parts[1].toLowerCase();
-        const id = parseInt(parts[2]);
-        console.log(`[Farmville] Interact with ${animalType} ${id}`);
-        handleAnimalInteract(animalType, id);
+        handleAnimalInteract(parts[1].toLowerCase(), parseInt(parts[2]));
       }
-      // Collection confirmed from Portals: collected_cow_1, collected_sheep_1, etc.
       else if (cmd === 'collected') {
-        const animalType = parts[1].toLowerCase();
-        const id = parseInt(parts[2]);
-        console.log(`[Farmville] Collection confirmed for ${animalType} ${id}`);
-        handleAnimalCollected(animalType, id);
-      }
-      // Confirmations from Portals
-      else if (cmd === 'plant' && parts[1] === 'confirmed') {
-        const plotId = parseInt(parts[2]);
-        console.log('[Farmville] Plant confirmed for plot', plotId);
+        handleAnimalCollected(parts[1].toLowerCase(), parseInt(parts[2]));
       }
       else if (cmd === 'crop' && parts[1] === 'ready') {
-        const plotId = parseInt(parts[2]);
-        const plot = gameState.plots[plotId - 1];
-        if (plot.state === 'growing') {
+        const plot = gameState.plots[parseInt(parts[2]) - 1];
+        if (plot && plot.state === 'growing') {
           plot.state = 'ready';
-          notify(`Plot ${plotId} is ready to harvest!`, 'success');
           renderCrops();
         }
       }
-      else if (cmd === 'harvest' && parts[1] === 'complete') {
-        const plotId = parseInt(parts[2]);
-        console.log('[Farmville] Harvest confirmed for plot', plotId);
-      }
     }
 
-    // Harvest triggered by 3D trigger cube (from Portals interact message)
     function harvestPlotFromTrigger(plotId) {
       const plot = gameState.plots[plotId - 1];
-      console.log('[Farmville] harvestPlotFromTrigger called for plot', plotId, 'cropType:', plot.cropType, 'state:', plot.state);
-
-      // Get crop info - use stored cropType or default to wheat for testing
+      if (!plot) return;
       const cropType = plot.cropType || 'wheat';
       const crop = CONFIG.crops[cropType];
       const cropName = crop ? crop.name : 'Wheat';
+      const harvestXP = crop ? crop.harvestXP : 5;
 
-      // Tell Portals to run the harvest task (Move Item, reset variables, etc.)
-      // v8 task: Harvest_Plot_X
       triggerTask(`Harvest_Plot_${plotId}`);
-
-      // Reset the trigger task so it can be used again next cycle
-      // v8 task: Plot_X_Trigger (set back to not active)
       triggerTask(`Plot_${plotId}_Trigger`, 'SetActiveToNotActive');
-
-      // Add crop to Portals inventory
-      // v8 task: Add_Crop_[Name]_1
       triggerTask(`Add_Crop_${cropName}_1`);
+      triggerTask(`Add_XP_${harvestXP}`);
 
-      // Add XP
-      // v8 task: Add_XP_5
-      triggerTask('Add_XP_5');
-
-      // Update local inventory
       gameState.inventory[cropType] += 1;
-      notify(`+1 ${cropName}!`, 'success');
-      console.log('[Farmville] Harvested 1', cropName);
+      addXP(harvestXP, 'harvesting');
+      notify(`+1 ${cropName}! +${harvestXP} XP`, 'success');
 
-      addXP(5);
-
-      // Reset plot state
       plot.state = 'empty';
       plot.cropType = null;
       plot.plantedAt = null;
       plot.readyAt = null;
 
-      // Auto-replant if enabled
       if (gameState.settings.autoReplant) {
         const p = gameState.settings.priorityCrop;
         if (gameState.inventory[`seeds_${p}`] > 0 && gameState.level >= CONFIG.crops[p].unlockLevel) {
@@ -482,277 +433,226 @@
         }
       }
 
-      saveGame();
+      saveGameQuiet();
       renderCrops();
       renderInventory();
       renderDashboard();
-      return true;
     }
 
-    function saveGame() { localStorage.setItem('farmville_state', JSON.stringify(gameState)); setVariable('Player_Gold', gameState.gold); setVariable('Player_Level', gameState.level); setVariable('Player_XP', gameState.xp); notify('Game saved!', 'success'); }
-    function loadFromStorage() { const saved = localStorage.getItem('farmville_state'); if (saved) { try { const p = JSON.parse(saved); gameState = { ...gameState, ...p }; gameState.plots.forEach(plot => { if (plot.state === 'growing' && plot.readyAt && Date.now() >= plot.readyAt) plot.state = 'ready'; }); } catch(e) {} } }
+    function saveGameQuiet() {
+      localStorage.setItem('farmville_state', JSON.stringify(gameState));
+    }
+
+    function saveGame() {
+      saveGameQuiet();
+      notify('Game saved!', 'success');
+    }
+
+    function loadFromStorage() {
+      const saved = localStorage.getItem('farmville_state');
+      if (saved) {
+        try {
+          const p = JSON.parse(saved);
+          // Merge carefully to preserve structure
+          gameState.gold = p.gold ?? gameState.gold;
+          gameState.xp = p.xp ?? gameState.xp;
+          gameState.level = p.level ?? gameState.level;
+          gameState.xpHistory = p.xpHistory ?? gameState.xpHistory;
+          gameState.inventory = { ...gameState.inventory, ...p.inventory };
+          gameState.equipment = { ...gameState.equipment, ...p.equipment };
+          gameState.settings = { ...gameState.settings, ...p.settings };
+
+          // Load plots
+          if (p.plots && p.plots.length === 24) {
+            gameState.plots = p.plots;
+            gameState.plots.forEach(plot => {
+              if (plot.state === 'growing' && plot.readyAt && Date.now() >= plot.readyAt) plot.state = 'ready';
+            });
+          }
+
+          // Load animals carefully
+          if (p.animals) {
+            ['cows', 'sheep', 'goats', 'pigs', 'chickens'].forEach(type => {
+              if (p.animals[type] && p.animals[type].length > 0) {
+                gameState.animals[type] = p.animals[type];
+                gameState.animals[type].forEach(animal => {
+                  if (animal.state === 'producing' && animal.readyAt && Date.now() >= animal.readyAt) {
+                    animal.state = 'ready';
+                  }
+                });
+              }
+            });
+          }
+        } catch(e) { console.error('Load error:', e); }
+      }
+    }
 
     function plantCrop(plotId, cropType) {
-      const plot = gameState.plots[plotId - 1], crop = CONFIG.crops[cropType], seedKey = `seeds_${cropType}`;
+      const plot = gameState.plots[plotId - 1];
+      const crop = CONFIG.crops[cropType];
+      const seedKey = `seeds_${cropType}`;
+
       if (plot.state !== 'empty') { notify('Plot not empty!', 'error'); return false; }
       if (gameState.inventory[seedKey] < 1) { notify(`No ${crop.name} seeds!`, 'error'); return false; }
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return false; }
 
-      // Trigger Portals plant task
       triggerTask(`Plant_Plot_${plotId}`);
-
-      // Trigger seed subtraction task (v8: Sub_Seeds_[Crop]_1)
       triggerTask(`Sub_Seeds_${crop.name}_1`);
+      triggerTask(`Add_XP_${crop.plantXP}`);
 
-      // Update local state
       gameState.inventory[seedKey]--;
       plot.state = 'growing';
       plot.cropType = cropType;
       plot.plantedAt = Date.now();
       plot.readyAt = Date.now() + (crop.growTime * 1000);
 
-      notify(`Planted ${crop.name}!`, 'success');
-      saveGame();
-      renderCrops();
-      renderInventory();
+      addXP(crop.plantXP, 'planting');
+      notify(`Planted ${crop.name}! +${crop.plantXP} XP`, 'success');
+      saveGameQuiet();
       return true;
     }
 
-    function harvestPlot(plotId) {
-      const plot = gameState.plots[plotId - 1]; if (plot.state !== 'ready') { notify('Not ready!', 'error'); return false; }
-      const crop = CONFIG.crops[plot.cropType]; let amount = crop.yield; if (gameState.equipment.basket) amount = Math.floor(amount * 1.5);
-      gameState.inventory[plot.cropType] += amount; addXP(5);
-      const oldType = plot.cropType; plot.state = 'empty'; plot.cropType = null; plot.plantedAt = null; plot.readyAt = null;
-      hideObject(`Plot_${plotId}_${crop.name}`); hideObject(`Plot_${plotId}_Ready`); showObject(`Plot_${plotId}_Empty`); playSound('harvest.mp3'); notify(`+${amount} ${crop.name}!`, 'success');
-      if (gameState.settings.autoReplant) { const p = gameState.settings.priorityCrop; if (gameState.inventory[`seeds_${p}`] > 0 && gameState.level >= CONFIG.crops[p].unlockLevel) setTimeout(() => plantCrop(plotId, p), 300); }
-      saveGame(); renderCrops(); renderInventory(); renderDashboard(); return true;
+    function plantAllEmpty() {
+      const c = gameState.settings.priorityCrop;
+      let n = 0;
+      gameState.plots.forEach((p, i) => {
+        if (p.state === 'empty' && gameState.inventory[`seeds_${c}`] > 0 && gameState.level >= CONFIG.crops[c].unlockLevel) {
+          if (plantCrop(i + 1, c)) n++;
+        }
+      });
+      if (n > 0) {
+        notify(`Planted ${n} crops!`, 'success');
+        renderCrops(); // Re-render to show all new timers
+      } else {
+        notify('No seeds or plots!', 'error');
+      }
     }
 
-    function plantAllEmpty() { const c = gameState.settings.priorityCrop; let n = 0; gameState.plots.forEach((p, i) => { if (p.state === 'empty' && gameState.inventory[`seeds_${c}`] > 0) if (plantCrop(i + 1, c)) n++; }); if (n > 0) notify(`Planted ${n} crops!`, 'success'); else notify('No seeds or plots!', 'error'); }
-
-    // ========================================
-    // ANIMAL ACTIVITY SYSTEM (follows plot pattern)
-    // Flow: Start in UI → Timer → Ready task → Collect in 3D → Product added
-    // ========================================
-
-    // Step 1: Start activity from UI (like planting a crop)
     function startAnimalActivity(animalType, id) {
-      const animalArrays = {
-        cow: gameState.animals.cows,
-        sheep: gameState.animals.sheep,
-        goat: gameState.animals.goats,
-        pig: gameState.animals.pigs,
-        chicken: gameState.animals.chickens
-      };
-      const animal = animalArrays[animalType][id - 1];
+      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens };
+      const animal = animalArrays[animalType]?.[id - 1];
       const config = CONFIG.animals[animalType];
 
-      if (animal.state !== 'idle') {
-        notify(`${config.name} ${id} is busy!`, 'error');
-        return;
-      }
+      if (!animal || !config) return;
+      if (gameState.level < config.unlockLevel) { notify(`Unlock at Lv.${config.unlockLevel}`, 'error'); return; }
+      if (animal.state !== 'idle') { notify(`${config.name} ${id} is busy!`, 'error'); return; }
 
-      // Start the activity timer
+      // Trigger the animal activity task
+      triggerTask(`${config.name}_${id}_Trigger`);
+
       animal.state = 'producing';
       animal.readyAt = Date.now() + (config.cooldown * 1000);
       animal.notified = false;
 
       notify(`Started ${config.name} ${id}!`, 'success');
-      saveGame();
+      saveGameQuiet();
       renderAnimals();
     }
 
-    // Step 2: Called from game loop when timer completes - triggers Ready task
     function animalBecameReady(animalType, id) {
-      const taskName = `Ready_${animalType.charAt(0).toUpperCase() + animalType.slice(1)}_${id}`;
-      triggerTask(taskName);
-      console.log(`[Farmville] Animal ready: ${taskName}`);
+      const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
+      triggerTask(`Ready_${capitalType}_${id}`);
     }
 
-    // Step 3: Called when player interacts with animal in 3D (from Portals message)
-    // Triggers the Collect task, Portals will send confirmation back
     function handleAnimalInteract(animalType, id) {
-      const animalArrays = {
-        cow: gameState.animals.cows,
-        sheep: gameState.animals.sheep,
-        goat: gameState.animals.goats,
-        pig: gameState.animals.pigs,
-        chicken: gameState.animals.chickens
-      };
+      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens };
       const animal = animalArrays[animalType]?.[id - 1];
+      if (!animal || animal.state !== 'ready') return;
 
-      if (!animal || animal.state !== 'ready') {
-        console.log(`[Farmville] Animal not ready for collection: ${animalType} ${id}`);
-        return;
-      }
-
-      // Trigger collect task - Portals will confirm and add product
       const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
       triggerTask(`Collect_${capitalType}_${id}`);
-      console.log(`[Farmville] Triggered Collect_${capitalType}_${id}`);
     }
 
-    // Step 4: Called when Portals confirms collection (collected_[animal]_X message)
     function handleAnimalCollected(animalType, id) {
-      const animalArrays = {
-        cow: gameState.animals.cows,
-        sheep: gameState.animals.sheep,
-        goat: gameState.animals.goats,
-        pig: gameState.animals.pigs,
-        chicken: gameState.animals.chickens
-      };
+      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens };
       const animal = animalArrays[animalType]?.[id - 1];
       const config = CONFIG.animals[animalType];
 
-      if (!animal || !config) {
-        console.log(`[Farmville] Unknown animal: ${animalType} ${id}`);
-        return;
-      }
+      if (!animal || !config) return;
 
-      // Add product to inventory
       gameState.inventory[config.product]++;
-
-      // Trigger the Add_[Product]_1 task to update Portals variable
-      // v8 task: Add_Milk_1, Add_Wool_1, Add_Truffle_1, Add_Egg_1, Add_Honey_1
       triggerTask(`Add_${config.productName}_1`);
+      triggerTask(`Add_XP_${config.collectXP}`);
 
-      // Add XP via Portals task
-      // v8 task: Add_XP_1
-      triggerTask('Add_XP_1');
-
-      // Reset animal to idle state
       animal.state = 'idle';
       animal.readyAt = null;
       animal.notified = false;
 
-      addXP(3);
-      notify(`+1 ${config.productName}!`, 'success');
-      saveGame();
+      addXP(config.collectXP, 'animals');
+      notify(`+1 ${config.productName}! +${config.collectXP} XP`, 'success');
+      saveGameQuiet();
       renderAnimals();
       renderInventory();
       renderDashboard();
     }
 
-    // Legacy functions for backward compatibility (now redirect to new system)
-    function collectFromCow(id) { handleAnimalInteract('cow', id); }
-    function collectFromSheep(id) { handleAnimalInteract('sheep', id); }
-    function collectFromGoat(id) { handleAnimalInteract('goat', id); }
-    function collectFromPig(id) { handleAnimalInteract('pig', id); }
-    function collectFromChicken(id) { handleAnimalInteract('chicken', id); }
-
-    function buySeeds(cropType, qty) {
-      const c = CONFIG.crops[cropType];
-      const cost = c.seedCost * qty;
-      if (gameState.gold < cost) { notify('Not enough gold!', 'error'); return; }
-      if (gameState.level < c.unlockLevel) { notify(`Unlock at Lv.${c.unlockLevel}`, 'error'); return; }
-
-      // Trigger v8 task: Buy_Seeds_[Crop]_1 or Buy_Seeds_[Crop]_5
-      const taskName = `Buy_Seeds_${c.name}_${qty}`;
-      triggerTask(taskName);
-
-      gameState.gold -= cost;
-      gameState.inventory[`seeds_${cropType}`] += qty;
-      playSound('purchase.mp3');
-      notify(`Bought ${qty} ${c.name} seeds!`, 'success');
-      saveGame();
-      updateHeader();
-      renderMarket();
-      renderInventory();
-    }
-
-    function sellItem(item, qty) {
-      if (gameState.inventory[item] < qty) { notify('Not enough!', 'error'); return; }
-
-      // Price lookup
-      const prices = {
-        wheat: 5, carrot: 8, corn: 10, potato: 12, tomato: 15, pumpkin: 30,
-        milk: 12, wool: 15, goat_meat: 20, truffle: 30, egg: 8,
-        flour: 20, bread: 35, cheese: 30, stew: 50, ragout: 75, pie: 80, meat_pie: 90, blanket: 50, butter: 30, cake: 100
-      };
-      const p = prices[item] || 5;
-
-      // Determine task name based on item type
-      // Crops: Sell_Crop_[Name]_1 or Sell_Crop_[Name]_5
-      // Products: Sell_[Name]_1
-      const cropConfig = CONFIG.crops[item];
-      let taskName;
-      if (cropConfig) {
-        taskName = `Sell_Crop_${cropConfig.name}_${qty}`;
-      } else {
-        // Capitalize first letter for product name
-        const productName = item.charAt(0).toUpperCase() + item.slice(1);
-        taskName = `Sell_${productName}_${qty}`;
+    function addXP(amount, category = 'other') {
+      gameState.xp += amount;
+      if (category && gameState.xpHistory[category] !== undefined) {
+        gameState.xpHistory[category] += amount;
       }
-      triggerTask(taskName);
 
-      gameState.inventory[item] -= qty;
-      gameState.gold += p * qty;
-      playSound('coins.mp3');
-      notify(`Sold for ${p * qty}g!`, 'success');
-      saveGame();
-      updateHeader();
-      renderMarket();
-      renderInventory();
-    }
-    function buyEquipment(id) { const eq = CONFIG.equipment.find(e => e.id === id); if (gameState.equipment[id]) { notify('Already owned!', 'error'); return; } if (gameState.gold < eq.price) { notify('Not enough gold!', 'error'); return; } gameState.gold -= eq.price; gameState.equipment[id] = true; setVariable(`Player_Has_${id}`, 1); playSound('purchase.mp3'); notify(`Bought ${eq.name}!`, 'success'); saveGame(); updateHeader(); renderMarket(); }
-    function craftItem(recipeId) {
-      const r = CONFIG.recipes.find(x => x.id === recipeId);
-      if (!r) return;
-
-      // Check ingredients
-      for (const [i, q] of Object.entries(r.ingredients)) {
-        if ((gameState.inventory[i] || 0) < q) {
-          notify(`Need more ${i}!`, 'error');
-          return;
+      const t = CONFIG.levelThresholds;
+      for (let i = t.length - 1; i >= 0; i--) {
+        if (gameState.xp >= t[i] && gameState.level < i + 1) {
+          gameState.level = i + 1;
+          notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success');
+          triggerTask(`Add_Level_1`);
+          break;
         }
       }
-
-      // Consume ingredients
-      for (const [i, q] of Object.entries(r.ingredients)) {
-        gameState.inventory[i] -= q;
-      }
-
-      // Add crafted item
-      gameState.inventory[recipeId] = (gameState.inventory[recipeId] || 0) + 1;
-
-      // Trigger crafting task in Portals (e.g., Craft_Flour, Craft_Bread)
-      if (r.taskName) {
-        triggerTask(r.taskName);
-      }
-
-      addXP(r.xp);
-      playSound('craft.mp3');
-      notify(`Crafted ${r.name}! +${r.xp} XP`, 'success');
-      saveGame();
-      renderCrafting();
-      renderInventory();
+      updateHeader();
     }
 
-    function addXP(a) { gameState.xp += a; const t = CONFIG.levelThresholds; for (let i = t.length - 1; i >= 0; i--) if (gameState.xp >= t[i] && gameState.level < i + 1) { gameState.level = i + 1; playSound('levelup.mp3'); notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success'); setVariable('Player_Level', gameState.level); break; } updateHeader(); }
-    function getXPProgress() { const t = CONFIG.levelThresholds; if (gameState.level >= t.length) return 100; const c = t[gameState.level - 1], n = t[gameState.level] || c + 1000; return Math.min(100, Math.max(0, ((gameState.xp - c) / (n - c)) * 100)); }
-    function formatTime(s) { if (s <= 0) return 'Ready!'; const m = Math.floor(s / 60), sec = Math.floor(s % 60); return m > 0 ? `${m}m ${sec}s` : `${sec}s`; }
+    function getXPProgress() {
+      const t = CONFIG.levelThresholds;
+      if (gameState.level >= t.length) return 100;
+      const c = t[gameState.level - 1];
+      const n = t[gameState.level] || c + 1000;
+      return Math.min(100, Math.max(0, ((gameState.xp - c) / (n - c)) * 100));
+    }
 
-    function updateHeader() { document.getElementById('header-gold').textContent = gameState.gold.toLocaleString(); document.getElementById('header-level').textContent = gameState.level; document.getElementById('header-xp-bar').style.width = getXPProgress() + '%'; }
+    function getXPForNextLevel() {
+      const t = CONFIG.levelThresholds;
+      if (gameState.level >= t.length) return 0;
+      return t[gameState.level] - gameState.xp;
+    }
+
+    function formatTime(s) {
+      if (s <= 0) return 'Ready!';
+      const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+      return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+    }
+
+    function updateHeader() {
+      document.getElementById('header-gold').textContent = gameState.gold.toLocaleString();
+      document.getElementById('header-level').textContent = gameState.level;
+      document.getElementById('header-xp-bar').style.width = getXPProgress() + '%';
+    }
 
     function renderDashboard() {
       const readyCrops = gameState.plots.filter(p => p.state === 'ready').length;
       const growingCrops = gameState.plots.filter(p => p.state === 'growing').length;
-
-      // Count animals by state
-      const readyCows = gameState.animals.cows.filter(a => a.state === 'ready').length;
-      const readySheep = gameState.animals.sheep.filter(a => a.state === 'ready').length;
-      const readyGoats = gameState.animals.goats.filter(a => a.state === 'ready').length;
-      const readyPigs = gameState.animals.pigs.filter(a => a.state === 'ready').length;
-      const readyChickens = gameState.animals.chickens.filter(a => a.state === 'ready').length;
-
-      const totalCrops = gameState.inventory.wheat + gameState.inventory.carrot + gameState.inventory.corn +
-                        gameState.inventory.potato + gameState.inventory.tomato + gameState.inventory.pumpkin;
+      const readyAnimals = Object.values(gameState.animals).flat().filter(a => a.state === 'ready').length;
+      const producingAnimals = Object.values(gameState.animals).flat().filter(a => a.state === 'producing').length;
+      const totalCrops = gameState.inventory.wheat + gameState.inventory.carrot + gameState.inventory.corn + gameState.inventory.potato + gameState.inventory.tomato + gameState.inventory.pumpkin;
       const totalSeeds = Object.keys(gameState.inventory).filter(k => k.startsWith('seeds_')).reduce((a, k) => a + gameState.inventory[k], 0);
-      const totalProducts = gameState.inventory.milk + gameState.inventory.wool + gameState.inventory.goat_meat +
-                           gameState.inventory.truffle + gameState.inventory.egg;
+      const totalProducts = gameState.inventory.milk + gameState.inventory.wool + gameState.inventory.goat_meat + gameState.inventory.truffle + gameState.inventory.egg;
+      const xpNeeded = getXPForNextLevel();
 
       document.getElementById('tab-dashboard').innerHTML = `
         <div class="dashboard-grid">
+          <div class="dashboard-card highlight">
+            <div class="card-header"><span class="card-icon">&#x2B50;</span><div class="card-title">Player Stats</div></div>
+            <div class="level-display">
+              <div class="level-label">LEVEL</div>
+              <div class="level-number">${gameState.level}</div>
+              <div class="xp-progress">
+                <div class="xp-progress-bar"><div class="xp-progress-fill" style="width:${getXPProgress()}%"></div></div>
+                <div class="xp-text">${gameState.xp} XP${xpNeeded > 0 ? ` (${xpNeeded} to next level)` : ' (MAX)'}</div>
+              </div>
+            </div>
+          </div>
           <div class="dashboard-card">
             <div class="card-header"><span class="card-icon">&#x1F33E;</span><div class="card-title">Crops (24 plots)</div></div>
             <div class="quick-stats">
@@ -764,11 +664,8 @@
           <div class="dashboard-card">
             <div class="card-header"><span class="card-icon">&#x1F404;</span><div class="card-title">Animals</div></div>
             <div class="quick-stats">
-              <div class="quick-stat"><span class="quick-stat-icon">&#x1F404;</span><div><div class="quick-stat-value">${readyCows}/6</div><div class="quick-stat-label">Cows</div></div></div>
-              <div class="quick-stat"><span class="quick-stat-icon">&#x1F411;</span><div><div class="quick-stat-value">${readySheep}/5</div><div class="quick-stat-label">Sheep</div></div></div>
-              <div class="quick-stat"><span class="quick-stat-icon">&#x1F410;</span><div><div class="quick-stat-value">${readyGoats}/5</div><div class="quick-stat-label">Goats</div></div></div>
-              <div class="quick-stat"><span class="quick-stat-icon">&#x1F437;</span><div><div class="quick-stat-value">${readyPigs}/6</div><div class="quick-stat-label">Pigs</div></div></div>
-              <div class="quick-stat"><span class="quick-stat-icon">&#x1F414;</span><div><div class="quick-stat-value">${readyChickens}/5</div><div class="quick-stat-label">Chickens</div></div></div>
+              <div class="quick-stat"><span class="quick-stat-icon">&#x2705;</span><div><div class="quick-stat-value">${readyAnimals}</div><div class="quick-stat-label">Ready</div></div></div>
+              <div class="quick-stat"><span class="quick-stat-icon">&#x23F3;</span><div><div class="quick-stat-value">${producingAnimals}</div><div class="quick-stat-label">Working</div></div></div>
             </div>
           </div>
           <div class="dashboard-card">
@@ -783,18 +680,46 @@
     }
 
     function renderCrops() {
-      let html = `<div class="crops-header"><div class="section-title">&#x1F33E; Crop Management</div><div class="crops-controls"><div class="control-group"><span class="control-label">Auto-Replant</span><div class="toggle-switch ${gameState.settings.autoReplant ? 'on' : ''}" onclick="toggleAutoReplant()"></div></div><div class="control-group"><span class="control-label">Priority</span><select id="priority-select" onchange="setPriority(this.value)">${Object.entries(CONFIG.crops).map(([k, v]) => gameState.level >= v.unlockLevel ? `<option value="${k}" ${gameState.settings.priorityCrop === k ? 'selected' : ''}>${v.name}</option>` : '').join('')}</select></div><button class="action-btn" onclick="plantAllEmpty()">&#x1F331; Plant All</button></div></div><div class="crops-grid">`;
+      const unlockedCrops = Object.entries(CONFIG.crops).filter(([k, v]) => gameState.level >= v.unlockLevel);
+      let html = `<div class="crops-header"><div class="section-title">&#x1F33E; Crop Management</div><div class="crops-controls"><div class="control-group"><span class="control-label">Auto-Replant</span><div class="toggle-switch ${gameState.settings.autoReplant ? 'on' : ''}" onclick="toggleAutoReplant()"></div></div><div class="control-group"><span class="control-label">Priority</span><select id="priority-select" onchange="setPriority(this.value)">${unlockedCrops.map(([k, v]) => `<option value="${k}" ${gameState.settings.priorityCrop === k ? 'selected' : ''}>${v.name}</option>`).join('')}</select></div><button class="action-btn" onclick="plantAllEmpty()">&#x1F331; Plant All</button></div></div><div class="crops-grid">`;
+
       gameState.plots.forEach((plot, i) => {
         const num = i + 1;
-        if (plot.state === 'empty') html += `<div class="plot-card empty"><span class="plot-number">#${num}</span><div class="plot-icon">&#x1F532;</div><div class="plot-name">Empty</div><select class="plot-select" id="sel-${num}">${Object.entries(CONFIG.crops).map(([k, v]) => gameState.level >= v.unlockLevel ? `<option value="${k}">${v.icon} ${v.name}</option>` : '').join('')}</select><button class="plot-btn" onclick="plantFromSelect(${num})">Plant</button></div>`;
-        else if (plot.state === 'growing') { const c = CONFIG.crops[plot.cropType], r = Math.max(0, (plot.readyAt - Date.now()) / 1000), p = ((c.growTime - r) / c.growTime) * 100; html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(r)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${p}%"></div></div></div>`; }
-        else { const c = CONFIG.crops[plot.cropType]; html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`; }
+        if (plot.state === 'empty') {
+          html += `<div class="plot-card empty"><span class="plot-number">#${num}</span><div class="plot-icon">&#x1F532;</div><div class="plot-name">Empty</div><select class="plot-select" id="sel-${num}">${unlockedCrops.map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select><button class="plot-btn" onclick="plantFromSelect(${num})">Plant</button></div>`;
+        } else if (plot.state === 'growing') {
+          const c = CONFIG.crops[plot.cropType];
+          const remaining = Math.max(0, (plot.readyAt - Date.now()) / 1000);
+          const progress = ((c.growTime - remaining) / c.growTime) * 100;
+          html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(remaining)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${progress}%"></div></div></div>`;
+        } else {
+          const c = CONFIG.crops[plot.cropType];
+          html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`;
+        }
       });
-      html += '</div>'; document.getElementById('tab-crops').innerHTML = html;
+      html += '</div>';
+      document.getElementById('tab-crops').innerHTML = html;
     }
-    function plantFromSelect(id) { const s = document.getElementById(`sel-${id}`); if (s && s.value) plantCrop(id, s.value); }
-    function toggleAutoReplant() { gameState.settings.autoReplant = !gameState.settings.autoReplant; saveGame(); renderCrops(); notify(`Auto-replant ${gameState.settings.autoReplant ? 'ON' : 'OFF'}`, 'success'); }
-    function setPriority(c) { gameState.settings.priorityCrop = c; saveGame(); }
+
+    function plantFromSelect(id) {
+      const s = document.getElementById(`sel-${id}`);
+      if (s && s.value) {
+        plantCrop(id, s.value);
+        renderCrops();
+      }
+    }
+
+    function toggleAutoReplant() {
+      gameState.settings.autoReplant = !gameState.settings.autoReplant;
+      saveGameQuiet();
+      renderCrops();
+      notify(`Auto-replant ${gameState.settings.autoReplant ? 'ON' : 'OFF'}`, 'success');
+    }
+
+    function setPriority(c) {
+      gameState.settings.priorityCrop = c;
+      saveGameQuiet();
+    }
 
     function renderInventory() {
       const sections = [
@@ -807,12 +732,12 @@
           { key: 'pumpkin', name: 'Pumpkin', icon: '&#x1F383;' }
         ]},
         { title: 'Seeds', items: [
-          { key: 'seeds_wheat', name: 'Wheat Seeds', icon: '&#x1F331;' },
-          { key: 'seeds_carrot', name: 'Carrot Seeds', icon: '&#x1F331;' },
-          { key: 'seeds_corn', name: 'Corn Seeds', icon: '&#x1F331;' },
-          { key: 'seeds_potato', name: 'Potato Seeds', icon: '&#x1F331;' },
-          { key: 'seeds_tomato', name: 'Tomato Seeds', icon: '&#x1F331;' },
-          { key: 'seeds_pumpkin', name: 'Pumpkin Seeds', icon: '&#x1F331;' }
+          { key: 'seeds_wheat', name: 'Wheat', icon: '&#x1F331;' },
+          { key: 'seeds_carrot', name: 'Carrot', icon: '&#x1F331;' },
+          { key: 'seeds_corn', name: 'Corn', icon: '&#x1F331;' },
+          { key: 'seeds_potato', name: 'Potato', icon: '&#x1F331;' },
+          { key: 'seeds_tomato', name: 'Tomato', icon: '&#x1F331;' },
+          { key: 'seeds_pumpkin', name: 'Pumpkin', icon: '&#x1F331;' }
         ]},
         { title: 'Animal Products', items: [
           { key: 'milk', name: 'Milk', icon: '&#x1F95B;' },
@@ -834,17 +759,28 @@
           { key: 'cake', name: 'Cake', icon: '&#x1F370;' }
         ]}
       ];
-      let html = ''; sections.forEach(s => { html += `<div class="inventory-section"><div class="section-title">${s.title}</div><div class="inventory-grid">${s.items.map(i => `<div class="inv-item ${gameState.inventory[i.key] === 0 ? 'zero' : ''}"><div class="inv-icon">${i.icon}</div><div class="inv-name">${i.name}</div><div class="inv-qty">${gameState.inventory[i.key] || 0}</div></div>`).join('')}</div></div>`; });
+      let html = '';
+      sections.forEach(s => {
+        html += `<div class="inventory-section"><div class="section-title">${s.title}</div><div class="inventory-grid">${s.items.map(i => `<div class="inv-item ${gameState.inventory[i.key] === 0 ? 'zero' : ''}"><div class="inv-icon">${i.icon}</div><div class="inv-name">${i.name}</div><div class="inv-qty">${gameState.inventory[i.key] || 0}</div></div>`).join('')}</div></div>`;
+      });
       document.getElementById('tab-inventory').innerHTML = html;
     }
 
-
     function renderAnimals() {
-      // Helper function to render an animal card with state-based UI
       function renderAnimalCard(animal, index, type, config) {
         const id = index + 1;
-        let statusText, statusClass, buttonText, buttonDisabled, buttonAction;
+        const locked = gameState.level < config.unlockLevel;
 
+        if (locked) {
+          return `<div class="animal-card locked">
+            <div class="animal-icon">${config.icon}</div>
+            <div class="animal-name">${config.name} ${id}</div>
+            <div class="locked-text">Unlocks Lv.${config.unlockLevel}</div>
+            <button class="animal-btn" disabled>Locked</button>
+          </div>`;
+        }
+
+        let statusText, statusClass, buttonText, buttonDisabled, buttonAction;
         if (animal.state === 'idle') {
           statusText = 'Idle';
           statusClass = '';
@@ -855,14 +791,14 @@
           const rem = Math.max(0, Math.ceil((animal.readyAt - Date.now()) / 1000));
           statusText = formatTime(rem);
           statusClass = 'cooldown';
-          buttonText = 'Producing...';
+          buttonText = 'Working...';
           buttonDisabled = true;
           buttonAction = '';
-        } else if (animal.state === 'ready') {
-          statusText = 'Go collect!';
+        } else {
+          statusText = 'Ready!';
           statusClass = 'ready';
           buttonText = 'Collect in 3D';
-          buttonDisabled = true; // Can't collect from UI, must go in-game
+          buttonDisabled = true;
           buttonAction = '';
         }
 
@@ -879,54 +815,151 @@
       }
 
       let html = '';
+      const animalTypes = [
+        { type: 'cow', array: gameState.animals.cows, config: CONFIG.animals.cow, title: 'Cows (Milk)' },
+        { type: 'chicken', array: gameState.animals.chickens, config: CONFIG.animals.chicken, title: 'Chickens (Egg)' },
+        { type: 'sheep', array: gameState.animals.sheep, config: CONFIG.animals.sheep, title: 'Sheep (Wool)' },
+        { type: 'goat', array: gameState.animals.goats, config: CONFIG.animals.goat, title: 'Goats (Meat)' },
+        { type: 'pig', array: gameState.animals.pigs, config: CONFIG.animals.pig, title: 'Pigs (Truffle)' }
+      ];
 
-      // Cows (6)
-      html += `<div class="animals-section"><div class="section-title">&#x1F404; Cows (Milk)</div><div class="animals-grid">`;
-      html += gameState.animals.cows.map((c, i) => renderAnimalCard(c, i, 'cow', CONFIG.animals.cow)).join('');
-      html += `</div></div>`;
-
-      // Sheep (5)
-      html += `<div class="animals-section"><div class="section-title">&#x1F411; Sheep (Wool)</div><div class="animals-grid">`;
-      html += gameState.animals.sheep.map((s, i) => renderAnimalCard(s, i, 'sheep', CONFIG.animals.sheep)).join('');
-      html += `</div></div>`;
-
-      // Goats (5)
-      html += `<div class="animals-section"><div class="section-title">&#x1F410; Goats (Goat Meat)</div><div class="animals-grid">`;
-      html += gameState.animals.goats.map((g, i) => renderAnimalCard(g, i, 'goat', CONFIG.animals.goat)).join('');
-      html += `</div></div>`;
-
-      // Pigs (6) - produce Truffle
-      html += `<div class="animals-section"><div class="section-title">&#x1F437; Pigs (Truffle)</div><div class="animals-grid">`;
-      html += gameState.animals.pigs.map((p, i) => renderAnimalCard(p, i, 'pig', CONFIG.animals.pig)).join('');
-      html += `</div></div>`;
-
-      // Chickens (5)
-      html += `<div class="animals-section"><div class="section-title">&#x1F414; Chickens (Egg)</div><div class="animals-grid">`;
-      html += gameState.animals.chickens.map((c, i) => renderAnimalCard(c, i, 'chicken', CONFIG.animals.chicken)).join('');
-      html += `</div></div>`;
+      animalTypes.forEach(({ type, array, config, title }) => {
+        const unlocked = gameState.level >= config.unlockLevel;
+        html += `<div class="animals-section"><div class="section-title">${config.icon} ${title} ${!unlocked ? `(Lv.${config.unlockLevel})` : ''}</div><div class="animals-grid">`;
+        html += array.map((a, i) => renderAnimalCard(a, i, type, config)).join('');
+        html += `</div></div>`;
+      });
 
       document.getElementById('tab-animals').innerHTML = html;
     }
 
-    function updateAllUI() { updateHeader(); renderDashboard(); renderCrops(); renderInventory(); renderAnimals(); }
+    function renderXP() {
+      const totalXP = gameState.xp;
+      const h = gameState.xpHistory;
 
-    document.querySelectorAll('.nav-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); tab.classList.add('active'); document.getElementById('tab-' + tab.dataset.tab).classList.add('active'); const n = tab.dataset.tab; if (n === 'dashboard') renderDashboard(); else if (n === 'crops') renderCrops(); else if (n === 'inventory') renderInventory(); else if (n === 'animals') renderAnimals(); }); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Tab') { e.preventDefault(); closeMenu(); } if (e.key >= '1' && e.key <= '4') { const tabs = ['dashboard', 'crops', 'inventory', 'animals']; document.querySelector(`[data-tab="${tabs[parseInt(e.key) - 1]}"]`).click(); } });
+      let html = `
+        <div class="section-title">&#x2B50; XP Breakdown</div>
+        <div class="xp-summary">
+          <div class="xp-summary-item"><div class="xp-summary-value">${totalXP}</div><div class="xp-summary-label">Total XP</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">${h.planting || 0}</div><div class="xp-summary-label">From Planting</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">${h.harvesting || 0}</div><div class="xp-summary-label">From Harvesting</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">${h.animals || 0}</div><div class="xp-summary-label">From Animals</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">${h.crafting || 0}</div><div class="xp-summary-label">From Crafting</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">${h.selling || 0}</div><div class="xp-summary-label">From Selling</div></div>
+        </div>
+        <div class="section-title">XP Rewards</div>
+        <div class="xp-history">
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Wheat/Carrot</span><span class="xp-entry-amount">+2 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Corn/Potato</span><span class="xp-entry-amount">+3 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Tomato</span><span class="xp-entry-amount">+4 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Pumpkin</span><span class="xp-entry-amount">+5 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Harvest Basic Crops</span><span class="xp-entry-amount">+5 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Harvest Advanced Crops</span><span class="xp-entry-amount">+8-15 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F414; Collect from Chickens</span><span class="xp-entry-amount">+3 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F404; Collect from Cows</span><span class="xp-entry-amount">+5 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F411; Collect from Sheep</span><span class="xp-entry-amount">+6 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F410; Collect from Goats</span><span class="xp-entry-amount">+8 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F437; Collect from Pigs</span><span class="xp-entry-amount">+10 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x2692; Craft Items</span><span class="xp-entry-amount">+10-40 XP</span></div>
+        </div>`;
+      document.getElementById('tab-xp').innerHTML = html;
+    }
 
-    function notify(msg, type = 'success') { const c = document.getElementById('notifications'), n = document.createElement('div'); n.className = `notification ${type}`; n.innerHTML = `<span class="notification-icon">${type === 'success' ? '&#x2705;' : '&#x274C;'}</span><span class="notification-text">${msg}</span>`; c.appendChild(n); setTimeout(() => n.remove(), 3000); }
+    function renderUnlocks() {
+      let html = `<div class="section-title">&#x1F513; Level Unlocks</div><div class="unlock-list">`;
+
+      CONFIG.unlocks.forEach(unlock => {
+        const unlocked = gameState.level >= unlock.level;
+        const current = gameState.level === unlock.level;
+        const statusIcon = unlocked ? '&#x2705;' : (current ? '&#x1F4A1;' : '&#x1F512;');
+
+        html += `<div class="unlock-item ${unlocked ? 'unlocked' : ''} ${current ? 'current' : ''}">
+          <div class="unlock-level ${unlocked ? 'unlocked' : ''}">${unlock.level}</div>
+          <div class="unlock-content">
+            <div class="unlock-title">${unlock.title}</div>
+            <div class="unlock-desc">${unlock.desc}</div>
+          </div>
+          <div class="unlock-status">${statusIcon}</div>
+        </div>`;
+      });
+
+      // XP requirements
+      html += `</div><div class="section-title" style="margin-top:20px">&#x1F4CA; XP Requirements</div><div class="unlock-list">`;
+      CONFIG.levelThresholds.forEach((xp, i) => {
+        if (i === 0) return;
+        const level = i + 1;
+        const unlocked = gameState.level >= level;
+        html += `<div class="unlock-item ${unlocked ? 'unlocked' : ''}">
+          <div class="unlock-level ${unlocked ? 'unlocked' : ''}">${level}</div>
+          <div class="unlock-content">
+            <div class="unlock-title">Level ${level}</div>
+            <div class="unlock-desc">Requires ${xp} total XP</div>
+          </div>
+          <div class="unlock-status">${unlocked ? '&#x2705;' : '&#x1F512;'}</div>
+        </div>`;
+      });
+      html += '</div>';
+
+      document.getElementById('tab-unlocks').innerHTML = html;
+    }
+
+    function updateAllUI() {
+      updateHeader();
+      renderDashboard();
+      renderCrops();
+      renderInventory();
+      renderAnimals();
+      renderXP();
+      renderUnlocks();
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        const n = tab.dataset.tab;
+        if (n === 'dashboard') renderDashboard();
+        else if (n === 'crops') renderCrops();
+        else if (n === 'inventory') renderInventory();
+        else if (n === 'animals') renderAnimals();
+        else if (n === 'xp') renderXP();
+        else if (n === 'unlocks') renderUnlocks();
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') { e.preventDefault(); closeMenu(); }
+      if (e.key >= '1' && e.key <= '6') {
+        const tabs = ['dashboard', 'crops', 'inventory', 'animals', 'xp', 'unlocks'];
+        document.querySelector(`[data-tab="${tabs[parseInt(e.key) - 1]}"]`)?.click();
+      }
+    });
+
+    function notify(msg, type = 'success') {
+      const c = document.getElementById('notifications');
+      const n = document.createElement('div');
+      n.className = `notification ${type}`;
+      n.innerHTML = `<span class="notification-icon">${type === 'success' ? '&#x2705;' : '&#x274C;'}</span><span class="notification-text">${msg}</span>`;
+      c.appendChild(n);
+      setTimeout(() => n.remove(), 3000);
+    }
 
     function gameLoop() {
-      // Check crops - trigger Ready task when timer completes
+      let needsRender = false;
+
+      // Check crops
       gameState.plots.forEach((p, i) => {
         if (p.state === 'growing' && Date.now() >= p.readyAt) {
           p.state = 'ready';
           triggerTask(`Ready_Plot_${i + 1}`);
           notify(`Plot ${i + 1} is ready!`, 'success');
+          needsRender = true;
         }
       });
 
-      // Check animals - trigger Ready tasks when production completes
-      // Animals follow same pattern as plots: producing → ready → collect in 3D
+      // Check animals
       const animalChecks = [
         { type: 'cow', array: gameState.animals.cows, name: 'Cow' },
         { type: 'sheep', array: gameState.animals.sheep, name: 'Sheep' },
@@ -942,13 +975,14 @@
             if (!animal.notified) {
               animalBecameReady(type, i + 1);
               animal.notified = true;
-              notify(`${name} ${i + 1} is ready to collect!`, 'success');
+              notify(`${name} ${i + 1} is ready!`, 'success');
+              needsRender = true;
             }
           }
         });
       });
 
-      // Update UI
+      // Always update active tab for timers
       const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
       if (activeTab === 'dashboard') renderDashboard();
       else if (activeTab === 'crops') renderCrops();
@@ -959,9 +993,10 @@
       loadFromStorage();
       updateAllUI();
       setInterval(gameLoop, 1000);
-      setInterval(() => { localStorage.setItem('farmville_state', JSON.stringify(gameState)); }, 30000);
+      setInterval(saveGameQuiet, 30000);
       console.log('[Farmville] Initialized');
     }
+
     window.onload = init;
   </script>
 </body>
