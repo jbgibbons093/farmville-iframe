@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>House Decorations</title>
+  <title>Hughberry Farms - Decorations</title>
   <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,7 +57,7 @@
     }
 
     function handleMessage(msg) {
-      console.log('[Decorations] Received:', msg);
+      console.log('[Hughberry Decorations] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
         const parts = msg.replace('Sync_Inventory_', '').split('_');
         for (let i = 0; i < parts.length - 1; i += 2) {

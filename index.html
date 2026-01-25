@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farmville</title>
+  <title>Hughberry Farms</title>
   <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -165,7 +165,7 @@
   <div class="overlay">
     <div class="menu-container">
       <div class="menu-header">
-        <div class="game-title">FARMVILLE</div>
+        <div class="game-title">HUGHBERRY FARMS</div>
         <div class="header-stats">
           <div class="stat-box"><span class="stat-icon">&#x1F4B0;</span><div><div class="stat-value" id="header-gold">100</div><div class="stat-label">Gold</div></div></div>
           <div class="stat-box"><span class="stat-icon">&#x2B50;</span><div><div class="stat-value">Lv.<span id="header-level">1</span></div><div class="xp-bar-bg"><div class="xp-bar-fill" id="header-xp-bar" style="width:0%"></div></div></div></div>
@@ -368,7 +368,7 @@
     }
 
     function handlePortalsMessage(msg) {
-      console.log('[Farmville] Received:', msg);
+      console.log('[Hughberry] Received:', msg);
       if (typeof msg !== 'string') return;
       const parts = msg.split('_');
       const cmd = parts[0];
@@ -440,7 +440,7 @@
     }
 
     function saveGameQuiet() {
-      localStorage.setItem('farmville_state', JSON.stringify(gameState));
+      localStorage.setItem('hughberry_state', JSON.stringify(gameState));
     }
 
     function saveGame() {
@@ -449,7 +449,7 @@
     }
 
     function loadFromStorage() {
-      const saved = localStorage.getItem('farmville_state');
+      const saved = localStorage.getItem('hughberry_state');
       if (saved) {
         try {
           const p = JSON.parse(saved);
@@ -994,7 +994,7 @@
       updateAllUI();
       setInterval(gameLoop, 1000);
       setInterval(saveGameQuiet, 30000);
-      console.log('[Farmville] Initialized');
+      console.log('[Hughberry Farms] Initialized');
     }
 
     window.onload = init;

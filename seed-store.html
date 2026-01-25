@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Seed Store</title>
+  <title>Hughberry Farms - Seed Store</title>
   <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -78,7 +78,7 @@
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
         PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
       }
-      console.log('[SeedStore] Task:', taskName);
+      console.log('[Hughberry SeedStore] Task:', taskName);
     }
 
     function notify(msg) {
@@ -136,7 +136,7 @@
     }
 
     function handleMessage(msg) {
-      console.log('[SeedStore] Received:', msg);
+      console.log('[Hughberry SeedStore] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('init_')) {
         const parts = msg.split('_');
         gameState.gold = parseInt(parts[1]) || 0;
