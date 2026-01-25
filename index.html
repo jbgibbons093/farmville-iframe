@@ -339,17 +339,29 @@
       const cropType = plot.cropType || 'wheat';
       const crop = CONFIG.crops[cropType];
 
-      if (!crop) {
-        console.log('No crop found, using wheat as default');
-        notify('+3 Wheat! (harvested)', 'success');
-        gameState.inventory.wheat += 3;
-      } else {
-        let amount = crop.yield;
+      let amount = 3; // default
+      if (crop) {
+        amount = crop.yield;
         if (gameState.equipment.basket) amount = Math.floor(amount * 1.5);
-        gameState.inventory[cropType] += amount;
-        notify(`+${amount} ${crop.name}!`, 'success');
-        console.log('Harvested', amount, crop.name);
       }
+
+      // Update Portals variables - trigger Add_Crop tasks
+      const cropVarName = `Crop_${crop ? crop.name : 'Wheat'}`;
+      // Use 5s and 1s to reach the amount
+      const fives = Math.floor(amount / 5);
+      const ones = amount % 5;
+      for (let i = 0; i < fives; i++) {
+        triggerTask(`Add_${cropVarName}_5`, 'SetNotActiveToActive');
+      }
+      for (let i = 0; i < ones; i++) {
+        triggerTask(`Add_${cropVarName}_1`, 'SetNotActiveToActive');
+      }
+      console.log(`Triggered Add_${cropVarName}: ${fives}x5 + ${ones}x1 = ${amount}`);
+
+      // Update local inventory
+      gameState.inventory[cropType] += amount;
+      notify(`+${amount} ${crop ? crop.name : 'Wheat'}!`, 'success');
+      console.log('Harvested', amount, crop ? crop.name : 'Wheat');
 
       addXP(5);
 
