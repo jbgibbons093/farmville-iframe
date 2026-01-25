@@ -329,8 +329,8 @@
       const plot = gameState.plots[plotId - 1];
       console.log('harvestPlotFromTrigger called for plot', plotId, 'cropType:', plot.cropType, 'state:', plot.state);
 
-      // Tell Portals to complete the harvest (runs Move Item, resets variables, etc.)
-      triggerTask(`Harvest_Plot_${plotId}`, 'SetActiveToCompleted');
+      // Tell Portals to run the harvest task (Move Item, reset variables, etc.)
+      triggerTask(`Harvest_Plot_${plotId}`, 'SetNotActiveToActive');
 
       // Get crop info - use stored cropType or default to wheat for testing
       const cropType = plot.cropType || 'wheat';
