@@ -169,11 +169,22 @@
       }
     }
 
-    // Also listen via window.postMessage as fallback (filter out extension noise)
+    // Also listen via window.postMessage as fallback (handle different message formats)
     window.addEventListener('message', function(event) {
+      // Direct string message
       if (event.data && typeof event.data === 'string') {
-        console.log('[Hughberry SeedStore] postMessage received:', event.data);
+        console.log('[Hughberry SeedStore] postMessage string:', event.data);
         handleMessage(event.data);
+      }
+      // Object with portalsMessage property (SDK format)
+      else if (event.data && event.data.portalsMessage) {
+        console.log('[Hughberry SeedStore] postMessage portalsMessage:', event.data.portalsMessage);
+        handleMessage(event.data.portalsMessage);
+      }
+      // Object with message property
+      else if (event.data && event.data.message && typeof event.data.message === 'string') {
+        console.log('[Hughberry SeedStore] postMessage message:', event.data.message);
+        handleMessage(event.data.message);
       }
     });
 
