@@ -208,11 +208,11 @@
         pumpkin: { id: 6, name: 'Pumpkin', icon: '&#x1F383;', growTime: 120, yield: 1, sellPrice: 30, seedCost: 15, unlockLevel: 5, plantXP: 5, harvestXP: 15 }
       },
       animals: {
-        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 1, collectXP: 5 },
-        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5, unlockLevel: 1, collectXP: 3 },
-        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 2, collectXP: 6 },
-        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 3, collectXP: 8 },
-        pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 4, collectXP: 10 }
+        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 1, startXP: 2, collectXP: 5 },
+        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5, unlockLevel: 1, startXP: 1, collectXP: 3 },
+        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 2, startXP: 3, collectXP: 6 },
+        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 3, startXP: 4, collectXP: 8 },
+        pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 4, startXP: 5, collectXP: 10 }
       },
       recipes: [
         { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 20, xp: 10, taskName: 'Craft_Flour' },
@@ -224,7 +224,8 @@
         { id: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', ingredients: { goat_meat: 1, flour: 1, egg: 1 }, sellPrice: 90, xp: 35, taskName: 'Craft_Meat_Pie' },
         { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 50, xp: 20, taskName: 'Craft_Blanket' },
         { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter' },
-        { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' }
+        { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' },
+        { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 3 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
       ],
       equipment: [
         { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'No bee sting damage', unlockLevel: 6 },
@@ -599,12 +600,14 @@
 
       // Trigger the animal activity task
       triggerTask(`${config.name}_${id}_Trigger`);
+      triggerTask(`Add_XP_${config.startXP}`);
 
       animal.state = 'producing';
       animal.readyAt = Date.now() + (config.cooldown * 1000);
       animal.notified = false;
 
-      notify(`Started ${config.name} ${id}!`, 'success');
+      addXP(config.startXP, 'animals');
+      notify(`Started ${config.name} ${id}! +${config.startXP} XP`, 'success');
       saveGameQuiet();
       renderAnimals();
     }
@@ -936,20 +939,55 @@
           <div class="xp-summary-item"><div class="xp-summary-value">${h.crafting || 0}</div><div class="xp-summary-label">From Crafting</div></div>
           <div class="xp-summary-item"><div class="xp-summary-value">${h.selling || 0}</div><div class="xp-summary-label">From Selling</div></div>
         </div>
-        <div class="section-title">XP Rewards</div>
+
+        <div class="section-title">Planting XP</div>
         <div class="xp-history">
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Wheat/Carrot</span><span class="xp-entry-amount">+2 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Corn/Potato</span><span class="xp-entry-amount">+3 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Tomato</span><span class="xp-entry-amount">+4 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F331; Plant Pumpkin</span><span class="xp-entry-amount">+5 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Harvest Basic Crops</span><span class="xp-entry-amount">+5 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Harvest Advanced Crops</span><span class="xp-entry-amount">+8-15 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F414; Collect from Chickens</span><span class="xp-entry-amount">+3 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F404; Collect from Cows</span><span class="xp-entry-amount">+5 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F411; Collect from Sheep</span><span class="xp-entry-amount">+6 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F410; Collect from Goats</span><span class="xp-entry-amount">+8 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F437; Collect from Pigs</span><span class="xp-entry-amount">+10 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x2692; Craft Items</span><span class="xp-entry-amount">+10-40 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Plant Wheat</span><span class="xp-entry-amount">+2 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F955; Plant Carrot</span><span class="xp-entry-amount">+2 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33D; Plant Corn</span><span class="xp-entry-amount">+3 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F954; Plant Potato</span><span class="xp-entry-amount">+3 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F345; Plant Tomato</span><span class="xp-entry-amount">+4 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F383; Plant Pumpkin</span><span class="xp-entry-amount">+5 XP</span></div>
+        </div>
+
+        <div class="section-title">Harvesting XP</div>
+        <div class="xp-history">
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Harvest Wheat</span><span class="xp-entry-amount">+5 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F955; Harvest Carrot</span><span class="xp-entry-amount">+5 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33D; Harvest Corn</span><span class="xp-entry-amount">+8 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F954; Harvest Potato</span><span class="xp-entry-amount">+8 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F345; Harvest Tomato</span><span class="xp-entry-amount">+10 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F383; Harvest Pumpkin</span><span class="xp-entry-amount">+15 XP</span></div>
+        </div>
+
+        <div class="section-title">Animal XP (Start + Collect)</div>
+        <div class="xp-history">
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F414; Chicken (Start)</span><span class="xp-entry-amount">+1 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F414; Chicken (Collect Egg)</span><span class="xp-entry-amount">+3 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F404; Cow (Start)</span><span class="xp-entry-amount">+2 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F404; Cow (Collect Milk)</span><span class="xp-entry-amount">+5 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F411; Sheep (Start)</span><span class="xp-entry-amount">+3 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F411; Sheep (Collect Wool)</span><span class="xp-entry-amount">+6 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F410; Goat (Start)</span><span class="xp-entry-amount">+4 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F410; Goat (Collect Meat)</span><span class="xp-entry-amount">+8 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F437; Pig (Start)</span><span class="xp-entry-amount">+5 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F437; Pig (Collect Truffle)</span><span class="xp-entry-amount">+10 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F41D; Collect Honey</span><span class="xp-entry-amount">+5 XP</span></div>
+        </div>
+
+        <div class="section-title">Crafting XP</div>
+        <div class="xp-history">
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F35E; Craft Flour</span><span class="xp-entry-amount">+10 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9C8; Craft Butter</span><span class="xp-entry-amount">+15 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9C0; Craft Cheese</span><span class="xp-entry-amount">+15 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F956; Craft Bread</span><span class="xp-entry-amount">+15 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9E3; Craft Blanket</span><span class="xp-entry-amount">+20 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F372; Craft Stew</span><span class="xp-entry-amount">+25 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F37A; Craft Mead</span><span class="xp-entry-amount">+25 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F967; Craft Pie</span><span class="xp-entry-amount">+30 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F356; Craft Ragout</span><span class="xp-entry-amount">+30 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F969; Craft Meat Pie</span><span class="xp-entry-amount">+35 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F370; Craft Cake</span><span class="xp-entry-amount">+40 XP</span></div>
         </div>`;
       document.getElementById('tab-xp').innerHTML = html;
     }

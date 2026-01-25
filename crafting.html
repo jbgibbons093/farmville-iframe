@@ -90,10 +90,15 @@
     let gameState = { inventory: {}, recipes: {} };
 
     function triggerTask(taskName) {
+      const message = JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' });
+      console.log('[Hughberry Crafting] Sending task:', taskName, 'SDK available:', typeof PortalsSdk !== 'undefined');
+
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
+        PortalsSdk.sendMessageToUnity(message);
+        console.log('[Hughberry Crafting] Message sent:', message);
+      } else {
+        console.warn('[Hughberry Crafting] SDK NOT AVAILABLE - cannot send:', message);
       }
-      console.log('[Hughberry Crafting] Task:', taskName);
     }
 
     function notify(msg) {
@@ -104,11 +109,16 @@
     }
 
     function craftItem(recipeId) {
+      console.log('[Hughberry Crafting] craftItem called with:', recipeId);
       const recipe = RECIPES.find(r => r.id === recipeId);
-      if (!recipe) return;
+      if (!recipe) {
+        console.log('[Hughberry Crafting] Recipe not found:', recipeId);
+        return;
+      }
 
       // Check if player owns the recipe
       if (!gameState.recipes['recipe_' + recipeId]) {
+        console.log('[Hughberry Crafting] Recipe not owned:', 'recipe_' + recipeId);
         notify('You need to buy this recipe first!');
         return;
       }
@@ -116,21 +126,37 @@
       // Check ingredients
       for (const [ing, qty] of Object.entries(recipe.ingredients)) {
         if ((gameState.inventory[ing] || 0) < qty) {
+          console.log('[Hughberry Crafting] Missing ingredient:', ing, 'have:', gameState.inventory[ing] || 0, 'need:', qty);
           notify('Missing ingredients!');
           return;
         }
       }
 
-      // Consume ingredients
+      // Consume ingredients locally (Portals will also update)
       for (const [ing, qty] of Object.entries(recipe.ingredients)) {
         gameState.inventory[ing] -= qty;
       }
 
-      // Add product
+      // Add product locally (Portals will also update)
       gameState.inventory[recipeId] = (gameState.inventory[recipeId] || 0) + 1;
 
-      // Trigger task
+      // Trigger craft task
+      console.log('[Hughberry Crafting] Triggering:', recipe.taskName);
       triggerTask(recipe.taskName);
+
+      // Trigger XP task after short delay to avoid message collision
+      const xpAmount = recipe.xp;
+      setTimeout(function() {
+        console.log('[Hughberry Crafting] Triggering: Add_XP_' + xpAmount);
+        triggerTask('Add_XP_' + xpAmount);
+      }, 100);
+
+      // Request sync to get updated state from Portals
+      setTimeout(function() {
+        console.log('[Hughberry Crafting] Requesting Sync_Inventory after craft');
+        triggerTask('Sync_Inventory');
+      }, 300);
+
       notify('Crafted ' + recipe.name + '! +' + recipe.xp + ' XP');
       render();
     }
