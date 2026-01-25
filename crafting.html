@@ -73,14 +73,16 @@
       { id: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', ingredients: { goat_meat: 1, flour: 1, egg: 1 }, sellPrice: 90, xp: 35, taskName: 'Craft_Meat_Pie' },
       { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 50, xp: 20, taskName: 'Craft_Blanket' },
       { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter' },
-      { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' }
+      { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' },
+      { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 3 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
     ];
 
     const INGREDIENT_ICONS = {
       wheat: '&#x1F33E;', carrot: '&#x1F955;', corn: '&#x1F33D;',
       potato: '&#x1F954;', tomato: '&#x1F345;', pumpkin: '&#x1F383;',
       milk: '&#x1F95B;', wool: '&#x1F9F6;', goat_meat: '&#x1F356;',
-      truffle: '&#x1F344;', egg: '&#x1F95A;', flour: '&#x1F35E;', butter: '&#x1F9C8;'
+      truffle: '&#x1F344;', egg: '&#x1F95A;', flour: '&#x1F35E;', butter: '&#x1F9C8;',
+      honey: '&#x1F36F;'
     };
 
     let gameState = { inventory: {} };
@@ -179,7 +181,8 @@
         'Crop_Wheat': 'wheat', 'Crop_Carrot': 'carrot', 'Crop_Corn': 'corn',
         'Crop_Potato': 'potato', 'Crop_Tomato': 'tomato', 'Crop_Pumpkin': 'pumpkin',
         'Milk': 'milk', 'Wool': 'wool', 'Goat_Meat': 'goat_meat',
-        'Truffle': 'truffle', 'Egg': 'egg', 'Flour': 'flour', 'Butter': 'butter'
+        'Truffle': 'truffle', 'Egg': 'egg', 'Flour': 'flour', 'Butter': 'butter',
+        'Honey': 'honey', 'Mead': 'mead'
       };
 
       const parts = msg.replace('Sync_Inventory_', '').split('_');
@@ -207,7 +210,8 @@
     // Initialize with test data
     gameState.inventory = {
       wheat: 10, carrot: 5, corn: 3, potato: 4, pumpkin: 2,
-      milk: 6, wool: 4, goat_meat: 2, egg: 8, flour: 2, butter: 1
+      milk: 6, wool: 4, goat_meat: 2, egg: 8, flour: 2, butter: 1,
+      honey: 5
     };
     render();
   </script>

@@ -64,8 +64,8 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const EQUIPMENT = [
-      { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'Protects from bee stings when collecting honey' },
-      { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: 'Increases crop yield by 50%' }
+      { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'Protects from bee stings when collecting honey', taskName: 'Buy_Beesuit' },
+      { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: 'Increases crop yield by 50%', taskName: 'Buy_Basket' }
     ];
 
     let gameState = { gold: 0, equipment: { beesuit: false, basket: false } };
@@ -90,7 +90,7 @@
       if (gameState.equipment[id]) { notify('Already owned!'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!'); return; }
 
-      triggerTask('Buy_' + equip.name.replace(' ', '_'));
+      triggerTask(equip.taskName);
       gameState.gold -= equip.price;
       gameState.equipment[id] = true;
       notify('Purchased ' + equip.name + '!');
