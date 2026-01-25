@@ -19,6 +19,8 @@
     .recipe { background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%); border: 2px solid #4a3a2a; border-radius: 12px; padding: 15px; transition: all 0.2s; }
     .recipe:hover { border-color: #8B4513; }
     .recipe.craftable { border-color: #27ae60; box-shadow: 0 0 10px rgba(39, 174, 96, 0.2); }
+    .recipe.locked { opacity: 0.6; border-color: #555; }
+    .recipe-locked-notice { background: rgba(231, 76, 60, 0.2); border: 1px solid #c0392b; color: #e74c3c; padding: 8px 12px; border-radius: 6px; font-size: 12px; margin-bottom: 12px; text-align: center; }
     .recipe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .recipe-name { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
     .recipe-icon { font-size: 28px; }
@@ -85,7 +87,7 @@
       honey: '&#x1F36F;'
     };
 
-    let gameState = { inventory: {} };
+    let gameState = { inventory: {}, recipes: {} };
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -104,6 +106,12 @@
     function craftItem(recipeId) {
       const recipe = RECIPES.find(r => r.id === recipeId);
       if (!recipe) return;
+
+      // Check if player owns the recipe
+      if (!gameState.recipes['recipe_' + recipeId]) {
+        notify('You need to buy this recipe first!');
+        return;
+      }
 
       // Check ingredients
       for (const [ing, qty] of Object.entries(recipe.ingredients)) {
@@ -130,7 +138,8 @@
     function render() {
       let html = '';
       RECIPES.forEach(recipe => {
-        let canCraft = true;
+        const hasRecipe = gameState.recipes['recipe_' + recipe.id];
+        let canCraft = hasRecipe;
         let ingredientsHtml = '';
 
         for (const [ing, qty] of Object.entries(recipe.ingredients)) {
@@ -145,7 +154,11 @@
           '</span>';
         }
 
-        html += '<div class="recipe ' + (canCraft ? 'craftable' : '') + '">' +
+        let buttonText = '&#x2692;&#xFE0F; Craft';
+        if (!hasRecipe) buttonText = '&#x1F512; Recipe Required';
+        else if (!canCraft) buttonText = 'Missing Ingredients';
+
+        html += '<div class="recipe ' + (canCraft ? 'craftable' : '') + ' ' + (!hasRecipe ? 'locked' : '') + '">' +
           '<div class="recipe-header">' +
             '<span class="recipe-name"><span class="recipe-icon">' + recipe.icon + '</span>' + recipe.name + '</span>' +
             '<div class="recipe-value">' +
@@ -153,9 +166,10 @@
               '<div class="recipe-xp">+' + recipe.xp + ' XP</div>' +
             '</div>' +
           '</div>' +
+          (!hasRecipe ? '<div class="recipe-locked-notice">Buy this recipe from the Blueprint Store</div>' : '') +
           '<div class="ingredients">' + ingredientsHtml + '</div>' +
           '<button class="craft-btn ' + (canCraft ? 'ready' : '') + '" onclick="craftItem(\'' + recipe.id + '\')" ' + (canCraft ? '' : 'disabled') + '>' +
-            (canCraft ? '&#x2692;&#xFE0F; Craft' : 'Missing Ingredients') +
+            buttonText +
           '</button>' +
         '</div>';
       });
@@ -176,17 +190,41 @@
         'Crop_Potato': 'potato', 'Crop_Tomato': 'tomato', 'Crop_Pumpkin': 'pumpkin',
         'Milk': 'milk', 'Wool': 'wool', 'Goat_Meat': 'goat_meat',
         'Truffle': 'truffle', 'Egg': 'egg', 'Flour': 'flour', 'Butter': 'butter',
-        'Honey': 'honey', 'Mead': 'mead'
+        'Honey': 'honey', 'Mead': 'mead', 'Bread': 'bread', 'Cheese': 'cheese',
+        'Stew': 'stew', 'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket',
+        'Cake': 'cake'
+      };
+
+      const recipeMapping = {
+        'Recipe_Flour': 'recipe_flour', 'Recipe_Bread': 'recipe_bread', 'Recipe_Cheese': 'recipe_cheese',
+        'Recipe_Stew': 'recipe_stew', 'Recipe_Ragout': 'recipe_ragout', 'Recipe_Pie': 'recipe_pie',
+        'Recipe_Blanket': 'recipe_blanket', 'Recipe_Butter': 'recipe_butter', 'Recipe_Cake': 'recipe_cake',
+        'Recipe_Mead': 'recipe_mead'
       };
 
       const parts = msg.replace('Sync_Inventory_', '').split('_');
       let i = 0;
       while (i < parts.length) {
-        // Try 2-word match first
+        // Handle Has_ prefix for recipes
+        if (parts[i] === 'Has' && i + 2 < parts.length) {
+          const itemKey = parts[i+1];
+          const hasIt = parseInt(parts[i+2]) > 0;
+          // Check for recipe
+          const recipeKey = 'recipe_' + itemKey.toLowerCase();
+          gameState.recipes[recipeKey] = hasIt;
+          i += 3;
+          continue;
+        }
+        // Try 2-word match first for inventory/recipes
         if (i + 2 < parts.length) {
           const twoWord = parts[i] + '_' + parts[i+1];
           if (mapping[twoWord]) {
             gameState.inventory[mapping[twoWord]] = parseInt(parts[i+2]) || 0;
+            i += 3;
+            continue;
+          }
+          if (recipeMapping[twoWord]) {
+            gameState.recipes[recipeMapping[twoWord]] = parseInt(parts[i+2]) > 0;
             i += 3;
             continue;
           }

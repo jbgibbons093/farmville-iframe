@@ -251,6 +251,11 @@
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0, mead: 0
       },
       equipment: { beesuit: false, basket: false },
+      recipes: {
+        recipe_flour: false, recipe_bread: false, recipe_cheese: false, recipe_stew: false,
+        recipe_ragout: false, recipe_pie: false, recipe_meat_pie: false, recipe_blanket: false,
+        recipe_butter: false, recipe_cake: false, recipe_mead: false
+      },
       plots: [],
       animals: { cows: [], sheep: [], goats: [], pigs: [], chickens: [] },
       settings: { autoReplant: false, priorityCrop: 'wheat' }
@@ -326,8 +331,21 @@
         'Blanket': { target: 'blanket' },
         'Butter': { target: 'butter' },
         'Cake': { target: 'cake' },
+        'Honey': { target: 'honey' },
+        'Mead': { target: 'mead' },
         'Has_Beesuit': { target: 'beesuit', isEquipment: true },
-        'Has_Basket': { target: 'basket', isEquipment: true }
+        'Has_Basket': { target: 'basket', isEquipment: true },
+        'Has_Recipe_Flour': { target: 'recipe_flour', isRecipe: true },
+        'Has_Recipe_Bread': { target: 'recipe_bread', isRecipe: true },
+        'Has_Recipe_Cheese': { target: 'recipe_cheese', isRecipe: true },
+        'Has_Recipe_Stew': { target: 'recipe_stew', isRecipe: true },
+        'Has_Recipe_Ragout': { target: 'recipe_ragout', isRecipe: true },
+        'Has_Recipe_Pie': { target: 'recipe_pie', isRecipe: true },
+        'Has_Recipe_Meat_Pie': { target: 'recipe_meat_pie', isRecipe: true },
+        'Has_Recipe_Blanket': { target: 'recipe_blanket', isRecipe: true },
+        'Has_Recipe_Butter': { target: 'recipe_butter', isRecipe: true },
+        'Has_Recipe_Cake': { target: 'recipe_cake', isRecipe: true },
+        'Has_Recipe_Mead': { target: 'recipe_mead', isRecipe: true }
       };
 
       const parts = msg.replace('Sync_Inventory_', '').split('_');
@@ -340,6 +358,7 @@
             const value = parseInt(parts[i + 2]) || 0;
             const mapping = varMapping[twoWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             i += 3; matched = true;
@@ -351,6 +370,7 @@
             const value = parseInt(parts[i + 1]) || 0;
             const mapping = varMapping[oneWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             i += 2; matched = true;
@@ -430,6 +450,17 @@
           plot.state = 'ready';
           renderCrops();
         }
+      }
+      else if (cmd === 'interact' && parts[1] === 'apiary') {
+        // Check beesuit requirement for honey
+        if (!gameState.equipment.beesuit) {
+          notify('You need a Bee Suit to collect honey!', 'warning');
+          return;
+        }
+        triggerTask('Collect_Honey');
+      }
+      else if (cmd === 'collected' && parts[1] === 'honey') {
+        handleHoneyCollect();
       }
     }
 
@@ -588,6 +619,12 @@
       const animal = animalArrays[animalType]?.[id - 1];
       if (!animal || animal.state !== 'ready') return;
 
+      // Check if basket is required for chickens (eggs)
+      if (animalType === 'chicken' && !gameState.equipment.basket) {
+        notify('You need a Harvest Basket to collect eggs!', 'warning');
+        return;
+      }
+
       const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
       triggerTask(`Collect_${capitalType}_${id}`);
     }
@@ -598,6 +635,12 @@
       const config = CONFIG.animals[animalType];
 
       if (!animal || !config) return;
+
+      // Double-check equipment requirements
+      if (animalType === 'chicken' && !gameState.equipment.basket) {
+        notify('You need a Harvest Basket to collect eggs!', 'warning');
+        return;
+      }
 
       gameState.inventory[config.product]++;
       triggerTask(`Add_${config.productName}_1`);
@@ -613,6 +656,23 @@
       renderAnimals();
       renderInventory();
       renderDashboard();
+    }
+
+    // Handle honey collection from apiary (requires beesuit)
+    function handleHoneyCollect() {
+      if (!gameState.equipment.beesuit) {
+        notify('You need a Bee Suit to collect honey!', 'warning');
+        return false;
+      }
+      gameState.inventory.honey++;
+      triggerTask('Add_Honey_1');
+      triggerTask('Add_XP_5');
+      addXP(5, 'animals');
+      notify('+1 Honey! +5 XP', 'success');
+      saveGameQuiet();
+      renderInventory();
+      renderDashboard();
+      return true;
     }
 
     function addXP(amount, category = 'other') {

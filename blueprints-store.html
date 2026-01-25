@@ -45,14 +45,22 @@
     <div class="container">
       <div class="header">
         <div class="title">BLUEPRINTS</div>
-        <div class="gold-display">
-          <span class="gold-icon">&#x1F4B0;</span>
-          <span class="gold-value" id="gold-display">0</span>
+        <div style="display: flex; gap: 10px;">
+          <div class="gold-display">
+            <span class="gold-icon">&#x2B50;</span>
+            <span class="gold-value">Lv.<span id="level-display">1</span></span>
+          </div>
+          <div class="gold-display">
+            <span class="gold-icon">&#x1F4B0;</span>
+            <span class="gold-value" id="gold-display">0</span>
+          </div>
         </div>
       </div>
       <div class="content">
         <div class="section-title">Equipment & Tools</div>
         <div class="grid" id="equipment-grid"></div>
+        <div class="section-title" style="margin-top: 20px;">Crafting Recipes</div>
+        <div class="grid" id="recipes-grid"></div>
       </div>
       <div class="footer">
         <div class="footer-hint">Walk away to close</div>
@@ -64,11 +72,25 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const EQUIPMENT = [
-      { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'Protects from bee stings when collecting honey', taskName: 'Buy_Beesuit' },
-      { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: 'Increases crop yield by 50%', taskName: 'Buy_Basket' }
+      { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 200, unlockLevel: 2, desc: 'Required to collect eggs from chickens', taskName: 'Buy_Basket' },
+      { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 400, unlockLevel: 3, desc: 'Required to collect honey from the apiary', taskName: 'Buy_Beesuit' }
     ];
 
-    let gameState = { gold: 0, equipment: { beesuit: false, basket: false } };
+    const RECIPES = [
+      { id: 'recipe_flour', name: 'Flour Recipe', icon: '&#x1F4DC;', price: 100, unlockLevel: 1, desc: 'Learn to grind wheat into flour', taskName: 'Buy_Recipe_Flour' },
+      { id: 'recipe_butter', name: 'Butter Recipe', icon: '&#x1F4DC;', price: 150, unlockLevel: 2, desc: 'Learn to churn milk into butter', taskName: 'Buy_Recipe_Butter' },
+      { id: 'recipe_cheese', name: 'Cheese Recipe', icon: '&#x1F4DC;', price: 200, unlockLevel: 2, desc: 'Learn to make cheese from milk', taskName: 'Buy_Recipe_Cheese' },
+      { id: 'recipe_bread', name: 'Bread Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 2, desc: 'Learn to bake fresh bread', taskName: 'Buy_Recipe_Bread' },
+      { id: 'recipe_blanket', name: 'Blanket Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 3, desc: 'Learn to weave wool into blankets', taskName: 'Buy_Recipe_Blanket' },
+      { id: 'recipe_stew', name: 'Stew Recipe', icon: '&#x1F4DC;', price: 300, unlockLevel: 3, desc: 'Learn to cook hearty vegetable stew', taskName: 'Buy_Recipe_Stew' },
+      { id: 'recipe_ragout', name: 'Ragout Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 4, desc: 'Learn to prepare savory meat ragout', taskName: 'Buy_Recipe_Ragout' },
+      { id: 'recipe_pie', name: 'Pie Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 4, desc: 'Learn to bake pumpkin pie', taskName: 'Buy_Recipe_Pie' },
+      { id: 'recipe_mead', name: 'Mead Recipe', icon: '&#x1F4DC;', price: 450, unlockLevel: 4, desc: 'Learn to brew honey mead', taskName: 'Buy_Recipe_Mead' },
+      { id: 'recipe_meat_pie', name: 'Meat Pie Recipe', icon: '&#x1F4DC;', price: 500, unlockLevel: 5, desc: 'Learn to bake savory meat pies', taskName: 'Buy_Recipe_Meat_Pie' },
+      { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 5, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
+    ];
+
+    let gameState = { gold: 0, level: 1, equipment: { beesuit: false, basket: false }, recipes: {} };
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -88,6 +110,7 @@
       const equip = EQUIPMENT.find(e => e.id === id);
       if (!equip) return;
       if (gameState.equipment[id]) { notify('Already owned!'); return; }
+      if (gameState.level < equip.unlockLevel) { notify('Level too low!'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!'); return; }
 
       triggerTask(equip.taskName);
@@ -97,19 +120,37 @@
       render();
     }
 
+    function buyRecipe(id) {
+      const recipe = RECIPES.find(r => r.id === id);
+      if (!recipe) return;
+      if (gameState.recipes[id]) { notify('Already owned!'); return; }
+      if (gameState.level < recipe.unlockLevel) { notify('Level too low!'); return; }
+      if (gameState.gold < recipe.price) { notify('Not enough gold!'); return; }
+
+      triggerTask(recipe.taskName);
+      gameState.gold -= recipe.price;
+      gameState.recipes[id] = true;
+      notify('Purchased ' + recipe.name + '!');
+      render();
+    }
+
     function render() {
       document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
+      document.getElementById('level-display').textContent = gameState.level;
 
-      let html = '';
+      // Render Equipment
+      let equipHtml = '';
       EQUIPMENT.forEach(equip => {
         const owned = gameState.equipment[equip.id];
-        const canBuy = !owned && gameState.gold >= equip.price;
+        const locked = gameState.level < equip.unlockLevel;
+        const canBuy = !owned && !locked && gameState.gold >= equip.price;
 
-        html += '<div class="item ' + (owned ? 'owned' : '') + '">' +
+        equipHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
           '<span class="item-icon">' + equip.icon + '</span>' +
           '<div class="item-info">' +
             '<div class="item-name">' + equip.name + '</div>' +
             '<div class="item-desc">' + equip.desc + '</div>' +
+            (locked ? '<div class="item-locked">Requires Level ' + equip.unlockLevel + '</div>' : '') +
           '</div>' +
           '<div class="item-actions">' +
             (owned ?
@@ -120,7 +161,32 @@
           '</div>' +
         '</div>';
       });
-      document.getElementById('equipment-grid').innerHTML = html;
+      document.getElementById('equipment-grid').innerHTML = equipHtml;
+
+      // Render Recipes
+      let recipeHtml = '';
+      RECIPES.forEach(recipe => {
+        const owned = gameState.recipes[recipe.id];
+        const locked = gameState.level < recipe.unlockLevel;
+        const canBuy = !owned && !locked && gameState.gold >= recipe.price;
+
+        recipeHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
+          '<span class="item-icon">' + recipe.icon + '</span>' +
+          '<div class="item-info">' +
+            '<div class="item-name">' + recipe.name + '</div>' +
+            '<div class="item-desc">' + recipe.desc + '</div>' +
+            (locked ? '<div class="item-locked">Requires Level ' + recipe.unlockLevel + '</div>' : '') +
+          '</div>' +
+          '<div class="item-actions">' +
+            (owned ?
+              '<div class="item-owned-tag">OWNED</div>' :
+              '<div class="item-price">' + recipe.price + 'g</div>' +
+              '<button class="buy-btn" onclick="buyRecipe(\'' + recipe.id + '\')" ' + (canBuy ? '' : 'disabled') + '>Purchase</button>'
+            ) +
+          '</div>' +
+        '</div>';
+      });
+      document.getElementById('recipes-grid').innerHTML = recipeHtml;
     }
 
     function handleMessage(msg) {
@@ -133,11 +199,28 @@
 
     function parseSync(msg) {
       const parts = msg.replace('Sync_Inventory_', '').split('_');
-      for (let i = 0; i < parts.length - 1; i += 2) {
-        if (parts[i] === 'Gold') gameState.gold = parseInt(parts[i+1]) || 0;
-        if (parts[i] === 'Has' && parts[i+1]) {
-          const equipId = parts[i+1].toLowerCase();
-          gameState.equipment[equipId] = parseInt(parts[i+2]) > 0;
+      let i = 0;
+      while (i < parts.length) {
+        if (parts[i] === 'Gold' && i + 1 < parts.length) {
+          gameState.gold = parseInt(parts[i+1]) || 0;
+          i += 2;
+        } else if (parts[i] === 'Level' && i + 1 < parts.length) {
+          gameState.level = parseInt(parts[i+1]) || 1;
+          i += 2;
+        } else if (parts[i] === 'Has' && i + 2 < parts.length) {
+          const itemId = parts[i+1].toLowerCase();
+          const hasIt = parseInt(parts[i+2]) > 0;
+          // Check if it's equipment or recipe
+          if (itemId === 'beesuit' || itemId === 'basket') {
+            gameState.equipment[itemId] = hasIt;
+          } else if (itemId.startsWith('recipe')) {
+            gameState.recipes['recipe_' + itemId.replace('recipe', '')] = hasIt;
+          } else {
+            // Try recipe_ prefix format
+            gameState.recipes['recipe_' + itemId] = hasIt;
+          }
+          i += 3;
+        } else {
           i++;
         }
       }
