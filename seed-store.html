@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seed Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito', sans-serif; background: rgba(0,0,0,0.85); min-height: 100vh; color: #fff; overflow: hidden; }
+    .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .container { width: 100%; max-width: 600px; max-height: 80vh; background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%); border: 4px solid #27ae60; border-radius: 20px; box-shadow: 0 0 30px rgba(39, 174, 96, 0.3); display: flex; flex-direction: column; overflow: hidden; }
+    .header { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .title { font-family: 'Luckiest Guy', cursive; font-size: 24px; color: #fff; text-shadow: 2px 2px 0 #1a5a32; letter-spacing: 2px; }
+    .gold-display { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 10px; }
+    .gold-icon { font-size: 20px; }
+    .gold-value { font-size: 18px; font-weight: 800; color: #FFD700; }
+    .content { flex: 1; overflow-y: auto; padding: 20px; }
+    .section-title { font-size: 14px; color: #27ae60; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+    .item { background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%); border: 2px solid #4a3a2a; border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 12px; transition: all 0.2s; }
+    .item:hover { border-color: #27ae60; transform: translateY(-2px); }
+    .item-icon { font-size: 36px; }
+    .item-info { flex: 1; }
+    .item-name { font-size: 16px; font-weight: 700; }
+    .item-stock { font-size: 12px; color: #888; margin-top: 2px; }
+    .item-locked { font-size: 11px; color: #e74c3c; }
+    .item-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    .item-price { font-size: 14px; font-weight: 700; color: #FFD700; }
+    .btn-row { display: flex; gap: 6px; }
+    .buy-btn { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 2px solid #2ecc71; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .buy-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 10px rgba(39,174,96,0.5); }
+    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .footer { background: rgba(0,0,0,0.4); padding: 12px 20px; text-align: center; border-top: 2px solid #27ae60; }
+    .footer-hint { font-size: 12px; color: #888; }
+    .notification { position: fixed; bottom: 20px; right: 20px; background: rgba(30, 25, 15, 0.95); border: 2px solid #27ae60; border-radius: 10px; padding: 12px 20px; font-size: 14px; font-weight: 600; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+    ::-webkit-scrollbar-thumb { background: #27ae60; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="container">
+      <div class="header">
+        <div class="title">SEED STORE</div>
+        <div class="gold-display">
+          <span class="gold-icon">&#x1F4B0;</span>
+          <span class="gold-value" id="gold-display">0</span>
+        </div>
+      </div>
+      <div class="content">
+        <div class="section-title">Buy Seeds</div>
+        <div class="grid" id="seeds-grid"></div>
+      </div>
+      <div class="footer">
+        <div class="footer-hint">Walk away to close</div>
+      </div>
+    </div>
+  </div>
+  <div id="notification" style="display:none" class="notification"></div>
+
+  <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+  <script>
+    const SEEDS = {
+      wheat: { name: 'Wheat', icon: '&#x1F33E;', cost: 2, unlockLevel: 1 },
+      carrot: { name: 'Carrot', icon: '&#x1F955;', cost: 3, unlockLevel: 1 },
+      corn: { name: 'Corn', icon: '&#x1F33D;', cost: 5, unlockLevel: 2 },
+      potato: { name: 'Potato', icon: '&#x1F954;', cost: 6, unlockLevel: 2 },
+      tomato: { name: 'Tomato', icon: '&#x1F345;', cost: 8, unlockLevel: 3 },
+      pumpkin: { name: 'Pumpkin', icon: '&#x1F383;', cost: 15, unlockLevel: 5 }
+    };
+
+    let gameState = { gold: 0, level: 1, seeds: {} };
+
+    function triggerTask(taskName) {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
+      }
+      console.log('[SeedStore] Task:', taskName);
+    }
+
+    function notify(msg) {
+      const el = document.getElementById('notification');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2000);
+    }
+
+    function buySeeds(type, qty) {
+      const seed = SEEDS[type];
+      const cost = seed.cost * qty;
+      if (gameState.gold < cost) { notify('Not enough gold!'); return; }
+      if (gameState.level < seed.unlockLevel) { notify('Level too low!'); return; }
+
+      triggerTask('Buy_Seeds_' + seed.name + '_' + qty);
+      gameState.gold -= cost;
+      gameState.seeds[type] = (gameState.seeds[type] || 0) + qty;
+      notify('Bought ' + qty + ' ' + seed.name + ' seeds!');
+      render();
+    }
+
+    function render() {
+      document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
+
+      let html = '';
+      Object.entries(SEEDS).forEach(([key, seed]) => {
+        const owned = gameState.seeds[key] || 0;
+        const locked = gameState.level < seed.unlockLevel;
+        const canBuy1 = !locked && gameState.gold >= seed.cost;
+        const canBuy5 = !locked && gameState.gold >= seed.cost * 5;
+
+        html += '<div class="item">' +
+          '<span class="item-icon">' + seed.icon + '</span>' +
+          '<div class="item-info">' +
+            '<div class="item-name">' + seed.name + ' Seeds</div>' +
+            '<div class="item-stock">Owned: ' + owned + '</div>' +
+            (locked ? '<div class="item-locked">Unlocks at Lv.' + seed.unlockLevel + '</div>' : '') +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<div class="item-price">' + seed.cost + 'g each</div>' +
+            '<div class="btn-row">' +
+              '<button class="buy-btn" onclick="buySeeds(\'' + key + '\', 1)" ' + (canBuy1 ? '' : 'disabled') + '>Buy 1</button>' +
+              '<button class="buy-btn" onclick="buySeeds(\'' + key + '\', 5)" ' + (canBuy5 ? '' : 'disabled') + '>Buy 5</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      document.getElementById('seeds-grid').innerHTML = html;
+    }
+
+    // Message listener
+    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+      PortalsSdk.setMessageListener(handleMessage);
+    }
+
+    function handleMessage(msg) {
+      console.log('[SeedStore] Received:', msg);
+      if (typeof msg === 'string' && msg.startsWith('init_')) {
+        const parts = msg.split('_');
+        gameState.gold = parseInt(parts[1]) || 0;
+        gameState.level = parseInt(parts[2]) || 1;
+        render();
+      }
+      if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
+        // Parse inventory sync
+        parseSync(msg);
+        render();
+      }
+    }
+
+    function parseSync(msg) {
+      const parts = msg.replace('Sync_Inventory_', '').split('_');
+      for (let i = 0; i < parts.length - 1; i += 2) {
+        if (parts[i] === 'Gold') gameState.gold = parseInt(parts[i+1]) || 0;
+        if (parts[i] === 'Level') gameState.level = parseInt(parts[i+1]) || 1;
+        if (parts[i] === 'Seeds' && parts[i+1]) {
+          const seedType = parts[i+1].toLowerCase();
+          gameState.seeds[seedType] = parseInt(parts[i+2]) || 0;
+          i++;
+        }
+      }
+    }
+
+    // Initialize
+    gameState.gold = 100;
+    render();
+  </script>
+</body>
+</html>

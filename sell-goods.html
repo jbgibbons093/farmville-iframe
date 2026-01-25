@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sell Goods</title>
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito', sans-serif; background: rgba(0,0,0,0.85); min-height: 100vh; color: #fff; overflow: hidden; }
+    .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .container { width: 100%; max-width: 700px; max-height: 85vh; background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%); border: 4px solid #f39c12; border-radius: 20px; box-shadow: 0 0 30px rgba(243, 156, 18, 0.3); display: flex; flex-direction: column; overflow: hidden; }
+    .header { background: linear-gradient(180deg, #f39c12 0%, #d68910 100%); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .title { font-family: 'Luckiest Guy', cursive; font-size: 24px; color: #fff; text-shadow: 2px 2px 0 #8a5a0a; letter-spacing: 2px; }
+    .gold-display { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 10px; }
+    .gold-icon { font-size: 20px; }
+    .gold-value { font-size: 18px; font-weight: 800; color: #FFD700; }
+    .tabs { display: flex; background: rgba(0,0,0,0.3); border-bottom: 2px solid #5a4030; }
+    .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: 700; font-size: 13px; transition: all 0.2s; border-bottom: 3px solid transparent; }
+    .tab:hover { background: rgba(243, 156, 18, 0.2); }
+    .tab.active { background: linear-gradient(180deg, #5a4020 0%, #3a2810 100%); border-bottom-color: #f39c12; color: #f39c12; }
+    .content { flex: 1; overflow-y: auto; padding: 20px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .item { background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%); border: 2px solid #4a3a2a; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+    .item:hover { border-color: #f39c12; }
+    .item.zero { opacity: 0.4; }
+    .item-icon { font-size: 32px; }
+    .item-info { flex: 1; }
+    .item-name { font-size: 14px; font-weight: 700; }
+    .item-stock { font-size: 12px; color: #888; }
+    .item-actions { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    .item-price { font-size: 13px; font-weight: 700; color: #FFD700; }
+    .btn-row { display: flex; gap: 4px; }
+    .sell-btn { background: linear-gradient(180deg, #e67e22 0%, #d35400 100%); border: 2px solid #f39c12; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .sell-btn:hover:not(:disabled) { transform: scale(1.05); }
+    .sell-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .footer { background: rgba(0,0,0,0.4); padding: 12px 20px; text-align: center; border-top: 2px solid #f39c12; }
+    .footer-hint { font-size: 12px; color: #888; }
+    .notification { position: fixed; bottom: 20px; right: 20px; background: rgba(30, 25, 15, 0.95); border: 2px solid #f39c12; border-radius: 10px; padding: 12px 20px; font-size: 14px; font-weight: 600; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+    ::-webkit-scrollbar-thumb { background: #f39c12; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="container">
+      <div class="header">
+        <div class="title">SELL GOODS</div>
+        <div class="gold-display">
+          <span class="gold-icon">&#x1F4B0;</span>
+          <span class="gold-value" id="gold-display">0</span>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-tab="crops">Crops</div>
+        <div class="tab" data-tab="products">Products</div>
+        <div class="tab" data-tab="crafted">Crafted</div>
+      </div>
+      <div class="content">
+        <div class="tab-content active" id="tab-crops"></div>
+        <div class="tab-content" id="tab-products"></div>
+        <div class="tab-content" id="tab-crafted"></div>
+      </div>
+      <div class="footer">
+        <div class="footer-hint">Walk away to close</div>
+      </div>
+    </div>
+  </div>
+  <div id="notification" style="display:none" class="notification"></div>
+
+  <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+  <script>
+    const ITEMS = {
+      crops: [
+        { key: 'wheat', name: 'Wheat', icon: '&#x1F33E;', price: 5, taskPrefix: 'Sell_Crop_Wheat' },
+        { key: 'carrot', name: 'Carrot', icon: '&#x1F955;', price: 8, taskPrefix: 'Sell_Crop_Carrot' },
+        { key: 'corn', name: 'Corn', icon: '&#x1F33D;', price: 10, taskPrefix: 'Sell_Crop_Corn' },
+        { key: 'potato', name: 'Potato', icon: '&#x1F954;', price: 12, taskPrefix: 'Sell_Crop_Potato' },
+        { key: 'tomato', name: 'Tomato', icon: '&#x1F345;', price: 15, taskPrefix: 'Sell_Crop_Tomato' },
+        { key: 'pumpkin', name: 'Pumpkin', icon: '&#x1F383;', price: 30, taskPrefix: 'Sell_Crop_Pumpkin' }
+      ],
+      products: [
+        { key: 'milk', name: 'Milk', icon: '&#x1F95B;', price: 12, taskPrefix: 'Sell_Milk' },
+        { key: 'wool', name: 'Wool', icon: '&#x1F9F6;', price: 15, taskPrefix: 'Sell_Wool' },
+        { key: 'goat_meat', name: 'Goat Meat', icon: '&#x1F356;', price: 20, taskPrefix: 'Sell_Goat_Meat' },
+        { key: 'truffle', name: 'Truffle', icon: '&#x1F344;', price: 30, taskPrefix: 'Sell_Truffle' },
+        { key: 'egg', name: 'Egg', icon: '&#x1F95A;', price: 8, taskPrefix: 'Sell_Egg' }
+      ],
+      crafted: [
+        { key: 'flour', name: 'Flour', icon: '&#x1F35E;', price: 20, taskPrefix: 'Sell_Flour' },
+        { key: 'bread', name: 'Bread', icon: '&#x1F956;', price: 35, taskPrefix: 'Sell_Bread' },
+        { key: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', price: 30, taskPrefix: 'Sell_Cheese' },
+        { key: 'stew', name: 'Stew', icon: '&#x1F372;', price: 50, taskPrefix: 'Sell_Stew' },
+        { key: 'ragout', name: 'Ragout', icon: '&#x1F356;', price: 75, taskPrefix: 'Sell_Ragout' },
+        { key: 'pie', name: 'Pie', icon: '&#x1F967;', price: 80, taskPrefix: 'Sell_Pie' },
+        { key: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', price: 90, taskPrefix: 'Sell_Meat_Pie' },
+        { key: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', price: 50, taskPrefix: 'Sell_Blanket' },
+        { key: 'butter', name: 'Butter', icon: '&#x1F9C8;', price: 30, taskPrefix: 'Sell_Butter' },
+        { key: 'cake', name: 'Cake', icon: '&#x1F370;', price: 100, taskPrefix: 'Sell_Cake' }
+      ]
+    };
+
+    let gameState = { gold: 0, inventory: {} };
+
+    function triggerTask(taskName) {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
+      }
+      console.log('[SellGoods] Task:', taskName);
+    }
+
+    function notify(msg) {
+      const el = document.getElementById('notification');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2000);
+    }
+
+    function sellItem(key, qty, taskPrefix, price) {
+      const owned = gameState.inventory[key] || 0;
+      if (owned < qty) { notify('Not enough to sell!'); return; }
+
+      triggerTask(taskPrefix + '_' + qty);
+      gameState.inventory[key] = owned - qty;
+      gameState.gold += price * qty;
+      notify('Sold for ' + (price * qty) + 'g!');
+      render();
+    }
+
+    function renderGrid(items, containerId) {
+      let html = '<div class="grid">';
+      items.forEach(item => {
+        const owned = gameState.inventory[item.key] || 0;
+        const canSell1 = owned >= 1;
+        const canSell5 = owned >= 5;
+
+        html += '<div class="item ' + (owned === 0 ? 'zero' : '') + '">' +
+          '<span class="item-icon">' + item.icon + '</span>' +
+          '<div class="item-info">' +
+            '<div class="item-name">' + item.name + '</div>' +
+            '<div class="item-stock">Owned: ' + owned + '</div>' +
+          '</div>' +
+          '<div class="item-actions">' +
+            '<div class="item-price">' + item.price + 'g each</div>' +
+            '<div class="btn-row">' +
+              '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 1, \'' + item.taskPrefix + '\', ' + item.price + ')" ' + (canSell1 ? '' : 'disabled') + '>Sell 1</button>' +
+              '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 5, \'' + item.taskPrefix + '\', ' + item.price + ')" ' + (canSell5 ? '' : 'disabled') + '>Sell 5</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+      document.getElementById(containerId).innerHTML = html;
+    }
+
+    function render() {
+      document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
+      renderGrid(ITEMS.crops, 'tab-crops');
+      renderGrid(ITEMS.products, 'tab-products');
+      renderGrid(ITEMS.crafted, 'tab-crafted');
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Message listener
+    if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+      PortalsSdk.setMessageListener(handleMessage);
+    }
+
+    function handleMessage(msg) {
+      console.log('[SellGoods] Received:', msg);
+      if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
+        parseSync(msg);
+        render();
+      }
+    }
+
+    function parseSync(msg) {
+      // Basic sync parsing - would need full implementation
+      const parts = msg.replace('Sync_Inventory_', '').split('_');
+      for (let i = 0; i < parts.length - 1; i += 2) {
+        if (parts[i] === 'Gold') gameState.gold = parseInt(parts[i+1]) || 0;
+      }
+    }
+
+    // Initialize with test data
+    gameState.gold = 100;
+    gameState.inventory = { wheat: 5, carrot: 3, milk: 2, egg: 4, flour: 1 };
+    render();
+  </script>
+</body>
+</html>
