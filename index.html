@@ -331,6 +331,8 @@
 
       // Tell Portals to run the harvest task (Move Item, reset variables, etc.)
       triggerTask(`Harvest_Plot_${plotId}`, 'SetNotActiveToActive');
+      // Reset the trigger task so it can be used again next cycle
+      triggerTask(`Plot_${plotId}_Trigger`, 'SetActiveToNotActive');
 
       // Get crop info - use stored cropType or default to wheat for testing
       const cropType = plot.cropType || 'wheat';
