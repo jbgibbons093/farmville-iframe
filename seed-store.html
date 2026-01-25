@@ -162,15 +162,17 @@
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
         PortalsSdk.setMessageListener(handleMessage);
         console.log('[Hughberry SeedStore] SDK listener registered');
+        console.log('[Hughberry SeedStore] PortalsSdk:', PortalsSdk);
       } else {
-        console.log('[Hughberry SeedStore] Waiting for SDK...');
+        console.log('[Hughberry SeedStore] Waiting for SDK... PortalsSdk =', typeof PortalsSdk);
         setTimeout(setupMessageListener, 100);
       }
     }
 
-    // Also listen via window.postMessage as fallback
+    // Also listen via window.postMessage as fallback (filter out extension noise)
     window.addEventListener('message', function(event) {
-      if (event.data) {
+      if (event.data && typeof event.data === 'string') {
+        console.log('[Hughberry SeedStore] postMessage received:', event.data);
         handleMessage(event.data);
       }
     });
