@@ -67,8 +67,8 @@
       }
     }
 
-    // Initialize
-    gameState.gold = 100;
+    // Initialize with empty state - populated by Sync_Inventory from Portals
+    gameState.gold = 0;
     document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
   </script>
 </body>

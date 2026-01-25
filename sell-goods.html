@@ -201,9 +201,9 @@
       }
     }
 
-    // Initialize with test data
-    gameState.gold = 100;
-    gameState.inventory = { wheat: 5, carrot: 3, milk: 2, egg: 4, flour: 1, mead: 1 };
+    // Initialize with empty inventory - populated by Sync_Inventory from Portals
+    gameState.gold = 0;
+    gameState.inventory = {};
     render();
   </script>
 </body>

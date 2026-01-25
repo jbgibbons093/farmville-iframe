@@ -207,12 +207,8 @@
       }
     }
 
-    // Initialize with test data
-    gameState.inventory = {
-      wheat: 10, carrot: 5, corn: 3, potato: 4, pumpkin: 2,
-      milk: 6, wool: 4, goat_meat: 2, egg: 8, flour: 2, butter: 1,
-      honey: 5
-    };
+    // Initialize with empty inventory - populated by Sync_Inventory from Portals
+    gameState.inventory = {};
     render();
   </script>
 </body>
