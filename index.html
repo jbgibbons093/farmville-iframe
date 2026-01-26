@@ -147,13 +147,13 @@
     .footer-hint { font-size: 12px; color: #888; }
     .footer-hint kbd { background: #4a3a2a; padding: 2px 6px; border-radius: 4px; margin: 0 2px; font-family: monospace; }
 
-    .notifications { position: fixed; bottom: 80px; right: 20px; z-index: 1001; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .notifications { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1001; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .notification { background: rgba(30, 25, 15, 0.95); border: 2px solid #8B4513; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; animation: notifSlide 0.3s ease, notifFade 0.5s ease 2.5s forwards; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .notification.success { border-color: #27ae60; }
     .notification.error { border-color: #c0392b; }
     .notification-icon { font-size: 20px; }
     .notification-text { font-size: 14px; font-weight: 600; }
-    @keyframes notifSlide { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes notifSlide { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     @keyframes notifFade { to { opacity: 0; transform: translateY(-20px); } }
 
     ::-webkit-scrollbar { width: 8px; }
