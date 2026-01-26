@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Nunito', sans-serif; background: rgba(0,0,0,0.85); min-height: 100vh; color: #fff; overflow: hidden; }
+    body { font-family: 'Nunito', sans-serif; min-height: 100vh; color: #fff; overflow: hidden; }
 
     .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -294,7 +294,14 @@
     }
 
     function sendToPortals(cmd) { console.log('To Portals:', cmd); }
-    function closeMenu() { console.log('Close menu requested'); }
+    function closeMenu() {
+      console.log('[Hughberry] Close menu requested');
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+        PortalsSdk.closeIframe();
+      } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Close_Iframe', TaskTargetState: 'SetNotActiveToActive' }));
+      }
+    }
     function setVariable(n, v) { console.log('Set variable:', n, v); }
     function showObject(n) { console.log('Show object:', n); }
     function hideObject(n) { console.log('Hide object:', n); }
