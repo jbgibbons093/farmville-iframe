@@ -365,7 +365,22 @@
       let i = 0;
       while (i < parts.length) {
         let matched = false;
-        if (i + 2 < parts.length) {
+        // Check three-word keys first (Has_Milk_Pail, Has_Shearing_Kit, Has_Butcher_Knife, Has_Truffle_Spade)
+        if (i + 3 < parts.length) {
+          const threeWordKey = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2];
+          if (varMapping[threeWordKey]) {
+            const value = parseInt(parts[i + 3]) || 0;
+            const mapping = varMapping[threeWordKey];
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
+            else if (mapping.isRoot) gameState[mapping.target] = value;
+            else gameState.inventory[mapping.target] = value;
+            console.log('[Hughberry] Parsed 3-word:', threeWordKey, '=', value);
+            i += 4; matched = true;
+          }
+        }
+        // Check two-word keys (Seeds_Wheat, Crop_Corn, Has_Basket, etc.)
+        if (!matched && i + 2 < parts.length) {
           const twoWordKey = parts[i] + '_' + parts[i + 1];
           if (varMapping[twoWordKey]) {
             const value = parseInt(parts[i + 2]) || 0;
@@ -377,6 +392,7 @@
             i += 3; matched = true;
           }
         }
+        // Check one-word keys (Gold, XP, Level, Milk, Wool, etc.)
         if (!matched && i + 1 < parts.length) {
           const oneWordKey = parts[i];
           if (varMapping[oneWordKey]) {
@@ -391,6 +407,7 @@
         }
         if (!matched) i++;
       }
+      console.log('[Hughberry] Equipment after sync:', JSON.stringify(gameState.equipment));
       saveGameQuiet();
     }
 
