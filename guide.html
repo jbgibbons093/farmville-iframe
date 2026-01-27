@@ -274,7 +274,7 @@
     </div>
     <div class="close-hint">
       <span>Press <span class="key-hint">ESC</span> to close</span>
-      <button class="close-btn" onclick="PortalsSdk.closeIframe()">
+      <button class="close-btn" onclick="closeGuide()">
         <span>&#x2715;</span>
         <span>Close</span>
       </button>
@@ -632,13 +632,21 @@
     // HUGHBERRY FARMS - GAME GUIDE OVERLAY
     // ============================================
 
-    // Keyboard controls - ESC to close (must be user interaction)
+    // Close function - matches inventory closeMenu pattern exactly
+    function closeGuide() {
+      console.log('[Guide] Close guide requested');
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+        PortalsSdk.closeIframe();
+      } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Close_Iframe', TaskTargetState: 'SetNotActiveToActive' }));
+      }
+    }
+
+    // Keyboard controls - ESC to close
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         e.preventDefault();
-        if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
-          PortalsSdk.closeIframe();
-        }
+        closeGuide();
       }
     });
 
