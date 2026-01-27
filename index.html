@@ -736,6 +736,7 @@
     };
 
     function handleCollectionStation(stationType) {
+      console.log('[Hughberry] handleCollectionStation:', stationType);
       const station = COLLECTION_STATIONS[stationType];
       if (!station) {
         console.log('[Hughberry] Unknown station type:', stationType);
@@ -743,6 +744,7 @@
       }
 
       // Check equipment requirement
+      console.log('[Hughberry] Equipment check:', station.equipment, '=', gameState.equipment[station.equipment]);
       if (station.equipment && !gameState.equipment[station.equipment]) {
         notify(`You need a ${station.equipmentName} to collect ${station.productName.toLowerCase()}!`, 'error');
         return;
@@ -750,8 +752,15 @@
 
       // Count ready animals
       const animals = gameState.animals[station.animalArray];
+      console.log('[Hughberry] Animals array:', station.animalArray, animals);
+      if (!animals || animals.length === 0) {
+        console.log('[Hughberry] No animals array found for', station.animalArray);
+        notify(`No ${station.productName.toLowerCase()} ready to collect!`, 'error');
+        return;
+      }
       const readyAnimals = animals.filter(a => a.state === 'ready');
       const readyCount = readyAnimals.length;
+      console.log('[Hughberry] Ready count:', readyCount, 'states:', animals.map(a => a.state));
 
       if (readyCount === 0) {
         notify(`No ${station.productName.toLowerCase()} ready to collect!`, 'error');
