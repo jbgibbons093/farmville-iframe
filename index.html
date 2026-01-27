@@ -843,7 +843,7 @@
       const producingAnimals = Object.values(gameState.animals).flat().filter(a => a.state === 'producing').length;
       const totalCrops = gameState.inventory.wheat + gameState.inventory.carrot + gameState.inventory.corn + gameState.inventory.potato + gameState.inventory.tomato + gameState.inventory.pumpkin;
       const totalSeeds = Object.keys(gameState.inventory).filter(k => k.startsWith('seeds_')).reduce((a, k) => a + gameState.inventory[k], 0);
-      const totalProducts = gameState.inventory.milk + gameState.inventory.wool + gameState.inventory.goat_meat + gameState.inventory.truffle + gameState.inventory.egg;
+      const totalProducts = gameState.inventory.milk + gameState.inventory.wool + gameState.inventory.goat_meat + gameState.inventory.truffle + gameState.inventory.egg + gameState.inventory.honey;
       const xpNeeded = getXPForNextLevel();
 
       document.getElementById('tab-dashboard').innerHTML = `
@@ -973,7 +973,8 @@
           { key: 'wool', name: 'Wool', icon: '&#x1F9F6;' },
           { key: 'goat_meat', name: 'Goat Meat', icon: '&#x1F356;' },
           { key: 'truffle', name: 'Truffle', icon: '&#x1F344;' },
-          { key: 'egg', name: 'Egg', icon: '&#x1F95A;' }
+          { key: 'egg', name: 'Egg', icon: '&#x1F95A;' },
+          { key: 'honey', name: 'Honey', icon: '&#x1F36F;' }
         ]},
         { title: 'Crafted Items', items: [
           { key: 'flour', name: 'Flour', icon: '&#x1F35E;' },
@@ -1277,6 +1278,22 @@
       setInterval(saveGameQuiet, 30000);
       console.log('[Hughberry Farms] Initialized');
     }
+
+    // Handle visibility changes - refresh timers when iframe becomes visible again
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        console.log('[Hughberry] Iframe visible - refreshing UI');
+        gameLoop(); // Immediately run gameLoop to catch up
+        updateAllUI(); // Full UI refresh
+      }
+    });
+
+    // Also handle focus events as backup
+    window.addEventListener('focus', function() {
+      console.log('[Hughberry] Iframe focused - refreshing UI');
+      gameLoop();
+      updateAllUI();
+    });
 
     window.onload = init;
   </script>
