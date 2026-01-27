@@ -632,14 +632,14 @@
     // HUGHBERRY FARMS - GAME GUIDE OVERLAY
     // ============================================
 
-    // Close function - use postMessage only, skip uniwebview:// redirect
+    // Close function - trigger close task instead of closeIframe
     function closeGuide() {
       console.log('[Guide] Close guide requested');
-      var msg = "closeIframe:" + window.location.href;
-      if (window.parent) window.parent.postMessage(msg, "*");
-      if (window.top && window.top !== window.parent) window.top.postMessage(msg, "*");
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.PortalsParent) {
-        PortalsSdk.PortalsParent.postMessage(msg, "*");
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({
+          TaskName: 'Close_Guide',
+          TaskTargetState: 'SetNotActiveToActive'
+        }));
       }
     }
 
