@@ -12,7 +12,6 @@
       font-family: 'Nunito', sans-serif;
       background: rgba(0, 0, 0, 0.85);
       color: #ddd;
-      min-height: 100vh;
       overflow-x: hidden;
     }
 
@@ -269,7 +268,7 @@
       <span class="header-text">Game Guide</span>
     </div>
     <div class="close-hint">
-      <span>Press <span class="key-hint">ESC</span> or <span class="key-hint">L</span> to close</span>
+      <span>Press <span class="key-hint">ESC</span> to close</span>
       <button class="close-btn" onclick="closeGuide()">
         <span>&#x2715;</span>
         <span>Close</span>
@@ -637,9 +636,9 @@
       }
     }
 
-    // Keyboard controls
+    // Keyboard controls - only ESC to close (L is handled by Portals)
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' || e.key.toLowerCase() === 'l') {
+      if (e.key === 'Escape') {
         e.preventDefault();
         closeGuide();
       }
