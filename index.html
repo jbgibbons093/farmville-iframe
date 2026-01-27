@@ -449,13 +449,13 @@
       else if (cmd === 'interact' && parts[1] === 'plot') {
         harvestPlotFromTrigger(parseInt(parts[2]));
       }
-      // Collection station interactions (interact_egg_basket, interact_milk_pail, etc.)
-      else if (cmd === 'interact' && ['egg', 'milk', 'wool', 'butcher', 'truffle'].includes(parts[1])) {
-        const stationType = parts.slice(1).join('_'); // e.g., "egg_basket", "milk_pail"
+      // Collection station interactions (interact_egg_basket, interact_milk_pail, interact_honey_jar, etc.)
+      else if (cmd === 'interact' && ['egg', 'milk', 'wool', 'butcher', 'truffle', 'honey'].includes(parts[1])) {
+        const stationType = parts.slice(1).join('_'); // e.g., "egg_basket", "milk_pail", "honey_jar"
         handleCollectionStation(stationType);
       }
-      // Collection confirmations from Portals (collected_eggs_X, collected_milk_X, etc.)
-      else if (cmd === 'collected' && ['eggs', 'milk', 'wool', 'meat', 'truffle'].includes(parts[1])) {
+      // Collection confirmations from Portals (collected_eggs_X, collected_milk_X, collected_honey_X, etc.)
+      else if (cmd === 'collected' && ['eggs', 'milk', 'wool', 'meat', 'truffle', 'honey'].includes(parts[1])) {
         handleCollectionConfirmed(parts[1], parseInt(parts[2]) || 0);
       }
       else if (cmd === 'crop' && parts[1] === 'ready') {
@@ -464,17 +464,6 @@
           plot.state = 'ready';
           renderCrops();
         }
-      }
-      else if (cmd === 'interact' && parts[1] === 'apiary') {
-        // Check beesuit requirement for honey
-        if (!gameState.equipment.beesuit) {
-          notify('You need a Bee Suit to collect honey!', 'warning');
-          return;
-        }
-        triggerTask('Collect_Honey');
-      }
-      else if (cmd === 'collected' && parts[1] === 'honey') {
-        handleHoneyCollect();
       }
     }
 
@@ -683,6 +672,16 @@
         xpPerUnit: 10,
         equipment: 'truffle_spade',
         equipmentName: 'Truffle Spade'
+      },
+      honey_jar: {
+        animalType: null, // Honey comes from apiary, not animals
+        animalArray: null,
+        product: 'honey',
+        productName: 'Honey',
+        collectTask: 'Collect_Honey',
+        xpPerUnit: 5,
+        equipment: 'beesuit',
+        equipmentName: 'Bee Suit'
       }
     };
 
@@ -696,6 +695,14 @@
       // Check equipment requirement
       if (station.equipment && !gameState.equipment[station.equipment]) {
         notify(`You need a ${station.equipmentName} to collect ${station.productName.toLowerCase()}!`, 'error');
+        return;
+      }
+
+      // Special handling for honey (no animals, uses Portals variable directly)
+      if (stationType === 'honey_jar') {
+        // Trigger the collect task - Portals handles the count via Honey_Uncollected variable
+        triggerTask(station.collectTask);
+        // Notification will come when we receive collected_honey_X message
         return;
       }
 
@@ -732,26 +739,19 @@
     }
 
     function handleCollectionConfirmed(productType, count) {
-      // Called when Portals confirms collection (collected_eggs_X, collected_milk_X, etc.)
-      // This is mainly for logging/debugging since we already updated local state
+      // Called when Portals confirms collection (collected_eggs_X, collected_milk_X, collected_honey_X, etc.)
       console.log(`[Hughberry] Collection confirmed: ${count} ${productType}`);
-    }
 
-    // Handle honey collection from apiary (requires beesuit)
-    function handleHoneyCollect() {
-      if (!gameState.equipment.beesuit) {
-        notify('You need a Bee Suit to collect honey!', 'warning');
-        return false;
+      // For honey, we need to show the notification here since we don't track it locally
+      if (productType === 'honey' && count > 0) {
+        const xpGained = count * 5; // 5 XP per honey
+        gameState.inventory.honey += count;
+        addXP(xpGained, 'animals');
+        notify(`Collected ${count} Honey! +${xpGained} XP`, 'success');
+        saveGameQuiet();
+        renderInventory();
+        renderDashboard();
       }
-      gameState.inventory.honey++;
-      triggerTask('Add_Honey_1');
-      triggerTask('Add_XP_5');
-      addXP(5, 'animals');
-      notify('+1 Honey! +5 XP', 'success');
-      saveGameQuiet();
-      renderInventory();
-      renderDashboard();
-      return true;
     }
 
     function addXP(amount, category = 'other') {
