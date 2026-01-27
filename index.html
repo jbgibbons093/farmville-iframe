@@ -559,7 +559,7 @@
 
           // Load animals carefully
           if (p.animals) {
-            ['cows', 'sheep', 'goats', 'pigs', 'chickens'].forEach(type => {
+            ['cows', 'sheep', 'goats', 'pigs', 'chickens', 'beehives'].forEach(type => {
               if (p.animals[type] && p.animals[type].length > 0) {
                 gameState.animals[type] = p.animals[type];
                 gameState.animals[type].forEach(animal => {
