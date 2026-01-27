@@ -632,14 +632,11 @@
     // HUGHBERRY FARMS - GAME GUIDE OVERLAY
     // ============================================
 
-    // Close function - trigger close task instead of closeIframe
+    // Close function - use SDK closeIframe
     function closeGuide() {
       console.log('[Guide] Close guide requested');
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({
-          TaskName: 'Close_Guide',
-          TaskTargetState: 'SetNotActiveToActive'
-        }));
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+        PortalsSdk.closeIframe();
       }
     }
 

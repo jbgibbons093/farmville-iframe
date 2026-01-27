@@ -337,12 +337,8 @@
     function sendToPortals(cmd) { console.log('To Portals:', cmd); }
     function closeMenu() {
       console.log('[Hughberry] Close menu requested');
-      // Use sendMessageToUnity to trigger close task instead of closeIframe
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({
-          TaskName: 'Close_Inventory',
-          TaskTargetState: 'SetNotActiveToActive'
-        }));
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+        PortalsSdk.closeIframe();
       }
     }
     function setVariable(n, v) { console.log('Set variable:', n, v); }
