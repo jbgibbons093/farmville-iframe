@@ -659,8 +659,14 @@
     function animalBecameReady(animalType, id) {
       // Trigger the generic ready task for this animal type (e.g., Chicken_Ready, Cow_Ready)
       // This increments the uncollected count and shows the collection station indicator
-      const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
-      const taskName = `${capitalType}_Ready`;
+      // Special case: beehive uses Honey_Ready (not Beehive_Ready)
+      let taskName;
+      if (animalType === 'beehive') {
+        taskName = 'Honey_Ready';
+      } else {
+        const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
+        taskName = `${capitalType}_Ready`;
+      }
       console.log('[Hughberry] animalBecameReady called:', animalType, id, '-> triggering', taskName);
       triggerTask(taskName);
     }
