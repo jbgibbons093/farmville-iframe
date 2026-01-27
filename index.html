@@ -625,6 +625,7 @@
       animal.state = 'producing';
       animal.readyAt = Date.now() + (config.cooldown * 1000);
       animal.notified = false;
+      console.log('[Hughberry] startAnimalActivity:', animalType, id, 'readyAt:', animal.readyAt, 'cooldown:', config.cooldown, 'seconds');
 
       addXP(config.startXP, 'animals');
       notify(`Started ${config.name} ${id}! +${config.startXP} XP`, 'success');
@@ -636,7 +637,9 @@
       // Trigger the generic ready task for this animal type (e.g., Chicken_Ready, Cow_Ready)
       // This increments the uncollected count and shows the collection station indicator
       const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
-      triggerTask(`${capitalType}_Ready`);
+      const taskName = `${capitalType}_Ready`;
+      console.log('[Hughberry] animalBecameReady called:', animalType, id, '-> triggering', taskName);
+      triggerTask(taskName);
     }
 
     // Collection station configuration
@@ -1226,13 +1229,18 @@
 
       animalChecks.forEach(({ type, array, name }) => {
         array.forEach((animal, i) => {
-          if (animal.state === 'producing' && animal.readyAt && Date.now() >= animal.readyAt) {
-            animal.state = 'ready';
-            if (!animal.notified) {
-              animalBecameReady(type, i + 1);
-              animal.notified = true;
-              notify(`${name} ${i + 1} is ready!`, 'success');
-              needsRender = true;
+          if (animal.state === 'producing' && animal.readyAt) {
+            const timeLeft = animal.readyAt - Date.now();
+            if (timeLeft <= 0) {
+              console.log('[Hughberry] gameLoop: Animal ready detected:', type, i + 1, 'state:', animal.state, 'notified:', animal.notified);
+              animal.state = 'ready';
+              if (!animal.notified) {
+                console.log('[Hughberry] gameLoop: Calling animalBecameReady for', type, i + 1);
+                animalBecameReady(type, i + 1);
+                animal.notified = true;
+                notify(`${name} ${i + 1} is ready!`, 'success');
+                needsRender = true;
+              }
             }
           }
         });
