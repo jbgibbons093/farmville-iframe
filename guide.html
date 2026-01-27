@@ -630,10 +630,16 @@
 
     function closeGuide() {
       console.log('[Guide] Closing guide');
+      // Reset the Game_Guide task so it can be triggered again
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({
+          TaskName: 'Game_Guide',
+          TaskTargetState: 'SetActiveToNotActive'
+        }));
+      }
+      // Close the iframe
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();
-      } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Close_Iframe', TaskTargetState: 'SetNotActiveToActive' }));
       }
     }
 
