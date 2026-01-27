@@ -100,15 +100,10 @@
     let gameState = { gold: 0, level: 1, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
 
     function triggerTask(taskName) {
-      const message = JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' });
-      console.log('[Hughberry Blueprints] Sending task:', taskName, 'SDK available:', typeof PortalsSdk !== 'undefined');
-
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(message);
-        console.log('[Hughberry Blueprints] Message sent:', message);
-      } else {
-        console.warn('[Hughberry Blueprints] SDK NOT AVAILABLE - cannot send:', message);
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
       }
+      console.log('[Hughberry Blueprints] Task:', taskName);
     }
 
     function closeIframe() {
