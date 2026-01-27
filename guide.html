@@ -630,18 +630,10 @@
 
     function closeGuide() {
       console.log('[Guide] Closing guide');
-      triggerTask('Close_Guide');
-    }
-
-    function triggerTask(taskName, targetState = 'SetNotActiveToActive') {
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({
-          TaskName: taskName,
-          TaskTargetState: targetState
-        }));
-        console.log('[Guide] Task triggered:', taskName);
-      } else {
-        console.warn('[Guide] PortalsSdk not available');
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+        PortalsSdk.closeIframe();
+      } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Close_Iframe', TaskTargetState: 'SetNotActiveToActive' }));
       }
     }
 
