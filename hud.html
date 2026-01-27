@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hughberry Farms HUD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .hud-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px;
+      background: linear-gradient(180deg, rgba(35, 28, 18, 0.95) 0%, rgba(25, 20, 12, 0.95) 100%);
+      border-bottom: 3px solid #5a4530;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      min-height: 60px;
+    }
+
+    /* Logo Section */
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      font-size: 32px;
+      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    }
+
+    .logo-text {
+      font-family: 'Luckiest Guy', cursive;
+      font-size: 22px;
+      color: #FFD700;
+      text-shadow: 2px 2px 0 #8B4513, 3px 3px 4px rgba(0,0,0,0.5);
+      letter-spacing: 1px;
+    }
+
+    .logo-text .farms {
+      color: #90EE90;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .stat-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(145deg, rgba(60, 50, 35, 0.8) 0%, rgba(40, 32, 20, 0.8) 100%);
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 2px solid #5a4530;
+    }
+
+    .stat-icon {
+      font-size: 24px;
+      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5));
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFD700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .stat-value.level {
+      color: #67b8f7;
+    }
+
+    /* XP Bar */
+    .xp-bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 150px;
+    }
+
+    .xp-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .xp-bar {
+      height: 12px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 6px;
+      border: 1px solid #5a4530;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f39c12, #e74c3c);
+      border-radius: 5px;
+      transition: width 0.5s ease;
+      box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+    }
+
+    /* Buttons Section */
+    .buttons-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hud-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hud-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .hud-btn:active {
+      transform: translateY(0);
+    }
+
+    .hud-btn-icon {
+      font-size: 18px;
+    }
+
+    .btn-inventory {
+      background: linear-gradient(145deg, #27ae60, #1e8449);
+      color: white;
+      border: 2px solid #2ecc71;
+      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-inventory:hover {
+      background: linear-gradient(145deg, #2ecc71, #27ae60);
+      border-color: #58d68d;
+    }
+
+    .btn-guide {
+      background: linear-gradient(145deg, #3498db, #2980b9);
+      color: white;
+      border: 2px solid #5dade2;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-guide:hover {
+      background: linear-gradient(145deg, #5dade2, #3498db);
+      border-color: #85c1e9;
+    }
+
+    /* Gold display */
+    .gold-display {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(145deg, rgba(60, 50, 35, 0.8) 0%, rgba(40, 32, 20, 0.8) 100%);
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 2px solid #B8860B;
+    }
+
+    .gold-icon {
+      font-size: 20px;
+    }
+
+    .gold-value {
+      font-size: 16px;
+      font-weight: 800;
+      color: #FFD700;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+      .hud-container {
+        padding: 8px 12px;
+      }
+      .logo-text {
+        font-size: 18px;
+      }
+      .stats-section {
+        gap: 15px;
+      }
+      .stat-box {
+        padding: 6px 12px;
+      }
+      .xp-bar-container {
+        min-width: 100px;
+      }
+      .hud-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="hud-container">
+    <!-- Logo Section -->
+    <div class="logo-section">
+      <span class="logo-icon">&#x1F33E;</span>
+      <div class="logo-text">
+        Hughberry <span class="farms">Farms</span>
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <!-- Gold -->
+      <div class="gold-display">
+        <span class="gold-icon">&#x1FA99;</span>
+        <span class="gold-value" id="gold-value">0</span>
+      </div>
+
+      <!-- Level -->
+      <div class="stat-box">
+        <span class="stat-icon">&#x2B50;</span>
+        <div class="stat-info">
+          <span class="stat-label">Level</span>
+          <span class="stat-value level" id="level-value">1</span>
+        </div>
+      </div>
+
+      <!-- XP Bar -->
+      <div class="stat-box">
+        <span class="stat-icon">&#x1F4CA;</span>
+        <div class="xp-bar-container">
+          <div class="xp-bar-label">
+            <span>XP</span>
+            <span id="xp-text">0 / 100</span>
+          </div>
+          <div class="xp-bar">
+            <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons Section -->
+    <div class="buttons-section">
+      <button class="hud-btn btn-inventory" id="btn-inventory" onclick="openInventory()">
+        <span class="hud-btn-icon">&#x1F392;</span>
+        <span>Inventory</span>
+      </button>
+      <button class="hud-btn btn-guide" id="btn-guide" onclick="openGuide()">
+        <span class="hud-btn-icon">&#x1F4D6;</span>
+        <span>How to Play</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+  <script>
+    // ============================================
+    // HUGHBERRY FARMS - GLOBAL HUD
+    // ============================================
+
+    // Game state
+    let gold = 0;
+    let xp = 0;
+    let level = 1;
+
+    // Level thresholds
+    const levelThresholds = [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500, 999999];
+
+    // ============================================
+    // UI UPDATE FUNCTIONS
+    // ============================================
+
+    function updateHUD() {
+      // Update gold
+      document.getElementById('gold-value').textContent = gold.toLocaleString();
+
+      // Update level
+      document.getElementById('level-value').textContent = level;
+
+      // Calculate XP progress for current level
+      const currentLevelXP = levelThresholds[level - 1] || 0;
+      const nextLevelXP = levelThresholds[level] || levelThresholds[levelThresholds.length - 1];
+      const xpInLevel = xp - currentLevelXP;
+      const xpNeeded = nextLevelXP - currentLevelXP;
+      const xpPercent = Math.min(100, Math.max(0, (xpInLevel / xpNeeded) * 100));
+
+      // Update XP bar
+      document.getElementById('xp-text').textContent = `${xp.toLocaleString()} / ${nextLevelXP.toLocaleString()}`;
+      document.getElementById('xp-bar-fill').style.width = xpPercent + '%';
+    }
+
+    // ============================================
+    // BUTTON ACTIONS
+    // ============================================
+
+    function openInventory() {
+      console.log('[HUD] Opening inventory');
+      triggerTask('Open_Inventory');
+    }
+
+    function openGuide() {
+      console.log('[HUD] Opening guide');
+      triggerTask('Open_Guide');
+    }
+
+    // ============================================
+    // PORTALS SDK INTEGRATION
+    // ============================================
+
+    function triggerTask(taskName, targetState = 'SetNotActiveToActive') {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({
+          TaskName: taskName,
+          TaskTargetState: targetState
+        }));
+        console.log('[HUD] Task triggered:', taskName);
+      } else {
+        console.warn('[HUD] PortalsSdk not available');
+      }
+    }
+
+    // Message deduplication
+    let lastMessageId = '';
+    let lastMessageTime = 0;
+
+    function processMessage(msg, source) {
+      const now = Date.now();
+      const msgId = msg + '_' + Math.floor(now / 100);
+      if (msgId === lastMessageId && now - lastMessageTime < 200) {
+        console.log('[HUD] Duplicate message ignored:', source);
+        return;
+      }
+      lastMessageId = msgId;
+      lastMessageTime = now;
+      handlePortalsMessage(msg);
+    }
+
+    function handlePortalsMessage(msg) {
+      console.log('[HUD] Received message:', msg.substring(0, 100) + '...');
+
+      // Handle Sync_Inventory message
+      if (msg.startsWith('Sync_Inventory_') || msg.includes('_Gold_')) {
+        parseInventorySync(msg);
+      }
+      // Handle init message
+      else if (msg.startsWith('init_')) {
+        const parts = msg.split('_');
+        if (parts.length >= 4) {
+          gold = parseInt(parts[1]) || 0;
+          level = parseInt(parts[2]) || 1;
+          xp = parseInt(parts[3]) || 0;
+          updateHUD();
+        }
+      }
+      // Handle HUD-specific update
+      else if (msg.startsWith('hud_')) {
+        const parts = msg.split('_');
+        if (parts.length >= 4) {
+          gold = parseInt(parts[1]) || 0;
+          level = parseInt(parts[2]) || 1;
+          xp = parseInt(parts[3]) || 0;
+          updateHUD();
+        }
+      }
+    }
+
+    function parseInventorySync(msg) {
+      // Parse key-value pairs from sync message
+      // Format: Sync_Inventory_Gold_100_XP_50_Level_2_...
+
+      const getValue = (key) => {
+        const regex = new RegExp(key + '_(\\d+)');
+        const match = msg.match(regex);
+        return match ? parseInt(match[1]) : null;
+      };
+
+      const newGold = getValue('Gold');
+      const newXP = getValue('XP');
+      const newLevel = getValue('Level');
+
+      if (newGold !== null) gold = newGold;
+      if (newXP !== null) xp = newXP;
+      if (newLevel !== null) level = newLevel;
+
+      updateHUD();
+      console.log('[HUD] Updated - Gold:', gold, 'XP:', xp, 'Level:', level);
+    }
+
+    // Setup message listener with retry for SDK initialization
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(function(msg) {
+          processMessage(msg, 'SDK');
+        });
+        console.log('[HUD] SDK listener registered');
+      } else {
+        console.log('[HUD] Waiting for SDK...');
+        setTimeout(setupMessageListener, 100);
+      }
+    }
+
+    // Also listen via window.postMessage as fallback
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'string') {
+        processMessage(event.data, 'postMessage-string');
+      }
+      else if (event.data && event.data.portalsMessage) {
+        processMessage(event.data.portalsMessage, 'postMessage-portals');
+      }
+      else if (event.data && event.data.message && typeof event.data.message === 'string') {
+        processMessage(event.data.message, 'postMessage-message');
+      }
+    });
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[HUD] Hughberry Farms HUD loaded');
+      setupMessageListener();
+      updateHUD();
+
+      // Request initial sync after a short delay
+      setTimeout(function() {
+        triggerTask('Sync_Inventory');
+      }, 500);
+    });
+
+    // Handle visibility changes
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        console.log('[HUD] Visible - requesting sync');
+        triggerTask('Sync_Inventory');
+      }
+    });
+  </script>
+</body>
+</html>
