@@ -75,11 +75,12 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const EQUIPMENT = [
-      { id: 'milk_pail', name: 'Milk Pail', icon: '&#x1FAA3;', price: 150, unlockLevel: 1, desc: 'Required to collect milk from the milk pail', taskName: 'Buy_Milk_Pail' },
-      { id: 'shearing_kit', name: 'Shearing Kit', icon: '&#x2702;', price: 250, unlockLevel: 2, desc: 'Required to collect wool from the wool bin', taskName: 'Buy_Shearing_Kit' },
-      { id: 'butcher_knife', name: 'Butcher Knife', icon: '&#x1F52A;', price: 350, unlockLevel: 3, desc: 'Required to collect goat meat from the butcher block', taskName: 'Buy_Butcher_Knife' },
+      { id: 'milk_pail', name: 'Milk Pail', icon: '&#x1FAA3;', price: 50, unlockLevel: 1, desc: 'Required to work with cows and collect milk (Starter)', taskName: 'Buy_Milk_Pail' },
+      { id: 'basket', name: 'Egg Basket', icon: '&#x1F9FA;', price: 150, unlockLevel: 1, desc: 'Required to work with chickens and collect eggs', taskName: 'Buy_Basket' },
+      { id: 'shearing_kit', name: 'Shearing Kit', icon: '&#x2702;', price: 250, unlockLevel: 2, desc: 'Required to work with sheep and collect wool', taskName: 'Buy_Shearing_Kit' },
+      { id: 'butcher_knife', name: 'Butcher Knife', icon: '&#x1F52A;', price: 350, unlockLevel: 3, desc: 'Required to work with goats and collect meat', taskName: 'Buy_Butcher_Knife' },
       { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 400, unlockLevel: 3, desc: 'Required to collect honey from the apiary', taskName: 'Buy_Beesuit' },
-      { id: 'truffle_spade', name: 'Truffle Spade', icon: '&#x1F9F9;', price: 450, unlockLevel: 4, desc: 'Required to collect truffles from the truffle crate', taskName: 'Buy_Truffle_Spade' }
+      { id: 'truffle_spade', name: 'Truffle Spade', icon: '&#x1F9F9;', price: 450, unlockLevel: 4, desc: 'Required to work with pigs and collect truffles', taskName: 'Buy_Truffle_Spade' }
     ];
 
     const RECIPES = [
@@ -96,7 +97,7 @@
       { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 5, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
     ];
 
-    let gameState = { gold: 0, level: 1, equipment: { beesuit: false, milk_pail: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
+    let gameState = { gold: 0, level: 1, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -230,19 +231,19 @@
           gameState.level = parseInt(parts[i+1]) || 1;
           i += 2;
         } else if (parts[i] === 'Has' && i + 2 < parts.length) {
-          // Handle equipment: Has_Beesuit, Has_Milk_Pail, Has_Shearing_Kit, Has_Butcher_Knife, Has_Truffle_Spade
+          // Handle equipment: Has_Milk_Pail, Has_Basket, Has_Beesuit, Has_Shearing_Kit, Has_Butcher_Knife, Has_Truffle_Spade
           // Check for multi-word equipment names
           let itemId = parts[i+1].toLowerCase();
           let valueIndex = i + 2;
 
-          // Check for two-word names (Milk_Pail, Shearing_Kit, etc.)
+          // Check for two-word names (Milk_Pail, Shearing_Kit, Butcher_Knife, Truffle_Spade)
           if (i + 3 < parts.length && ['milk', 'shearing', 'butcher', 'truffle'].includes(itemId)) {
             itemId = itemId + '_' + parts[i+2].toLowerCase();
             valueIndex = i + 3;
           }
 
           const hasIt = parseInt(parts[valueIndex]) > 0;
-          const validEquipment = ['beesuit', 'milk_pail', 'shearing_kit', 'butcher_knife', 'truffle_spade'];
+          const validEquipment = ['milk_pail', 'basket', 'beesuit', 'shearing_kit', 'butcher_knife', 'truffle_spade'];
           if (validEquipment.includes(itemId)) {
             gameState.equipment[itemId] = hasIt;
           }

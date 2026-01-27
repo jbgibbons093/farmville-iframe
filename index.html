@@ -251,7 +251,7 @@
         milk: 0, wool: 0, goat_meat: 0, truffle: 0, egg: 0, honey: 0,
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0, mead: 0
       },
-      equipment: { beesuit: false, milk_pail: false, shearing_kit: false, butcher_knife: false, truffle_spade: false },
+      equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false },
       recipes: {
         recipe_flour: false, recipe_bread: false, recipe_cheese: false, recipe_stew: false,
         recipe_ragout: false, recipe_pie: false, recipe_meat_pie: false, recipe_blanket: false,
@@ -341,8 +341,9 @@
         'Cake': { target: 'cake' },
         'Honey': { target: 'honey' },
         'Mead': { target: 'mead' },
-        'Has_Beesuit': { target: 'beesuit', isEquipment: true },
         'Has_Milk_Pail': { target: 'milk_pail', isEquipment: true },
+        'Has_Basket': { target: 'basket', isEquipment: true },
+        'Has_Beesuit': { target: 'beesuit', isEquipment: true },
         'Has_Shearing_Kit': { target: 'shearing_kit', isEquipment: true },
         'Has_Butcher_Knife': { target: 'butcher_knife', isEquipment: true },
         'Has_Truffle_Spade': { target: 'truffle_spade', isEquipment: true },
@@ -591,6 +592,15 @@
       }
     }
 
+    // Equipment requirements for starting animal activities
+    const ANIMAL_EQUIPMENT = {
+      cow: { id: 'milk_pail', name: 'Milk Pail' }, // Starter equipment - cheap at level 1
+      chicken: { id: 'basket', name: 'Egg Basket' },
+      sheep: { id: 'shearing_kit', name: 'Shearing Kit' },
+      goat: { id: 'butcher_knife', name: 'Butcher Knife' },
+      pig: { id: 'truffle_spade', name: 'Truffle Spade' }
+    };
+
     function startAnimalActivity(animalType, id) {
       const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens };
       const animal = animalArrays[animalType]?.[id - 1];
@@ -598,6 +608,14 @@
 
       if (!animal || !config) return;
       if (gameState.level < config.unlockLevel) { notify(`Unlock at Lv.${config.unlockLevel}`, 'error'); return; }
+
+      // Check equipment requirement
+      const reqEquip = ANIMAL_EQUIPMENT[animalType];
+      if (reqEquip && !gameState.equipment[reqEquip.id]) {
+        notify(`You need a ${reqEquip.name} first! Buy it from the Blueprint Store.`, 'error');
+        return;
+      }
+
       if (animal.state !== 'idle') { notify(`${config.name} ${id} is busy!`, 'error'); return; }
 
       // Trigger the animal activity task
@@ -630,8 +648,8 @@
         productName: 'Egg',
         collectTask: 'Collect_Eggs',
         xpPerUnit: 3,
-        equipment: null, // No equipment required for eggs (starter)
-        equipmentName: null
+        equipment: 'basket',
+        equipmentName: 'Egg Basket'
       },
       milk_pail: {
         animalType: 'cow',
@@ -971,13 +989,25 @@
           </div>`;
         }
 
+        // Check equipment requirement
+        const reqEquip = ANIMAL_EQUIPMENT[type];
+        const hasEquipment = !reqEquip || gameState.equipment[reqEquip.id];
+
         let statusText, statusClass, buttonText, buttonDisabled, buttonAction;
         if (animal.state === 'idle') {
-          statusText = 'Idle';
-          statusClass = '';
-          buttonText = 'Start';
-          buttonDisabled = false;
-          buttonAction = `startAnimalActivity('${type}', ${id})`;
+          if (!hasEquipment) {
+            statusText = `Need ${reqEquip.name}`;
+            statusClass = 'cooldown';
+            buttonText = 'No Equipment';
+            buttonDisabled = true;
+            buttonAction = '';
+          } else {
+            statusText = 'Idle';
+            statusClass = '';
+            buttonText = 'Start';
+            buttonDisabled = false;
+            buttonAction = `startAnimalActivity('${type}', ${id})`;
+          }
         } else if (animal.state === 'producing') {
           const rem = Math.max(0, Math.ceil((animal.readyAt - Date.now()) / 1000));
           statusText = formatTime(rem);
