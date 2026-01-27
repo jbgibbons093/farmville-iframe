@@ -546,6 +546,14 @@
           renderCrops();
         }
       }
+      // Handle show_guide from HUD button
+      else if (cmd === 'show' && parts[1] === 'guide') {
+        document.querySelector('[data-tab="guide"]')?.click();
+      }
+      // Handle show_inventory from HUD button
+      else if (cmd === 'show' && parts[1] === 'inventory') {
+        document.querySelector('[data-tab="dashboard"]')?.click();
+      }
     }
 
     function harvestPlotFromTrigger(plotId) {
