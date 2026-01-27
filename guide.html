@@ -626,7 +626,7 @@
     </div>
   </div>
 
-  <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+  <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js?v=10005456"></script>
   <script>
     // ============================================
     // HUGHBERRY FARMS - GAME GUIDE OVERLAY
@@ -635,10 +635,14 @@
     // Close function - matches inventory closeMenu pattern exactly
     function closeGuide() {
       console.log('[Guide] Close guide requested');
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
-        PortalsSdk.closeIframe();
-      } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Close_Iframe', TaskTargetState: 'SetNotActiveToActive' }));
+      try {
+        if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+          PortalsSdk.closeIframe();
+        } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+          PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Close_Iframe', TaskTargetState: 'SetNotActiveToActive' }));
+        }
+      } catch (e) {
+        console.log('[Guide] Close error:', e);
       }
     }
 
