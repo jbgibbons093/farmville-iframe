@@ -8,15 +8,22 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
+    html {
+      margin: 0;
+      padding: 0;
+      background: transparent !important;
+    }
+
+    body {
       font-family: 'Nunito', sans-serif;
       background: transparent !important;
       overflow: hidden;
       margin: 0;
       padding: 0;
       pointer-events: none;
-      width: fit-content;
-      height: fit-content;
+      display: flex;
+      justify-content: center;
+      width: 100%;
     }
 
     .hud-container {
@@ -28,6 +35,7 @@
       border-radius: 10px;
       border: 2px solid rgba(90, 69, 48, 0.8);
       pointer-events: none;
+      margin-top: 4px;
     }
 
     /* Logo Section */
