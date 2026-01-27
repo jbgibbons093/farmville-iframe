@@ -632,14 +632,11 @@
     // HUGHBERRY FARMS - GAME GUIDE OVERLAY
     // ============================================
 
-    // Close function - bypass SDK to avoid uniwebview:// freeze
+    // Close function - use SDK like inventory does
     function closeGuide() {
       console.log('[Guide] Close guide requested');
-      try {
-        // Use postMessage directly instead of SDK's closeIframe to avoid uniwebview:// scheme issues
-        window.parent.postMessage("closeIframe:" + window.location.href, "*");
-      } catch (e) {
-        console.log('[Guide] Close error:', e);
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+        PortalsSdk.closeIframe();
       }
     }
 
