@@ -7,9 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Nunito', sans-serif; min-height: 100vh; color: #fff; overflow: hidden; }
+    html, body { margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; color: #fff; overflow: hidden; }
 
-    .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
+    .overlay { display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .menu-container { width: 100%; max-width: 1100px; height: 85vh; max-height: 750px; background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%); border: 4px solid #8B4513; border-radius: 20px; box-shadow: 0 0 0 2px #5a3a1a, 0 20px 60px rgba(0,0,0,0.8), inset 0 2px 0 rgba(255,255,255,0.1); display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.4s ease; }

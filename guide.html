@@ -8,19 +8,24 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html, body {
+    html {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
       font-family: 'Nunito', sans-serif;
       background: rgba(0, 0, 0, 0.85);
       color: #ddd;
       overflow-x: hidden;
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     /* Header Bar */
     .header-bar {
-      position: fixed;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
