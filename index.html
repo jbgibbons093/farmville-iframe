@@ -808,6 +808,29 @@
       }
     }
 
+    // Lightweight function to update only crop timers without rebuilding the whole UI
+    function updateCropTimers() {
+      gameState.plots.forEach((plot, i) => {
+        if (plot.state === 'growing') {
+          const c = CONFIG.crops[plot.cropType];
+          const remaining = Math.max(0, (plot.readyAt - Date.now()) / 1000);
+          const progress = ((c.growTime - remaining) / c.growTime) * 100;
+
+          // Find and update the status text
+          const plotCards = document.querySelectorAll('.plot-card.growing');
+          plotCards.forEach(card => {
+            const numEl = card.querySelector('.plot-number');
+            if (numEl && numEl.textContent === `#${i + 1}`) {
+              const statusEl = card.querySelector('.plot-status');
+              const progressFill = card.querySelector('.plot-progress-fill');
+              if (statusEl) statusEl.textContent = formatTime(remaining);
+              if (progressFill) progressFill.style.width = progress + '%';
+            }
+          });
+        }
+      });
+    }
+
     function toggleAutoReplant() {
       gameState.settings.autoReplant = !gameState.settings.autoReplant;
       saveGameQuiet();
@@ -1119,7 +1142,7 @@
       // Always update active tab for timers
       const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
       if (activeTab === 'dashboard') renderDashboard();
-      else if (activeTab === 'crops') renderCrops();
+      else if (activeTab === 'crops') updateCropTimers(); // Use lightweight timer update instead of full re-render
       else if (activeTab === 'animals') renderAnimals();
     }
 
