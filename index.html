@@ -1072,6 +1072,37 @@
         html += `</div></div>`;
       });
 
+      // Apiary / Honey section
+      const hasBeeSuit = gameState.equipment.beesuit;
+      const honeyUnlockLevel = 3;
+      const honeyUnlocked = gameState.level >= honeyUnlockLevel;
+      html += `<div class="animals-section"><div class="section-title">&#x1F41D; Apiary (Honey) ${!honeyUnlocked ? `(Lv.${honeyUnlockLevel})` : ''}</div><div class="animals-grid">`;
+
+      if (!honeyUnlocked) {
+        html += `<div class="animal-card locked">
+          <div class="animal-icon">&#x1F36F;</div>
+          <div class="animal-name">Apiary</div>
+          <div class="locked-text">Unlocks Lv.${honeyUnlockLevel}</div>
+          <button class="animal-btn" disabled>Locked</button>
+        </div>`;
+      } else if (!hasBeeSuit) {
+        html += `<div class="animal-card">
+          <div class="animal-icon">&#x1F36F;</div>
+          <div class="animal-name">Apiary</div>
+          <div class="animal-status cooldown">Need Bee Suit</div>
+          <button class="animal-btn" disabled>No Equipment</button>
+        </div>`;
+      } else {
+        html += `<div class="animal-card">
+          <div class="animal-icon">&#x1F36F;</div>
+          <div class="animal-name">Apiary</div>
+          <div class="animal-status">Honey: ${gameState.inventory.honey}</div>
+          <div class="plot-hint">Collect honey at apiary in 3D</div>
+          <button class="animal-btn" disabled>Collect in 3D</button>
+        </div>`;
+      }
+      html += `</div></div>`;
+
       document.getElementById('tab-animals').innerHTML = html;
     }
 
