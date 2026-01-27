@@ -626,7 +626,7 @@
     };
 
     function startAnimalActivity(animalType, id) {
-      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens };
+      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens, beehive: gameState.animals.beehives };
       const animal = animalArrays[animalType]?.[id - 1];
       const config = CONFIG.animals[animalType];
 
