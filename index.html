@@ -419,7 +419,10 @@
     // Setup message listener with retry for SDK initialization
     function setupMessageListener() {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
-        PortalsSdk.setMessageListener(handlePortalsMessage);
+        PortalsSdk.setMessageListener(function(msg) {
+          console.log('[Hughberry] SDK message:', msg);
+          processMessage(msg, 'SDK');
+        });
         console.log('[Hughberry] SDK listener registered');
       } else {
         console.log('[Hughberry] Waiting for SDK...');
@@ -427,19 +430,35 @@
       }
     }
 
+    // Deduplication for messages (SDK and postMessage can both fire)
+    let lastMessageId = '';
+    let lastMessageTime = 0;
+
+    function processMessage(msg, source) {
+      const now = Date.now();
+      const msgId = msg + '_' + Math.floor(now / 100); // 100ms window
+      if (msgId === lastMessageId && now - lastMessageTime < 200) {
+        console.log('[Hughberry] Duplicate message ignored:', source);
+        return;
+      }
+      lastMessageId = msgId;
+      lastMessageTime = now;
+      handlePortalsMessage(msg);
+    }
+
     // Also listen via window.postMessage as fallback
     window.addEventListener('message', function(event) {
       if (event.data && typeof event.data === 'string') {
         console.log('[Hughberry] postMessage string:', event.data);
-        handlePortalsMessage(event.data);
+        processMessage(event.data, 'postMessage-string');
       }
       else if (event.data && event.data.portalsMessage) {
         console.log('[Hughberry] postMessage portalsMessage:', event.data.portalsMessage);
-        handlePortalsMessage(event.data.portalsMessage);
+        processMessage(event.data.portalsMessage, 'postMessage-portalsMessage');
       }
       else if (event.data && event.data.message && typeof event.data.message === 'string') {
         console.log('[Hughberry] postMessage message:', event.data.message);
-        handlePortalsMessage(event.data.message);
+        processMessage(event.data.message, 'postMessage-message');
       }
     });
 
