@@ -619,6 +619,9 @@
 
       if (animal.state !== 'idle') { notify(`${config.name} ${id} is busy!`, 'error'); return; }
 
+      // Add XP for starting animal
+      triggerTask(`Add_XP_${config.startXP}`);
+
       animal.state = 'producing';
       animal.readyAt = Date.now() + (config.cooldown * 1000);
       animal.notified = false;
