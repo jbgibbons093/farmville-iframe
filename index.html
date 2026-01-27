@@ -1277,28 +1277,46 @@
       else if (activeTab === 'animals') renderAnimals();
     }
 
+    let gameLoopInterval = null;
+
+    function startGameLoop() {
+      if (gameLoopInterval) clearInterval(gameLoopInterval);
+      gameLoopInterval = setInterval(gameLoop, 1000);
+    }
+
     function init() {
       loadFromStorage();
       updateAllUI();
-      setInterval(gameLoop, 1000);
+      startGameLoop();
       setInterval(saveGameQuiet, 30000);
       console.log('[Hughberry Farms] Initialized');
     }
 
-    // Handle visibility changes - refresh timers when iframe becomes visible again
+    // Handle visibility changes - restart timer loop when iframe becomes visible
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
-        console.log('[Hughberry] Iframe visible - refreshing UI');
-        gameLoop(); // Immediately run gameLoop to catch up
-        updateAllUI(); // Full UI refresh
+        console.log('[Hughberry] Iframe visible - restarting game loop');
+        startGameLoop(); // Restart fresh interval
+        gameLoop(); // Immediately run to catch up
+        updateAllUI();
       }
     });
 
     // Also handle focus events as backup
     window.addEventListener('focus', function() {
       console.log('[Hughberry] Iframe focused - refreshing UI');
+      startGameLoop(); // Restart fresh interval
       gameLoop();
       updateAllUI();
+    });
+
+    // Message from parent window can also trigger refresh
+    window.addEventListener('message', function(event) {
+      if (event.data === 'refresh' || event.data === 'focus') {
+        startGameLoop();
+        gameLoop();
+        updateAllUI();
+      }
     });
 
     window.onload = init;
