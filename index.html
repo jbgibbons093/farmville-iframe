@@ -287,10 +287,15 @@
     initAnimals();
 
     function triggerTask(taskName, targetState = 'SetNotActiveToActive') {
+      const message = JSON.stringify({ TaskName: taskName, TaskTargetState: targetState });
+      console.log('[Hughberry] Sending task:', taskName, 'SDK available:', typeof PortalsSdk !== 'undefined');
+
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: targetState }));
+        PortalsSdk.sendMessageToUnity(message);
+        console.log('[Hughberry] Message sent:', message);
+      } else {
+        console.warn('[Hughberry] SDK NOT AVAILABLE - cannot send:', message);
       }
-      console.log('Trigger Task:', taskName, targetState);
     }
 
     function sendToPortals(cmd) { console.log('To Portals:', cmd); }
