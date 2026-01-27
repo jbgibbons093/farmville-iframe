@@ -632,12 +632,10 @@
     // HUGHBERRY FARMS - GAME GUIDE OVERLAY
     // ============================================
 
-    // Close function - use SDK like inventory does
+    // Close function - use postMessage only, skip uniwebview:// redirect
     function closeGuide() {
       console.log('[Guide] Close guide requested');
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
-        PortalsSdk.closeIframe();
-      }
+      window.parent.postMessage("closeIframe:" + window.location.href, "*");
     }
 
     // Keyboard controls - ESC to close
