@@ -297,18 +297,6 @@
     // PORTALS SDK INTEGRATION
     // ============================================
 
-    function triggerTask(taskName, targetState = 'SetNotActiveToActive') {
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({
-          TaskName: taskName,
-          TaskTargetState: targetState
-        }));
-        console.log('[HUD] Task triggered:', taskName);
-      } else {
-        console.warn('[HUD] PortalsSdk not available');
-      }
-    }
-
     // Message deduplication
     let lastMessageId = '';
     let lastMessageTime = 0;
@@ -410,19 +398,6 @@
       console.log('[HUD] Hughberry Farms HUD loaded');
       setupMessageListener();
       updateHUD();
-
-      // Request initial sync after a short delay
-      setTimeout(function() {
-        triggerTask('Sync_Inventory');
-      }, 500);
-    });
-
-    // Handle visibility changes
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) {
-        console.log('[HUD] Visible - requesting sync');
-        triggerTask('Sync_Inventory');
-      }
     });
   </script>
 </body>
