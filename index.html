@@ -86,6 +86,7 @@
     .plot-card.growing { border-color: #27ae60; }
     .plot-card.ready { border-color: #FFD700; box-shadow: 0 0 15px rgba(255,215,0,0.4); animation: pulseGold 2s infinite; }
     @keyframes pulseGold { 0%, 100% { box-shadow: 0 0 15px rgba(255,215,0,0.4); } 50% { box-shadow: 0 0 25px rgba(255,215,0,0.7); } }
+    @keyframes pulseGreen { 0%, 100% { box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); } 50% { box-shadow: 0 0 30px rgba(46, 204, 113, 0.7); } }
     .plot-number { position: absolute; top: 3px; left: 5px; font-size: 9px; color: #666; font-weight: 700; }
     .plot-icon { font-size: 28px; margin: 4px 0; }
     .plot-name { font-size: 11px; font-weight: 700; }
@@ -279,7 +280,8 @@
     };
 
     let gameState = {
-      gold: 0, xp: 0, level: 1,
+      gold: 0, xp: 0, level: 0,
+      claimedStarterSeeds: false,
       xpHistory: { planting: 0, harvesting: 0, animals: 0, crafting: 0, selling: 0 },
       inventory: {
         wheat: 0, carrot: 0, corn: 0, potato: 0, tomato: 0, pumpkin: 0,
@@ -346,6 +348,21 @@
     function hideObject(n) { console.log('Hide object:', n); }
     function playSound(s) { console.log('Play sound:', s); }
 
+    // Claim free starter seeds (one-time only)
+    function claimStarterSeeds() {
+      if (gameState.claimedStarterSeeds) {
+        showNotification('Already claimed!', 'error');
+        return;
+      }
+      // Trigger Portals task to give 5 wheat seeds and set the flag
+      triggerTask('Claim_Starter_Seeds');
+      // Optimistically update local state
+      gameState.claimedStarterSeeds = true;
+      gameState.inventory.seeds_wheat += 5;
+      showNotification('+5 Wheat Seeds claimed!', 'success');
+      renderDashboard();
+    }
+
     function parseAndSyncInventory(msg) {
       const varMapping = {
         'Gold': { target: 'gold', isRoot: true },
@@ -396,7 +413,8 @@
         'RecipeBlanket': { target: 'recipe_blanket', isRecipe: true },
         'RecipeButter': { target: 'recipe_butter', isRecipe: true },
         'RecipeCake': { target: 'recipe_cake', isRecipe: true },
-        'RecipeMead': { target: 'recipe_mead', isRecipe: true }
+        'RecipeMead': { target: 'recipe_mead', isRecipe: true },
+        'Has_Starter_Seeds': { target: 'claimedStarterSeeds', isFlag: true }
       };
 
       const parts = msg.replace('Sync_Inventory_', '').split('_');
@@ -411,6 +429,7 @@
             const mapping = varMapping[threeWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
+            else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             console.log('[Hughberry] Parsed 3-word:', threeWordKey, '=', value);
@@ -425,6 +444,7 @@
             const mapping = varMapping[twoWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
+            else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             i += 3; matched = true;
@@ -438,6 +458,7 @@
             const mapping = varMapping[oneWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
+            else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             i += 2; matched = true;
@@ -953,6 +974,17 @@
               <div class="quick-stat"><span class="quick-stat-icon">&#x1F95B;</span><div><div class="quick-stat-value">${totalProducts}</div><div class="quick-stat-label">Products</div></div></div>
             </div>
           </div>
+          ${!gameState.claimedStarterSeeds ? `
+          <div class="dashboard-card" style="border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); animation: pulseGreen 2s infinite;">
+            <div class="card-header"><span class="card-icon">&#x1F381;</span><div class="card-title" style="color: #2ecc71;">Free Starter Seeds!</div></div>
+            <div style="text-align: center; padding: 10px 0;">
+              <p style="font-size: 13px; color: #ccc; margin-bottom: 12px;">New farmer? Claim your free wheat seeds to get started!</p>
+              <button onclick="claimStarterSeeds()" style="background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); border: 2px solid #58d68d; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #1e8449; transition: all 0.2s;">
+                &#x1F33E; Claim 5 Wheat Seeds
+              </button>
+            </div>
+          </div>
+          ` : ''}
         </div>`;
     }
 
