@@ -251,7 +251,7 @@
         milk: 0, wool: 0, goat_meat: 0, truffle: 0, egg: 0, honey: 0,
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0, mead: 0
       },
-      equipment: { beesuit: false, basket: false },
+      equipment: { beesuit: false, milk_pail: false, shearing_kit: false, butcher_knife: false, truffle_spade: false },
       recipes: {
         recipe_flour: false, recipe_bread: false, recipe_cheese: false, recipe_stew: false,
         recipe_ragout: false, recipe_pie: false, recipe_meat_pie: false, recipe_blanket: false,
@@ -342,7 +342,10 @@
         'Honey': { target: 'honey' },
         'Mead': { target: 'mead' },
         'Has_Beesuit': { target: 'beesuit', isEquipment: true },
-        'Has_Basket': { target: 'basket', isEquipment: true },
+        'Has_Milk_Pail': { target: 'milk_pail', isEquipment: true },
+        'Has_Shearing_Kit': { target: 'shearing_kit', isEquipment: true },
+        'Has_Butcher_Knife': { target: 'butcher_knife', isEquipment: true },
+        'Has_Truffle_Spade': { target: 'truffle_spade', isEquipment: true },
         'RecipeFlour': { target: 'recipe_flour', isRecipe: true },
         'RecipeBread': { target: 'recipe_bread', isRecipe: true },
         'RecipeCheese': { target: 'recipe_cheese', isRecipe: true },
@@ -446,11 +449,14 @@
       else if (cmd === 'interact' && parts[1] === 'plot') {
         harvestPlotFromTrigger(parseInt(parts[2]));
       }
-      else if (cmd === 'interact') {
-        handleAnimalInteract(parts[1].toLowerCase(), parseInt(parts[2]));
+      // Collection station interactions (interact_egg_basket, interact_milk_pail, etc.)
+      else if (cmd === 'interact' && ['egg', 'milk', 'wool', 'butcher', 'truffle'].includes(parts[1])) {
+        const stationType = parts.slice(1).join('_'); // e.g., "egg_basket", "milk_pail"
+        handleCollectionStation(stationType);
       }
-      else if (cmd === 'collected') {
-        handleAnimalCollected(parts[1].toLowerCase(), parseInt(parts[2]));
+      // Collection confirmations from Portals (collected_eggs_X, collected_milk_X, etc.)
+      else if (cmd === 'collected' && ['eggs', 'milk', 'wool', 'meat', 'truffle'].includes(parts[1])) {
+        handleCollectionConfirmed(parts[1], parseInt(parts[2]) || 0);
       }
       else if (cmd === 'crop' && parts[1] === 'ready') {
         const plot = gameState.plots[parseInt(parts[2]) - 1];
@@ -620,52 +626,115 @@
     }
 
     function animalBecameReady(animalType, id) {
+      // Trigger the generic ready task for this animal type (e.g., Chicken_Ready, Cow_Ready)
+      // This increments the uncollected count and shows the collection station indicator
       const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
-      triggerTask(`Ready_${capitalType}_${id}`);
+      triggerTask(`${capitalType}_Ready`);
     }
 
-    function handleAnimalInteract(animalType, id) {
-      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens };
-      const animal = animalArrays[animalType]?.[id - 1];
-      if (!animal || animal.state !== 'ready') return;
+    // Collection station configuration
+    const COLLECTION_STATIONS = {
+      egg_basket: {
+        animalType: 'chicken',
+        animalArray: 'chickens',
+        product: 'egg',
+        productName: 'Egg',
+        collectTask: 'Collect_Eggs',
+        xpPerUnit: 3,
+        equipment: null, // No equipment required for eggs (starter)
+        equipmentName: null
+      },
+      milk_pail: {
+        animalType: 'cow',
+        animalArray: 'cows',
+        product: 'milk',
+        productName: 'Milk',
+        collectTask: 'Collect_Milk',
+        xpPerUnit: 5,
+        equipment: 'milk_pail',
+        equipmentName: 'Milk Pail'
+      },
+      wool_bin: {
+        animalType: 'sheep',
+        animalArray: 'sheep',
+        product: 'wool',
+        productName: 'Wool',
+        collectTask: 'Collect_Wool',
+        xpPerUnit: 6,
+        equipment: 'shearing_kit',
+        equipmentName: 'Shearing Kit'
+      },
+      butcher_block: {
+        animalType: 'goat',
+        animalArray: 'goats',
+        product: 'goat_meat',
+        productName: 'Goat Meat',
+        collectTask: 'Collect_Meat',
+        xpPerUnit: 8,
+        equipment: 'butcher_knife',
+        equipmentName: 'Butcher Knife'
+      },
+      truffle_crate: {
+        animalType: 'pig',
+        animalArray: 'pigs',
+        product: 'truffle',
+        productName: 'Truffle',
+        collectTask: 'Collect_Truffle',
+        xpPerUnit: 10,
+        equipment: 'truffle_spade',
+        equipmentName: 'Truffle Spade'
+      }
+    };
 
-      // Check if basket is required for chickens (eggs)
-      if (animalType === 'chicken' && !gameState.equipment.basket) {
-        notify('You need a Harvest Basket to collect eggs!', 'warning');
+    function handleCollectionStation(stationType) {
+      const station = COLLECTION_STATIONS[stationType];
+      if (!station) {
+        console.log('[Hughberry] Unknown station type:', stationType);
         return;
       }
 
-      const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
-      triggerTask(`Collect_${capitalType}_${id}`);
-    }
-
-    function handleAnimalCollected(animalType, id) {
-      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens };
-      const animal = animalArrays[animalType]?.[id - 1];
-      const config = CONFIG.animals[animalType];
-
-      if (!animal || !config) return;
-
-      // Double-check equipment requirements
-      if (animalType === 'chicken' && !gameState.equipment.basket) {
-        notify('You need a Harvest Basket to collect eggs!', 'warning');
+      // Check equipment requirement
+      if (station.equipment && !gameState.equipment[station.equipment]) {
+        notify(`You need a ${station.equipmentName} to collect ${station.productName.toLowerCase()}!`, 'error');
         return;
       }
 
-      gameState.inventory[config.product]++;
-      triggerTask(`Add_${config.productName}_1`);
-      triggerTask(`Add_XP_${config.collectXP}`);
+      // Count ready animals
+      const animals = gameState.animals[station.animalArray];
+      const readyAnimals = animals.filter(a => a.state === 'ready');
+      const readyCount = readyAnimals.length;
 
-      animal.state = 'idle';
-      animal.readyAt = null;
-      animal.notified = false;
+      if (readyCount === 0) {
+        notify(`No ${station.productName.toLowerCase()} ready to collect!`, 'error');
+        return;
+      }
 
-      addXP(config.collectXP, 'animals');
-      notify(`+1 ${config.productName}! +${config.collectXP} XP`, 'success');
+      // Trigger the collect task - Portals will handle adding inventory and XP
+      triggerTask(station.collectTask);
+
+      // Reset all ready animals to idle
+      readyAnimals.forEach(animal => {
+        animal.state = 'idle';
+        animal.readyAt = null;
+        animal.notified = false;
+      });
+
+      // Local state updates (will be synced from Portals)
+      const xpGained = readyCount * station.xpPerUnit;
+      addXP(xpGained, 'animals');
+      gameState.inventory[station.product] += readyCount;
+
+      notify(`Collected ${readyCount} ${station.productName}! +${xpGained} XP`, 'success');
       saveGameQuiet();
       renderAnimals();
       renderInventory();
       renderDashboard();
+    }
+
+    function handleCollectionConfirmed(productType, count) {
+      // Called when Portals confirms collection (collected_eggs_X, collected_milk_X, etc.)
+      // This is mainly for logging/debugging since we already updated local state
+      console.log(`[Hughberry] Collection confirmed: ${count} ${productType}`);
     }
 
     // Handle honey collection from apiary (requires beesuit)
