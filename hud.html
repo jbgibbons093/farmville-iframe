@@ -297,6 +297,26 @@
     // PORTALS SDK INTEGRATION
     // ============================================
 
+    let sdkReady = false;
+
+    function triggerTask(taskName) {
+      if (!sdkReady) {
+        console.log('[HUD] SDK not ready, skipping task:', taskName);
+        return;
+      }
+      try {
+        if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+          PortalsSdk.sendMessageToUnity(JSON.stringify({
+            TaskName: taskName,
+            TaskTargetState: 'SetNotActiveToActive'
+          }));
+          console.log('[HUD] Task triggered:', taskName);
+        }
+      } catch (e) {
+        console.log('[HUD] Error triggering task:', e);
+      }
+    }
+
     // Message deduplication
     let lastMessageId = '';
     let lastMessageTime = 0;
@@ -371,6 +391,11 @@
           processMessage(msg, 'SDK');
         });
         console.log('[HUD] SDK listener registered');
+        sdkReady = true;
+        // Request initial sync now that SDK is ready
+        setTimeout(function() {
+          triggerTask('Sync_Inventory');
+        }, 300);
       } else {
         console.log('[HUD] Waiting for SDK...');
         setTimeout(setupMessageListener, 100);
