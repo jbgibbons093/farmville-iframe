@@ -14,6 +14,7 @@
       overflow: hidden;
       margin: 0;
       padding: 0;
+      pointer-events: none;
     }
 
     .hud-container {
@@ -23,6 +24,12 @@
       padding: 8px 20px;
       background: transparent;
       min-height: 60px;
+      pointer-events: none;
+    }
+
+    /* Re-enable pointer events on interactive elements */
+    .hud-btn, .stat-box, .gold-display, .logo-section {
+      pointer-events: auto;
     }
 
     /* Logo Section */
