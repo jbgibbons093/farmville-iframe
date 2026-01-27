@@ -337,8 +337,14 @@
     function sendToPortals(cmd) { console.log('To Portals:', cmd); }
     function closeMenu() {
       console.log('[Hughberry] Close menu requested');
-      // Use postMessage only, skip SDK's uniwebview:// redirect that freezes desktop
-      window.parent.postMessage("closeIframe:" + window.location.href, "*");
+      // Try multiple targets for postMessage
+      var msg = "closeIframe:" + window.location.href;
+      if (window.parent) window.parent.postMessage(msg, "*");
+      if (window.top && window.top !== window.parent) window.top.postMessage(msg, "*");
+      // Also try SDK's PortalsParent if available
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.PortalsParent) {
+        PortalsSdk.PortalsParent.postMessage(msg, "*");
+      }
     }
     function setVariable(n, v) { console.log('Set variable:', n, v); }
     function showObject(n) { console.log('Show object:', n); }
