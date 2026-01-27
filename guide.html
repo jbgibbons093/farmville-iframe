@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hughberry Farms - Game Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      font-family: 'Nunito', sans-serif;
+      background: rgba(0, 0, 0, 0.85);
+      color: #ddd;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header Bar */
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: linear-gradient(145deg, rgba(60, 50, 35, 0.95) 0%, rgba(40, 32, 20, 0.95) 100%);
+      border-bottom: 3px solid #5a4530;
+      z-index: 100;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-icon {
+      font-size: 28px;
+    }
+
+    .header-text {
+      font-family: 'Luckiest Guy', cursive;
+      font-size: 22px;
+      color: #FFD700;
+      text-shadow: 2px 2px 0 #8B4513;
+    }
+
+    .close-hint {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .close-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: linear-gradient(145deg, #c0392b, #a93226);
+      border: 2px solid #e74c3c;
+      border-radius: 6px;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: linear-gradient(145deg, #e74c3c, #c0392b);
+      transform: translateY(-1px);
+    }
+
+    .key-hint {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 6px;
+      background: #333;
+      border: 1px solid #555;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: 0 2px 0 #222;
+    }
+
+    /* Main Content */
+    .guide-wrapper {
+      padding: 80px 20px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Guide Sections */
+    .guide-section {
+      background: linear-gradient(145deg, rgba(50, 40, 25, 0.6) 0%, rgba(35, 28, 18, 0.6) 100%);
+      border: 2px solid #5a4530;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .guide-section-title {
+      font-family: 'Luckiest Guy', cursive;
+      font-size: 20px;
+      color: #FFD700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .guide-section-title::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, #FFD700, transparent);
+    }
+
+    .guide-text {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #ddd;
+      margin-bottom: 12px;
+    }
+
+    .guide-text strong { color: #FFD700; }
+    .guide-text em { color: #67b8f7; font-style: normal; }
+
+    .guide-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+    }
+
+    .guide-list li {
+      padding: 8px 0 8px 28px;
+      position: relative;
+      border-bottom: 1px solid rgba(90, 69, 48, 0.3);
+    }
+
+    .guide-list li:last-child { border-bottom: none; }
+
+    .guide-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 12px;
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(145deg, #5a4530, #3a2a1a);
+      border-radius: 4px;
+    }
+
+    .guide-list.numbered li::before {
+      content: counter(guide-counter);
+      counter-increment: guide-counter;
+      background: linear-gradient(145deg, #27ae60, #1e8449);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .guide-list.numbered { counter-reset: guide-counter; }
+
+    .guide-tip {
+      background: rgba(39, 174, 96, 0.15);
+      border: 2px solid #27ae60;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 15px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .guide-tip-icon { font-size: 20px; flex-shrink: 0; }
+    .guide-tip-text { font-size: 13px; color: #2ecc71; }
+
+    .guide-warning {
+      background: rgba(243, 156, 18, 0.15);
+      border: 2px solid #f39c12;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 15px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .guide-warning-icon { font-size: 20px; flex-shrink: 0; }
+    .guide-warning-text { font-size: 13px; color: #f39c12; }
+
+    .guide-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 13px;
+    }
+
+    .guide-table th {
+      background: rgba(90, 69, 48, 0.5);
+      color: #FFD700;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 700;
+      border: 1px solid #5a4530;
+    }
+
+    .guide-table td {
+      padding: 8px;
+      border: 1px solid #4a3a2a;
+      color: #ccc;
+    }
+
+    .guide-table tr:nth-child(even) { background: rgba(0,0,0,0.2); }
+    .guide-table .icon-col { text-align: center; font-size: 18px; width: 40px; }
+
+    .guide-subsection {
+      margin: 15px 0;
+      padding: 15px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      border-left: 3px solid #8B4513;
+    }
+
+    .guide-subsection-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFD700;
+      margin-bottom: 10px;
+    }
+
+    .guide-key {
+      display: inline-block;
+      background: #4a3a2a;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      margin: 0 2px;
+      border: 1px solid #5a4530;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+    ::-webkit-scrollbar-thumb { background: #5a4530; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6b5640; }
+  </style>
+</head>
+<body>
+  <!-- Header Bar -->
+  <div class="header-bar">
+    <div class="header-title">
+      <span class="header-icon">&#x1F4D6;</span>
+      <span class="header-text">Game Guide</span>
+    </div>
+    <div class="close-hint">
+      <span>Press <span class="key-hint">ESC</span> or <span class="key-hint">L</span> to close</span>
+      <button class="close-btn" onclick="closeGuide()">
+        <span>&#x2715;</span>
+        <span>Close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Guide Content -->
+  <div class="guide-wrapper">
+    <!-- Welcome Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x1F3E1; Welcome to Hughberry Farms!</div>
+      <p class="guide-text">
+        Welcome, farmer! <strong>Hughberry Farms</strong> is a relaxing farming simulation where you'll grow crops,
+        raise animals, craft goods, and build your farming empire. This guide will teach you everything you need
+        to know to become a master farmer!
+      </p>
+      <div class="guide-tip">
+        <span class="guide-tip-icon">&#x1F4A1;</span>
+        <span class="guide-tip-text"><strong>Quick Tip:</strong> Press <span class="guide-key">I</span> to open your inventory and manage your farm.
+        Press <span class="guide-key">L</span> to toggle this guide on/off!</span>
+      </div>
+    </div>
+
+    <!-- Getting Started -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x1F331; Getting Started</div>
+      <p class="guide-text">
+        When you first arrive at Hughberry Farms, you'll start at <strong>Level 1</strong> with some starting gold.
+        Here's what you should do first:
+      </p>
+      <ol class="guide-list numbered">
+        <li><strong>Buy Seeds</strong> - Visit the <em>Seed Store</em> in the marketplace to purchase Wheat and Carrot seeds</li>
+        <li><strong>Plant Your Crops</strong> - Go to the <em>Crops</em> tab or walk to a plot in the 3D world and plant your seeds</li>
+        <li><strong>Buy Equipment</strong> - Visit the <em>Blueprint Store</em> to buy a <em>Milk Pail</em> (required to work with cows)</li>
+        <li><strong>Start Your Animals</strong> - Go to the <em>Animals</em> tab and click "Start" on a cow to begin milk production</li>
+        <li><strong>Wait & Collect</strong> - Crops and animals take time. When ready, harvest crops and collect products!</li>
+      </ol>
+      <div class="guide-warning">
+        <span class="guide-warning-icon">&#x26A0;&#xFE0F;</span>
+        <span class="guide-warning-text"><strong>Important:</strong> You need the correct <em>equipment</em> to work with each animal type.
+        Buy equipment from the Blueprint Store before trying to start animal production!</span>
+      </div>
+    </div>
+
+    <!-- Crops Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x1F33E; Growing Crops</div>
+      <p class="guide-text">
+        Crops are your bread and butter (literally - you can craft both!). Here's how the crop system works:
+      </p>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">How to Plant Crops</div>
+        <ol class="guide-list numbered">
+          <li><strong>Buy seeds</strong> from the Seed Store in the marketplace</li>
+          <li>Go to the <em>Crops</em> tab in the inventory menu</li>
+          <li>Find an empty plot and select which crop to plant</li>
+          <li>Click <strong>"Plant"</strong> to plant the seed</li>
+          <li>Wait for the timer to complete (shown on each plot)</li>
+          <li>When ready, go to the plot in the 3D world and press <span class="guide-key">X</span> to harvest</li>
+        </ol>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Crop Reference Table</div>
+        <table class="guide-table">
+          <tr>
+            <th class="icon-col">Icon</th>
+            <th>Crop</th>
+            <th>Grow Time</th>
+            <th>Seed Cost</th>
+            <th>Sell Price</th>
+            <th>Unlock Level</th>
+          </tr>
+          <tr><td class="icon-col">&#x1F33E;</td><td>Wheat</td><td>30 seconds</td><td>2g</td><td>5g</td><td>Level 1</td></tr>
+          <tr><td class="icon-col">&#x1F955;</td><td>Carrot</td><td>45 seconds</td><td>3g</td><td>8g</td><td>Level 1</td></tr>
+          <tr><td class="icon-col">&#x1F33D;</td><td>Corn</td><td>60 seconds</td><td>5g</td><td>10g</td><td>Level 2</td></tr>
+          <tr><td class="icon-col">&#x1F954;</td><td>Potato</td><td>75 seconds</td><td>6g</td><td>12g</td><td>Level 2</td></tr>
+          <tr><td class="icon-col">&#x1F345;</td><td>Tomato</td><td>90 seconds</td><td>8g</td><td>15g</td><td>Level 3</td></tr>
+          <tr><td class="icon-col">&#x1F383;</td><td>Pumpkin</td><td>120 seconds</td><td>15g</td><td>30g</td><td>Level 5</td></tr>
+        </table>
+      </div>
+
+      <div class="guide-tip">
+        <span class="guide-tip-icon">&#x1F4A1;</span>
+        <span class="guide-tip-text"><strong>Pro Tip:</strong> Use the <em>Auto-Replant</em> toggle in the Crops tab!
+        When enabled, harvested plots will automatically replant with your chosen priority crop (if you have seeds).</span>
+      </div>
+    </div>
+
+    <!-- Animals Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x1F404; Raising Animals</div>
+      <p class="guide-text">
+        Animals produce valuable goods like milk, eggs, wool, and more. Each animal type requires
+        <strong>specific equipment</strong> before you can work with them.
+      </p>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">How Animal Production Works</div>
+        <ol class="guide-list numbered">
+          <li><strong>Buy the required equipment</strong> from the Blueprint Store</li>
+          <li>Go to the <em>Animals</em> tab and click <strong>"Start"</strong> on an idle animal</li>
+          <li>Wait for the production timer to complete</li>
+          <li>When ready, walk to the <em>collection station</em> in the 3D world and press <span class="guide-key">X</span></li>
+          <li>All ready products from that animal type will be collected at once!</li>
+        </ol>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Animal & Equipment Reference</div>
+        <table class="guide-table">
+          <tr>
+            <th class="icon-col">Icon</th>
+            <th>Animal</th>
+            <th>Product</th>
+            <th>Timer</th>
+            <th>Required Equipment</th>
+            <th>Collection Station</th>
+          </tr>
+          <tr><td class="icon-col">&#x1F404;</td><td>Cow (x6)</td><td>Milk</td><td>90s</td><td>Milk Pail (50g, Lv.1)</td><td>Milk Pail Station</td></tr>
+          <tr><td class="icon-col">&#x1F414;</td><td>Chicken (x5)</td><td>Egg</td><td>60s</td><td>Egg Basket (150g, Lv.1)</td><td>Egg Basket</td></tr>
+          <tr><td class="icon-col">&#x1F411;</td><td>Sheep (x5)</td><td>Wool</td><td>120s</td><td>Shearing Kit (250g, Lv.2)</td><td>Wool Bin</td></tr>
+          <tr><td class="icon-col">&#x1F410;</td><td>Goat (x5)</td><td>Goat Meat</td><td>90s</td><td>Butcher Knife (350g, Lv.3)</td><td>Butcher Block</td></tr>
+          <tr><td class="icon-col">&#x1F437;</td><td>Pig (x6)</td><td>Truffle</td><td>90s</td><td>Truffle Spade (450g, Lv.4)</td><td>Truffle Crate</td></tr>
+          <tr><td class="icon-col">&#x1F41D;</td><td>Beehive (x9)</td><td>Honey</td><td>120s</td><td>Bee Suit (400g, Lv.3)</td><td>Honey Jar</td></tr>
+        </table>
+      </div>
+
+      <div class="guide-warning">
+        <span class="guide-warning-icon">&#x26A0;&#xFE0F;</span>
+        <span class="guide-warning-text"><strong>Remember:</strong> Animals are unlocked at different levels!
+        Cows and Chickens are available at Level 1, but Pigs require Level 4. Check the Unlocks tab for details.</span>
+      </div>
+    </div>
+
+    <!-- Crafting Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x2692;&#xFE0F; Crafting System</div>
+      <p class="guide-text">
+        Turn your raw crops and animal products into valuable crafted goods! Crafted items sell for
+        much more than raw materials and give bonus XP.
+      </p>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">How to Craft</div>
+        <ol class="guide-list numbered">
+          <li><strong>Buy the recipe</strong> from the Blueprint Store (each recipe costs gold and has a level requirement)</li>
+          <li>Gather the required <strong>ingredients</strong> (crops, animal products, or other crafted items)</li>
+          <li>Visit the <strong>Crafting Table</strong> in the marketplace</li>
+          <li>Select your recipe and click <strong>"Craft"</strong></li>
+          <li>Sell your crafted goods at the <strong>Sell Goods</strong> stall for profit!</li>
+        </ol>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Recipe Reference</div>
+        <table class="guide-table">
+          <tr>
+            <th class="icon-col">Icon</th>
+            <th>Recipe</th>
+            <th>Ingredients</th>
+            <th>Recipe Cost</th>
+            <th>Sell Price</th>
+            <th>XP</th>
+          </tr>
+          <tr><td class="icon-col">&#x1F35E;</td><td>Flour</td><td>3 Wheat</td><td>100g (Lv.1)</td><td>20g</td><td>+10</td></tr>
+          <tr><td class="icon-col">&#x1F9C8;</td><td>Butter</td><td>2 Milk</td><td>150g (Lv.2)</td><td>30g</td><td>+15</td></tr>
+          <tr><td class="icon-col">&#x1F9C0;</td><td>Cheese</td><td>2 Milk</td><td>200g (Lv.2)</td><td>30g</td><td>+15</td></tr>
+          <tr><td class="icon-col">&#x1F956;</td><td>Bread</td><td>1 Flour, 1 Egg</td><td>250g (Lv.2)</td><td>35g</td><td>+15</td></tr>
+          <tr><td class="icon-col">&#x1F9E3;</td><td>Blanket</td><td>3 Wool</td><td>250g (Lv.3)</td><td>50g</td><td>+20</td></tr>
+          <tr><td class="icon-col">&#x1F372;</td><td>Stew</td><td>1 Potato, 1 Carrot, 1 Corn</td><td>300g (Lv.3)</td><td>50g</td><td>+25</td></tr>
+          <tr><td class="icon-col">&#x1F37A;</td><td>Mead</td><td>3 Honey</td><td>450g (Lv.4)</td><td>60g</td><td>+25</td></tr>
+          <tr><td class="icon-col">&#x1F356;</td><td>Ragout</td><td>1 Goat Meat, 1 Potato, 1 Carrot</td><td>400g (Lv.4)</td><td>75g</td><td>+30</td></tr>
+          <tr><td class="icon-col">&#x1F967;</td><td>Pie</td><td>1 Flour, 1 Pumpkin, 1 Egg</td><td>400g (Lv.4)</td><td>80g</td><td>+30</td></tr>
+          <tr><td class="icon-col">&#x1F969;</td><td>Meat Pie</td><td>1 Goat Meat, 1 Flour, 1 Egg</td><td>500g (Lv.5)</td><td>90g</td><td>+35</td></tr>
+          <tr><td class="icon-col">&#x1F370;</td><td>Cake</td><td>1 Flour, 2 Eggs, 1 Butter</td><td>600g (Lv.5)</td><td>100g</td><td>+40</td></tr>
+        </table>
+      </div>
+
+      <div class="guide-tip">
+        <span class="guide-tip-icon">&#x1F4A1;</span>
+        <span class="guide-tip-text"><strong>Pro Tip:</strong> Some recipes require <em>other crafted items</em> as ingredients!
+        For example, Bread needs Flour, and Cake needs both Flour and Butter. Plan your crafting chain!</span>
+      </div>
+    </div>
+
+    <!-- Marketplace Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x1F3EA; The Marketplace</div>
+      <p class="guide-text">
+        The marketplace is your hub for buying and selling. Here you'll find several important stalls:
+      </p>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Marketplace Locations</div>
+        <table class="guide-table">
+          <tr>
+            <th class="icon-col">Icon</th>
+            <th>Location</th>
+            <th>Purpose</th>
+          </tr>
+          <tr><td class="icon-col">&#x1F331;</td><td>Seed Store</td><td>Buy seeds for all crop types. Higher-level crops cost more but sell for more too!</td></tr>
+          <tr><td class="icon-col">&#x1F4B0;</td><td>Sell Goods</td><td>Sell your crops, animal products, and crafted items for gold.</td></tr>
+          <tr><td class="icon-col">&#x1F4DC;</td><td>Blueprint Store</td><td>Buy equipment (required for animals) and crafting recipes.</td></tr>
+          <tr><td class="icon-col">&#x2692;&#xFE0F;</td><td>Crafting Table</td><td>Craft items using your ingredients and purchased recipes.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- XP & Leveling Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x2B50; XP & Leveling Up</div>
+      <p class="guide-text">
+        Everything you do on the farm earns <strong>XP (Experience Points)</strong>. Earn enough XP and you'll level up,
+        unlocking new crops, animals, recipes, and equipment!
+      </p>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Ways to Earn XP</div>
+        <table class="guide-table">
+          <tr><th>Activity</th><th>XP Earned</th></tr>
+          <tr><td>Planting crops</td><td>+2 to +5 XP (varies by crop)</td></tr>
+          <tr><td>Harvesting crops</td><td>+5 to +15 XP (varies by crop)</td></tr>
+          <tr><td>Starting animals</td><td>+1 to +5 XP (varies by animal)</td></tr>
+          <tr><td>Collecting animal products</td><td>+3 to +10 XP (varies by product)</td></tr>
+          <tr><td>Crafting items</td><td>+10 to +40 XP (varies by recipe)</td></tr>
+        </table>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Level Requirements</div>
+        <table class="guide-table">
+          <tr><th>Level</th><th>Total XP Required</th><th>New Unlocks</th></tr>
+          <tr><td>Level 1</td><td>0 XP</td><td>Wheat, Carrot, Cows, Chickens</td></tr>
+          <tr><td>Level 2</td><td>100 XP</td><td>Corn, Potato, Sheep</td></tr>
+          <tr><td>Level 3</td><td>300 XP</td><td>Tomato, Goats, Beehives</td></tr>
+          <tr><td>Level 4</td><td>600 XP</td><td>Pigs, Advanced Recipes</td></tr>
+          <tr><td>Level 5</td><td>1,000 XP</td><td>Pumpkin, Meat Pie, Cake</td></tr>
+          <tr><td>Level 6+</td><td>1,500+ XP</td><td>Expert farmer status!</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tips & Strategies Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x1F4DD; Tips & Strategies</div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Early Game (Levels 1-2)</div>
+        <ul class="guide-list">
+          <li><strong>Focus on Wheat</strong> - It's cheap, grows fast (30s), and you'll need lots for Flour</li>
+          <li><strong>Buy the Milk Pail first</strong> - It's only 50g and lets you work with all 6 cows</li>
+          <li><strong>Start multiple animals at once</strong> - Get all cows and chickens producing while you farm</li>
+          <li><strong>Use Auto-Replant</strong> - Set it to Wheat and let your farm run automatically</li>
+          <li><strong>Buy the Flour recipe early</strong> - 3 Wheat makes 1 Flour, which sells for 20g and gives 10 XP</li>
+        </ul>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Mid Game (Levels 3-4)</div>
+        <ul class="guide-list">
+          <li><strong>Diversify your crops</strong> - You'll need Potatoes, Carrots, and Corn for Stew</li>
+          <li><strong>Get all equipment</strong> - Each new animal type = more passive income</li>
+          <li><strong>Start crafting chains</strong> - Make Flour first, then use it for Bread and Pies</li>
+          <li><strong>Beehives are valuable</strong> - 9 hives producing honey makes great Mead!</li>
+        </ul>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Late Game (Levels 5+)</div>
+        <ul class="guide-list">
+          <li><strong>Pumpkins are king</strong> - 15g seed cost, 30g sell price = 100% profit, plus great for Pies</li>
+          <li><strong>Cake is the ultimate craft</strong> - Requires Flour + Butter + 2 Eggs, sells for 100g!</li>
+          <li><strong>Run all animals constantly</strong> - 36 animals producing = massive passive income</li>
+          <li><strong>Keep seeds stocked</strong> - Buy in bulk (5 at a time) to keep your farm running</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Controls Reference -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x1F3AE; Controls Reference</div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Menu Controls</div>
+        <table class="guide-table">
+          <tr><th>Key</th><th>Action</th></tr>
+          <tr><td><span class="guide-key">I</span></td><td>Open/Close the inventory menu</td></tr>
+          <tr><td><span class="guide-key">L</span></td><td>Open/Close this game guide</td></tr>
+          <tr><td><span class="guide-key">ESC</span></td><td>Close current menu/guide</td></tr>
+          <tr><td><span class="guide-key">1-7</span></td><td>Switch between inventory tabs</td></tr>
+        </table>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">3D World Controls</div>
+        <table class="guide-table">
+          <tr><th>Key</th><th>Action</th></tr>
+          <tr><td><span class="guide-key">W A S D</span></td><td>Move around the farm</td></tr>
+          <tr><td><span class="guide-key">Space</span></td><td>Jump</td></tr>
+          <tr><td><span class="guide-key">X</span></td><td>Interact (harvest crops, collect products, use stations)</td></tr>
+          <tr><td><span class="guide-key">Mouse</span></td><td>Look around</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="guide-section">
+      <div class="guide-section-title">&#x2753; Frequently Asked Questions</div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Q: Why can't I start an animal?</div>
+        <p class="guide-text">You need to buy the correct <strong>equipment</strong> from the Blueprint Store first.
+        Each animal type requires specific equipment (e.g., Milk Pail for cows, Bee Suit for beehives).</p>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Q: Why can't I plant a certain crop?</div>
+        <p class="guide-text">Check two things: 1) Do you have seeds? Buy them from the Seed Store.
+        2) Is the crop unlocked? Some crops require higher levels (check the Unlocks tab).</p>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Q: Why can't I craft an item?</div>
+        <p class="guide-text">You need to <strong>buy the recipe first</strong> from the Blueprint Store.
+        Also make sure you have all the required ingredients - some recipes need other crafted items!</p>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Q: How do I collect animal products?</div>
+        <p class="guide-text">Walk to the <strong>collection station</strong> for that animal type (e.g., Honey Jar for beehives,
+        Milk Pail station for cows) and press <span class="guide-key">X</span>. All ready products will be collected at once!</p>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Q: My crops/animals show "Ready" but nothing happens?</div>
+        <p class="guide-text">You need to physically go to the location in the 3D world and press <span class="guide-key">X</span>
+        to interact. The menu shows status but you collect in the 3D world!</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="guide-section" style="text-align: center; border-color: #FFD700;">
+      <p class="guide-text" style="margin: 0;">
+        &#x1F33E; <strong>Happy Farming!</strong> &#x1F33E;<br>
+        <span style="font-size: 12px; color: #888;">Hughberry Farms - A Portals Experience</span>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+  <script>
+    // ============================================
+    // HUGHBERRY FARMS - GAME GUIDE OVERLAY
+    // ============================================
+
+    function closeGuide() {
+      console.log('[Guide] Closing guide');
+      triggerTask('Close_Guide');
+    }
+
+    function triggerTask(taskName, targetState = 'SetNotActiveToActive') {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({
+          TaskName: taskName,
+          TaskTargetState: targetState
+        }));
+        console.log('[Guide] Task triggered:', taskName);
+      } else {
+        console.warn('[Guide] PortalsSdk not available');
+      }
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        closeGuide();
+      }
+    });
+
+    // Setup SDK listener
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(function(msg) {
+          console.log('[Guide] Received message:', msg);
+        });
+        console.log('[Guide] SDK listener registered');
+      } else {
+        setTimeout(setupMessageListener, 100);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[Guide] Game Guide loaded');
+      setupMessageListener();
+    });
+  </script>
+</body>
+</html>
