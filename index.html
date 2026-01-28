@@ -579,7 +579,7 @@
       const cropName = crop ? crop.name : 'Wheat';
       const harvestXP = crop ? crop.harvestXP : 5;
 
-      triggerTask(`Harvest_${cropName}_Plot_${plotId}`);
+      triggerTask(`Harvest_Plot_${plotId}`);
       triggerTask(`Plot_${plotId}_Trigger`, 'SetActiveToNotActive');
       triggerTask(`Add_Crop_${cropName}_1`);
       triggerTask(`Add_XP_${harvestXP}`);
@@ -658,7 +658,7 @@
       if (gameState.inventory[seedKey] < 1) { notify(`No ${crop.name} seeds!`, 'error'); return false; }
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return false; }
 
-      triggerTask(`Plant_${crop.name}_Plot_${plotId}`);
+      triggerTask(`Plant_Plot_${plotId}`);
       triggerTask(`Sub_Seeds_${crop.name}_1`);
       triggerTask(`Add_XP_${crop.plantXP}`);
 
