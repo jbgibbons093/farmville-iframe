@@ -75,7 +75,7 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const EQUIPMENT = [
-      { id: 'milk_pail', name: 'Milk Pail', icon: '&#x1FAA3;', price: 50, unlockLevel: 1, desc: 'Required to work with cows and collect milk (Starter)', taskName: 'Buy_Milk_Pail' },
+      { id: 'milk_pail', name: 'Milk Pail', icon: '&#x1FAA3;', price: 50, unlockLevel: 0, desc: 'Required to work with cows and collect milk (Starter)', taskName: 'Buy_Milk_Pail' },
       { id: 'basket', name: 'Egg Basket', icon: '&#x1F9FA;', price: 150, unlockLevel: 1, desc: 'Required to work with chickens and collect eggs', taskName: 'Buy_Basket' },
       { id: 'shearing_kit', name: 'Shearing Kit', icon: '&#x2702;', price: 250, unlockLevel: 2, desc: 'Required to work with sheep and collect wool', taskName: 'Buy_Shearing_Kit' },
       { id: 'butcher_knife', name: 'Butcher Knife', icon: '&#x1F52A;', price: 350, unlockLevel: 3, desc: 'Required to work with goats and collect meat', taskName: 'Buy_Butcher_Knife' },
@@ -97,7 +97,7 @@
       { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 5, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
     ];
 
-    let gameState = { gold: 0, level: 1, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
+    let gameState = { gold: 0, level: 0, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -130,10 +130,9 @@
       if (gameState.gold < equip.price) { notify('Not enough gold!'); return; }
 
       triggerTask(equip.taskName);
-      gameState.gold -= equip.price;
-      gameState.equipment[id] = true;
       notify('Purchased ' + equip.name + '!');
-      render();
+      // Request sync to get updated values from Portals
+      setTimeout(function() { triggerTask('Sync_Inventory'); }, 200);
     }
 
     function buyRecipe(id) {
@@ -144,10 +143,9 @@
       if (gameState.gold < recipe.price) { notify('Not enough gold!'); return; }
 
       triggerTask(recipe.taskName);
-      gameState.gold -= recipe.price;
-      gameState.recipes[id] = true;
       notify('Purchased ' + recipe.name + '!');
-      render();
+      // Request sync to get updated values from Portals
+      setTimeout(function() { triggerTask('Sync_Inventory'); }, 200);
     }
 
     function render() {
@@ -228,7 +226,7 @@
           gameState.gold = parseInt(parts[i+1]) || 0;
           i += 2;
         } else if (parts[i] === 'Level' && i + 1 < parts.length) {
-          gameState.level = parseInt(parts[i+1]) || 1;
+          gameState.level = parseInt(parts[i+1]) || 0;
           i += 2;
         } else if (parts[i] === 'Has' && i + 2 < parts.length) {
           // Handle equipment: Has_Milk_Pail, Has_Basket, Has_Beesuit, Has_Shearing_Kit, Has_Butcher_Knife, Has_Truffle_Spade

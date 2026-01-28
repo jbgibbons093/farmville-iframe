@@ -80,10 +80,11 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const ITEMS = {
+      // Prices must match Excel Sell tasks
       crops: [
         { key: 'wheat', name: 'Wheat', icon: '&#x1F33E;', price: 5, taskPrefix: 'Sell_Crop_Wheat' },
-        { key: 'carrot', name: 'Carrot', icon: '&#x1F955;', price: 8, taskPrefix: 'Sell_Crop_Carrot' },
-        { key: 'corn', name: 'Corn', icon: '&#x1F33D;', price: 10, taskPrefix: 'Sell_Crop_Corn' },
+        { key: 'carrot', name: 'Carrot', icon: '&#x1F955;', price: 10, taskPrefix: 'Sell_Crop_Carrot' },
+        { key: 'corn', name: 'Corn', icon: '&#x1F33D;', price: 8, taskPrefix: 'Sell_Crop_Corn' },
         { key: 'potato', name: 'Potato', icon: '&#x1F954;', price: 12, taskPrefix: 'Sell_Crop_Potato' },
         { key: 'tomato', name: 'Tomato', icon: '&#x1F345;', price: 15, taskPrefix: 'Sell_Crop_Tomato' },
         { key: 'pumpkin', name: 'Pumpkin', icon: '&#x1F383;', price: 30, taskPrefix: 'Sell_Crop_Pumpkin' }
@@ -92,9 +93,9 @@
         { key: 'milk', name: 'Milk', icon: '&#x1F95B;', price: 12, taskPrefix: 'Sell_Milk', singleOnly: true },
         { key: 'wool', name: 'Wool', icon: '&#x1F9F6;', price: 15, taskPrefix: 'Sell_Wool', singleOnly: true },
         { key: 'goat_meat', name: 'Goat Meat', icon: '&#x1F356;', price: 20, taskPrefix: 'Sell_Goat_Meat', singleOnly: true },
-        { key: 'truffle', name: 'Truffle', icon: '&#x1F344;', price: 30, taskPrefix: 'Sell_Truffle', singleOnly: true },
+        { key: 'truffle', name: 'Truffle', icon: '&#x1F344;', price: 50, taskPrefix: 'Sell_Truffle', singleOnly: true },
         { key: 'egg', name: 'Egg', icon: '&#x1F95A;', price: 8, taskPrefix: 'Sell_Egg', singleOnly: true },
-        { key: 'honey', name: 'Honey', icon: '&#x1F36F;', price: 15, taskPrefix: 'Sell_Honey', singleOnly: true }
+        { key: 'honey', name: 'Honey', icon: '&#x1F36F;', price: 25, taskPrefix: 'Sell_Honey', singleOnly: true }
       ],
       crafted: [
         { key: 'flour', name: 'Flour', icon: '&#x1F35E;', price: 20, taskPrefix: 'Sell_Flour', singleOnly: true },
@@ -141,10 +142,9 @@
       if (owned < qty) { notify('Not enough to sell!'); return; }
 
       triggerTask(taskPrefix + '_' + qty);
-      gameState.inventory[key] = owned - qty;
-      gameState.gold += price * qty;
       notify('Sold for ' + (price * qty) + 'g!');
-      render();
+      // Request sync to get updated values from Portals
+      setTimeout(function() { triggerTask('Sync_Inventory'); }, 200);
     }
 
     function renderGrid(items, containerId) {

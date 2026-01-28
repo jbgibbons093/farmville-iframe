@@ -143,14 +143,6 @@
         }
       }
 
-      // Consume ingredients locally (Portals will also update)
-      for (const [ing, qty] of Object.entries(recipe.ingredients)) {
-        gameState.inventory[ing] -= qty;
-      }
-
-      // Add product locally (Portals will also update)
-      gameState.inventory[recipeId] = (gameState.inventory[recipeId] || 0) + 1;
-
       // Trigger craft task
       console.log('[Hughberry Crafting] Triggering:', recipe.taskName);
       triggerTask(recipe.taskName);
@@ -169,7 +161,6 @@
       }, 300);
 
       notify('Crafted ' + recipe.name + '! +' + recipe.xp + ' XP');
-      render();
     }
 
     function render() {

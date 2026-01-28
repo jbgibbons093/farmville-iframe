@@ -68,16 +68,17 @@
 
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
+    // Prices must match Excel Buy_Seeds tasks: wheat=2, carrot=5, corn=3, potato=6, tomato=8, pumpkin=15
     const SEEDS = {
-      wheat: { name: 'Wheat', icon: '&#x1F33E;', cost: 2, unlockLevel: 1 },
-      carrot: { name: 'Carrot', icon: '&#x1F955;', cost: 3, unlockLevel: 1 },
-      corn: { name: 'Corn', icon: '&#x1F33D;', cost: 5, unlockLevel: 2 },
+      wheat: { name: 'Wheat', icon: '&#x1F33E;', cost: 2, unlockLevel: 0 },
+      carrot: { name: 'Carrot', icon: '&#x1F955;', cost: 5, unlockLevel: 1 },
+      corn: { name: 'Corn', icon: '&#x1F33D;', cost: 3, unlockLevel: 2 },
       potato: { name: 'Potato', icon: '&#x1F954;', cost: 6, unlockLevel: 2 },
       tomato: { name: 'Tomato', icon: '&#x1F345;', cost: 8, unlockLevel: 3 },
       pumpkin: { name: 'Pumpkin', icon: '&#x1F383;', cost: 15, unlockLevel: 5 }
     };
 
-    let gameState = { gold: 0, level: 1, seeds: {} };
+    let gameState = { gold: 0, level: 0, seeds: {} };
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -109,10 +110,9 @@
       if (gameState.level < seed.unlockLevel) { notify('Level too low!'); return; }
 
       triggerTask('Buy_Seeds_' + seed.name + '_' + qty);
-      gameState.gold -= cost;
-      gameState.seeds[type] = (gameState.seeds[type] || 0) + qty;
       notify('Bought ' + qty + ' ' + seed.name + ' seeds!');
-      render();
+      // Request sync to get updated values from Portals
+      setTimeout(function() { triggerTask('Sync_Inventory'); }, 200);
     }
 
     function render() {
@@ -162,7 +162,7 @@
       const parts = msg.replace('Sync_Inventory_', '').split('_');
       for (let i = 0; i < parts.length - 1; i += 2) {
         if (parts[i] === 'Gold') gameState.gold = parseInt(parts[i+1]) || 0;
-        if (parts[i] === 'Level') gameState.level = parseInt(parts[i+1]) || 1;
+        if (parts[i] === 'Level') gameState.level = parseInt(parts[i+1]) || 0;
         if (parts[i] === 'Seeds' && parts[i+1]) {
           const seedType = parts[i+1].toLowerCase();
           gameState.seeds[seedType] = parseInt(parts[i+2]) || 0;
