@@ -226,7 +226,7 @@
       </div>
       <div class="menu-footer">
         <div class="footer-hint">Press <kbd>Tab</kbd> to close | <kbd>1-6</kbd> Quick nav | <kbd>L</kbd> Guide</div>
-        <button class="action-btn secondary" onclick="saveGame()">&#x1F4BE; Save</button>
+        <button class="action-btn secondary" onclick="refreshSync()">&#x1F504; Refresh</button>
       </div>
     </div>
   </div>
@@ -610,9 +610,9 @@
       localStorage.setItem('hughberry_state', JSON.stringify(gameState));
     }
 
-    function saveGame() {
-      saveGameQuiet();
-      notify('Game saved!', 'success');
+    function refreshSync() {
+      triggerTask('Sync_Inventory');
+      notify('Syncing with server...', 'success');
     }
 
     function loadFromStorage() {
