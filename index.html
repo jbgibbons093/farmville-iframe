@@ -236,7 +236,7 @@
   <script>
     const CONFIG = {
       crops: {
-        wheat: { id: 1, name: 'Wheat', icon: '&#x1F33E;', growTime: 30, yield: 1, sellPrice: 5, seedCost: 2, unlockLevel: 1, plantXP: 2, harvestXP: 5 },
+        wheat: { id: 1, name: 'Wheat', icon: '&#x1F33E;', growTime: 30, yield: 1, sellPrice: 5, seedCost: 2, unlockLevel: 0, plantXP: 2, harvestXP: 5 },
         carrot: { id: 2, name: 'Carrot', icon: '&#x1F955;', growTime: 45, yield: 1, sellPrice: 8, seedCost: 3, unlockLevel: 1, plantXP: 2, harvestXP: 5 },
         corn: { id: 3, name: 'Corn', icon: '&#x1F33D;', growTime: 60, yield: 1, sellPrice: 10, seedCost: 5, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
         potato: { id: 4, name: 'Potato', icon: '&#x1F954;', growTime: 75, yield: 1, sellPrice: 12, seedCost: 6, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
@@ -244,7 +244,7 @@
         pumpkin: { id: 6, name: 'Pumpkin', icon: '&#x1F383;', growTime: 120, yield: 1, sellPrice: 30, seedCost: 15, unlockLevel: 5, plantXP: 5, harvestXP: 15 }
       },
       animals: {
-        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 1, startXP: 2, collectXP: 5 },
+        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 0, startXP: 2, collectXP: 5 },
         chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5, unlockLevel: 1, startXP: 1, collectXP: 3 },
         sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 2, startXP: 3, collectXP: 6 },
         goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 3, startXP: 4, collectXP: 8 },
@@ -270,7 +270,8 @@
       ],
       levelThresholds: [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500],
       unlocks: [
-        { level: 1, title: 'Getting Started', desc: 'Plant Wheat & Carrots, tend Cows & Chickens', items: ['Wheat', 'Carrot', 'Cows', 'Chickens'] },
+        { level: 0, title: 'New Farmer', desc: 'Plant Wheat, tend Cows for milk', items: ['Wheat', 'Cows'] },
+        { level: 1, title: 'Getting Started', desc: 'Plant Carrots, tend Chickens for eggs', items: ['Carrot', 'Chickens'] },
         { level: 2, title: 'Expanding Fields', desc: 'Plant Corn & Potatoes, tend Sheep', items: ['Corn', 'Potato', 'Sheep'] },
         { level: 3, title: 'Growing Farm', desc: 'Plant Tomatoes, tend Goats for meat', items: ['Tomato', 'Goats'] },
         { level: 4, title: 'Advanced Farming', desc: 'Tend Pigs for truffles, buy Harvest Basket', items: ['Pigs', 'Harvest Basket'] },
