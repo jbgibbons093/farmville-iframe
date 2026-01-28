@@ -619,13 +619,8 @@
       if (saved) {
         try {
           const p = JSON.parse(saved);
-          // Merge carefully to preserve structure
-          gameState.gold = p.gold ?? gameState.gold;
-          gameState.xp = p.xp ?? gameState.xp;
-          gameState.level = p.level ?? gameState.level;
-          gameState.xpHistory = p.xpHistory ?? gameState.xpHistory;
-          gameState.inventory = { ...gameState.inventory, ...p.inventory };
-          gameState.equipment = { ...gameState.equipment, ...p.equipment };
+          // Only load LOCAL state (timers, settings) - NOT gold/xp/level/inventory
+          // Those come from Portals Sync_Inventory
           gameState.settings = { ...gameState.settings, ...p.settings };
 
           // Load plots
