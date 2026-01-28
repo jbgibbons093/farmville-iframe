@@ -620,31 +620,9 @@
       if (saved) {
         try {
           const p = JSON.parse(saved);
-          // Only load LOCAL state (timers, settings) - NOT gold/xp/level/inventory
-          // Those come from Portals Sync_Inventory
+          // Only load settings - NOT plots, animals, gold, xp, inventory
+          // Everything else comes from Portals or resets on refresh
           gameState.settings = { ...gameState.settings, ...p.settings };
-
-          // Load plots
-          if (p.plots && p.plots.length === 24) {
-            gameState.plots = p.plots;
-            gameState.plots.forEach(plot => {
-              if (plot.state === 'growing' && plot.readyAt && Date.now() >= plot.readyAt) plot.state = 'ready';
-            });
-          }
-
-          // Load animals carefully
-          if (p.animals) {
-            ['cows', 'sheep', 'goats', 'pigs', 'chickens', 'beehives'].forEach(type => {
-              if (p.animals[type] && p.animals[type].length > 0) {
-                gameState.animals[type] = p.animals[type];
-                gameState.animals[type].forEach(animal => {
-                  if (animal.state === 'producing' && animal.readyAt && Date.now() >= animal.readyAt) {
-                    animal.state = 'ready';
-                  }
-                });
-              }
-            });
-          }
         } catch(e) { console.error('Load error:', e); }
       }
     }
