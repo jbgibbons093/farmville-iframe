@@ -15,24 +15,31 @@
 
     body {
       font-family: 'Nunito', sans-serif;
-      background: rgba(0, 0, 0, 0.85);
-      color: #ddd;
+      background: transparent;
       overflow-x: hidden;
-      max-width: 900px;
-      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .guide-container {
+      background: linear-gradient(145deg, #f5f0e6 0%, #ebe4d6 100%);
+      color: #3a2a1a;
+      width: fit-content;
+      max-width: 700px;
+      border-radius: 12px;
+      border: 3px solid #8B4513;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      overflow: hidden;
     }
 
     /* Header Bar */
     .header-bar {
-      position: sticky;
-      top: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 12px 24px;
-      background: linear-gradient(145deg, rgba(60, 50, 35, 0.95) 0%, rgba(40, 32, 20, 0.95) 100%);
-      border-bottom: 3px solid #5a4530;
-      z-index: 100;
+      background: linear-gradient(145deg, #5a4020 0%, #3a2810 100%);
+      border-bottom: 3px solid #8B4513;
     }
 
     .header-title {
@@ -99,15 +106,15 @@
 
     /* Main Content */
     .guide-wrapper {
-      padding: 80px 20px 40px;
-      max-width: 900px;
-      margin: 0 auto;
+      padding: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
     }
 
     /* Guide Sections */
     .guide-section {
-      background: linear-gradient(145deg, rgba(50, 40, 25, 0.6) 0%, rgba(35, 28, 18, 0.6) 100%);
-      border: 2px solid #5a4530;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.7) 0%, rgba(245, 240, 230, 0.7) 100%);
+      border: 2px solid #c9a86c;
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 20px;
@@ -133,12 +140,12 @@
     .guide-text {
       font-size: 14px;
       line-height: 1.7;
-      color: #ddd;
+      color: #3a2a1a;
       margin-bottom: 12px;
     }
 
-    .guide-text strong { color: #FFD700; }
-    .guide-text em { color: #67b8f7; font-style: normal; }
+    .guide-text strong { color: #8B4513; }
+    .guide-text em { color: #2874a6; font-style: normal; }
 
     .guide-list {
       list-style: none;
@@ -149,7 +156,8 @@
     .guide-list li {
       padding: 8px 0 8px 28px;
       position: relative;
-      border-bottom: 1px solid rgba(90, 69, 48, 0.3);
+      border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+      color: #3a2a1a;
     }
 
     .guide-list li:last-child { border-bottom: none; }
@@ -161,7 +169,7 @@
       top: 12px;
       width: 18px;
       height: 18px;
-      background: linear-gradient(145deg, #5a4530, #3a2a1a);
+      background: linear-gradient(145deg, #c9a86c, #a0824a);
       border-radius: 4px;
     }
 
@@ -215,8 +223,8 @@
     }
 
     .guide-table th {
-      background: rgba(90, 69, 48, 0.5);
-      color: #FFD700;
+      background: linear-gradient(145deg, #8B4513, #6b3410);
+      color: #fff;
       padding: 10px 8px;
       text-align: left;
       font-weight: 700;
@@ -225,17 +233,17 @@
 
     .guide-table td {
       padding: 8px;
-      border: 1px solid #4a3a2a;
-      color: #ccc;
+      border: 1px solid #c9a86c;
+      color: #3a2a1a;
     }
 
-    .guide-table tr:nth-child(even) { background: rgba(0,0,0,0.2); }
+    .guide-table tr:nth-child(even) { background: rgba(139, 69, 19, 0.08); }
     .guide-table .icon-col { text-align: center; font-size: 18px; width: 40px; }
 
     .guide-subsection {
       margin: 15px 0;
       padding: 15px;
-      background: rgba(0,0,0,0.2);
+      background: rgba(139, 69, 19, 0.08);
       border-radius: 8px;
       border-left: 3px solid #8B4513;
     }
@@ -243,13 +251,14 @@
     .guide-subsection-title {
       font-size: 15px;
       font-weight: 700;
-      color: #FFD700;
+      color: #8B4513;
       margin-bottom: 10px;
     }
 
     .guide-key {
       display: inline-block;
-      background: #4a3a2a;
+      background: #3a2a1a;
+      color: #fff;
       padding: 3px 8px;
       border-radius: 4px;
       font-family: monospace;
@@ -260,12 +269,13 @@
 
     /* Scrollbar styling */
     ::-webkit-scrollbar { width: 10px; }
-    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-    ::-webkit-scrollbar-thumb { background: #5a4530; border-radius: 5px; }
-    ::-webkit-scrollbar-thumb:hover { background: #6b5640; }
+    ::-webkit-scrollbar-track { background: rgba(139, 69, 19, 0.1); }
+    ::-webkit-scrollbar-thumb { background: #c9a86c; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a0824a; }
   </style>
 </head>
 <body>
+  <div class="guide-container">
   <!-- Header Bar -->
   <div class="header-bar">
     <div class="header-title">
@@ -618,12 +628,13 @@
     </div>
 
     <!-- Footer -->
-    <div class="guide-section" style="text-align: center; border-color: #FFD700;">
+    <div class="guide-section" style="text-align: center; border-color: #8B4513;">
       <p class="guide-text" style="margin: 0;">
         &#x1F33E; <strong>Happy Farming!</strong> &#x1F33E;<br>
-        <span style="font-size: 12px; color: #888;">Hughberry Farms - A Portals Experience</span>
+        <span style="font-size: 12px; color: #6b5640;">Hughberry Farms - A Portals Experience</span>
       </p>
     </div>
+  </div>
   </div>
 
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js?v=10005456"></script>
