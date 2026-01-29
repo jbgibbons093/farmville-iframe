@@ -1227,17 +1227,16 @@
         </div>`;
       });
 
-      // XP requirements
+      // XP requirements - levelThresholds[i] = total XP to reach level (i+1)
       html += `</div><div class="section-title" style="margin-top:20px">&#x1F4CA; XP Requirements</div><div class="unlock-list">`;
       CONFIG.levelThresholds.forEach((xp, i) => {
-        if (i === 0) return;
-        const level = i + 1;
+        const level = i + 1; // levelThresholds[0]=50 is for Level 1, etc.
         const unlocked = gameState.level >= level;
         html += `<div class="unlock-item ${unlocked ? 'unlocked' : ''}">
           <div class="unlock-level ${unlocked ? 'unlocked' : ''}">${level}</div>
           <div class="unlock-content">
             <div class="unlock-title">Level ${level}</div>
-            <div class="unlock-desc">Requires ${xp} total XP</div>
+            <div class="unlock-desc">Requires ${xp.toLocaleString()} total XP</div>
           </div>
           <div class="unlock-status">${unlocked ? '&#x2705;' : '&#x1F512;'}</div>
         </div>`;
