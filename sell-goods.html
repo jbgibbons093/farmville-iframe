@@ -113,6 +113,7 @@
     };
 
     let gameState = { gold: 0, inventory: {} };
+    let actionPending = false;
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -138,13 +139,12 @@
     }
 
     function sellItem(key, qty, taskPrefix, price) {
+      if (actionPending) { notify('Please wait...'); return; }
+
       const owned = gameState.inventory[key] || 0;
       if (owned < qty) { notify('Not enough to sell!'); return; }
 
-      // Decrement locally to prevent rapid-click exploits (Sync_Inventory will correct)
-      gameState.inventory[key] = owned - qty;
-      render();
-
+      actionPending = true;
       triggerTask(taskPrefix + '_' + qty);
       notify('Sold for ' + (price * qty) + 'g!');
     }
@@ -201,6 +201,7 @@
       console.log('[Hughberry SellGoods] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
         parseSync(msg);
+        actionPending = false;
         render();
       }
     }

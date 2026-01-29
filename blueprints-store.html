@@ -98,6 +98,7 @@
     ];
 
     let gameState = { gold: 0, level: 0, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
+    let actionPending = false;
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -123,39 +124,31 @@
     }
 
     function buyEquipment(id) {
+      if (actionPending) { notify('Please wait...'); return; }
+
       const equip = EQUIPMENT.find(e => e.id === id);
       if (!equip) return;
       if (gameState.equipment[id]) { notify('Already owned!'); return; }
       if (gameState.level < equip.unlockLevel) { notify('Level too low!'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!'); return; }
 
-      // Update locally to prevent rapid-click exploits (Sync_Inventory will correct)
-      gameState.gold -= equip.price;
-      gameState.equipment[id] = true;
-      render();
-
+      actionPending = true;
       triggerTask(equip.taskName);
       notify('Purchased ' + equip.name + '!');
-      // Request sync to get updated values from Portals
-      setTimeout(function() { triggerTask('Sync_Inventory'); }, 200);
     }
 
     function buyRecipe(id) {
+      if (actionPending) { notify('Please wait...'); return; }
+
       const recipe = RECIPES.find(r => r.id === id);
       if (!recipe) return;
       if (gameState.recipes[id]) { notify('Already owned!'); return; }
       if (gameState.level < recipe.unlockLevel) { notify('Level too low!'); return; }
       if (gameState.gold < recipe.price) { notify('Not enough gold!'); return; }
 
-      // Update locally to prevent rapid-click exploits (Sync_Inventory will correct)
-      gameState.gold -= recipe.price;
-      gameState.recipes[id] = true;
-      render();
-
+      actionPending = true;
       triggerTask(recipe.taskName);
       notify('Purchased ' + recipe.name + '!');
-      // Request sync to get updated values from Portals
-      setTimeout(function() { triggerTask('Sync_Inventory'); }, 200);
     }
 
     function render() {
@@ -217,6 +210,7 @@
       console.log('[Hughberry Blueprints] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
         parseSync(msg);
+        actionPending = false;
         render();
       }
     }
