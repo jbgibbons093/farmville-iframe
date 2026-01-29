@@ -268,13 +268,14 @@
     // HUGHBERRY FARMS - GLOBAL HUD
     // ============================================
 
-    // Game state
+    // Game state - all values come from Portals via Sync_Inventory
     let gold = 0;
     let xp = 0;
-    let level = 1;
+    let level = 0;
 
-    // Level thresholds
-    const levelThresholds = [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500, 999999];
+    // Total XP required to reach each level (players start at level 0)
+    // Level 1=50, 2=150, 3=400, 4=800, 5=1500, 6=2500, 7=4000, 8=6000, 9=9000, 10=13000
+    const levelThresholds = [50, 150, 400, 800, 1500, 2500, 4000, 6000, 9000, 13000];
 
     // ============================================
     // UI UPDATE FUNCTIONS
@@ -287,15 +288,18 @@
       // Update level
       document.getElementById('level-value').textContent = level;
 
-      // Calculate XP progress for current level
-      const currentLevelXP = levelThresholds[level - 1] || 0;
-      const nextLevelXP = levelThresholds[level] || levelThresholds[levelThresholds.length - 1];
+      // Calculate XP progress for current level (handles level 0)
+      const isMaxLevel = level >= levelThresholds.length;
+      const currentLevelXP = level === 0 ? 0 : levelThresholds[level - 1];
+      const nextLevelXP = isMaxLevel ? levelThresholds[levelThresholds.length - 1] : levelThresholds[level];
       const xpInLevel = xp - currentLevelXP;
       const xpNeeded = nextLevelXP - currentLevelXP;
-      const xpPercent = Math.min(100, Math.max(0, (xpInLevel / xpNeeded) * 100));
+      const xpPercent = isMaxLevel ? 100 : Math.min(100, Math.max(0, (xpInLevel / xpNeeded) * 100));
+      const nextLevel = level + 1;
 
-      // Update XP bar
-      document.getElementById('xp-text').textContent = `${xp.toLocaleString()} / ${nextLevelXP.toLocaleString()}`;
+      // Update XP bar - show "current / total to Level X"
+      const xpText = isMaxLevel ? `${xp.toLocaleString()} (MAX)` : `${xp.toLocaleString()} / ${nextLevelXP.toLocaleString()}`;
+      document.getElementById('xp-text').textContent = xpText;
       document.getElementById('xp-bar-fill').style.width = xpPercent + '%';
     }
 
@@ -351,7 +355,7 @@
         const parts = msg.split('_');
         if (parts.length >= 4) {
           gold = parseInt(parts[1]) || 0;
-          level = parseInt(parts[2]) || 1;
+          level = parseInt(parts[2]) || 0;
           xp = parseInt(parts[3]) || 0;
           updateHUD();
         }
@@ -361,7 +365,7 @@
         const parts = msg.split('_');
         if (parts.length >= 4) {
           gold = parseInt(parts[1]) || 0;
-          level = parseInt(parts[2]) || 1;
+          level = parseInt(parts[2]) || 0;
           xp = parseInt(parts[3]) || 0;
           updateHUD();
         }

@@ -268,7 +268,9 @@
         { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'No bee sting damage', unlockLevel: 6 },
         { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: '+50% crop yield', unlockLevel: 4 }
       ],
-      levelThresholds: [0, 100, 300, 600, 1000, 1500, 2200, 3000, 4000, 5500],
+      // Total XP required to reach each level (players start at level 0)
+      // Level 1=50, 2=150, 3=400, 4=800, 5=1500, 6=2500, 7=4000, 8=6000, 9=9000, 10=13000
+      levelThresholds: [50, 150, 400, 800, 1500, 2500, 4000, 6000, 9000, 13000],
       unlocks: [
         { level: 0, title: 'New Farmer', desc: 'Plant Wheat, tend Cows for milk', items: ['Wheat', 'Cows'] },
         { level: 1, title: 'Getting Started', desc: 'Plant Carrots, tend Chickens for eggs', items: ['Carrot', 'Chickens'] },
@@ -702,7 +704,7 @@
       animal.notified = false;
       console.log('[Hughberry] startAnimalActivity:', animalType, id, 'readyAt:', animal.readyAt, 'cooldown:', config.cooldown, 'seconds');
 
-      addXP(config.startXP, 'animals');
+      // No local XP update - Portals handles all state via Sync_Inventory
       notify(`Started ${config.name} ${id}! +${config.startXP} XP`, 'success');
       saveGameQuiet();
       renderAnimals();
@@ -848,36 +850,31 @@
       }
     }
 
-    function addXP(amount, category = 'other') {
-      gameState.xp += amount;
-      if (category && gameState.xpHistory[category] !== undefined) {
-        gameState.xpHistory[category] += amount;
-      }
-
-      const t = CONFIG.levelThresholds;
-      for (let i = t.length - 1; i >= 0; i--) {
-        if (gameState.xp >= t[i] && gameState.level < i + 1) {
-          gameState.level = i + 1;
-          notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success');
-          triggerTask(`Add_Level_1`);
-          break;
-        }
-      }
-      updateHeader();
-    }
+    // XP and Level come from Portals via Sync_Inventory - no local XP tracking
 
     function getXPProgress() {
       const t = CONFIG.levelThresholds;
       if (gameState.level >= t.length) return 100;
-      const c = t[gameState.level - 1];
-      const n = t[gameState.level] || c + 1000;
-      return Math.min(100, Math.max(0, ((gameState.xp - c) / (n - c)) * 100));
+      // For level 0, range is 0 to t[0]. For level N, range is t[N-1] to t[N]
+      const currentLevelStart = gameState.level === 0 ? 0 : t[gameState.level - 1];
+      const nextLevelXP = t[gameState.level];
+      const xpInLevel = gameState.xp - currentLevelStart;
+      const xpNeededForLevel = nextLevelXP - currentLevelStart;
+      return Math.min(100, Math.max(0, (xpInLevel / xpNeededForLevel) * 100));
     }
 
     function getXPForNextLevel() {
       const t = CONFIG.levelThresholds;
       if (gameState.level >= t.length) return 0;
       return t[gameState.level] - gameState.xp;
+    }
+
+    function getXPRangeForCurrentLevel() {
+      const t = CONFIG.levelThresholds;
+      if (gameState.level >= t.length) return { current: gameState.xp, start: t[t.length - 1], end: t[t.length - 1] };
+      const start = gameState.level === 0 ? 0 : t[gameState.level - 1];
+      const end = t[gameState.level];
+      return { current: gameState.xp, start: start, end: end, inLevel: gameState.xp - start, needed: end - start };
     }
 
     function formatTime(s) {
@@ -900,7 +897,9 @@
       const totalCrops = gameState.inventory.wheat + gameState.inventory.carrot + gameState.inventory.corn + gameState.inventory.potato + gameState.inventory.tomato + gameState.inventory.pumpkin;
       const totalSeeds = Object.keys(gameState.inventory).filter(k => k.startsWith('seeds_')).reduce((a, k) => a + gameState.inventory[k], 0);
       const totalProducts = gameState.inventory.milk + gameState.inventory.wool + gameState.inventory.goat_meat + gameState.inventory.truffle + gameState.inventory.egg + gameState.inventory.honey;
-      const xpNeeded = getXPForNextLevel();
+      const xpRange = getXPRangeForCurrentLevel();
+      const nextLevel = gameState.level + 1;
+      const isMaxLevel = gameState.level >= CONFIG.levelThresholds.length;
 
       document.getElementById('tab-dashboard').innerHTML = `
         <div class="dashboard-grid">
@@ -911,7 +910,7 @@
               <div class="level-number">${gameState.level}</div>
               <div class="xp-progress">
                 <div class="xp-progress-bar"><div class="xp-progress-fill" style="width:${getXPProgress()}%"></div></div>
-                <div class="xp-text">${gameState.xp} XP${xpNeeded > 0 ? ` (${xpNeeded} to next level)` : ' (MAX)'}</div>
+                <div class="xp-text">${isMaxLevel ? `${gameState.xp} XP (MAX LEVEL)` : `${gameState.xp} / ${xpRange.end} XP to Level ${nextLevel}`}</div>
               </div>
             </div>
           </div>
