@@ -546,6 +546,7 @@
       }
       else if (msg.startsWith('Sync_Inventory')) {
         parseAndSyncInventory(msg);
+        checkLevelUp(); // Detect level-ups and trigger Add_Level_1 to Portals
         updateAllUI();
       }
       else if (cmd === 'interact' && parts[1] === 'plot') {
@@ -850,7 +851,23 @@
       }
     }
 
-    // XP and Level come from Portals via Sync_Inventory - no local XP tracking
+    // XP and Level come from Portals via Sync_Inventory
+    // But iframe must detect level-ups and trigger Add_Level_1 task
+
+    function checkLevelUp() {
+      const t = CONFIG.levelThresholds;
+      // Check if XP qualifies for a higher level than current
+      for (let i = t.length - 1; i >= 0; i--) {
+        const levelForThisThreshold = i + 1; // t[0]=50 is for level 1, t[1]=150 is for level 2, etc.
+        if (gameState.xp >= t[i] && gameState.level < levelForThisThreshold) {
+          // Player should be at a higher level - trigger level up
+          console.log('[Hughberry] Level up detected! XP:', gameState.xp, 'Current level:', gameState.level, 'Should be:', levelForThisThreshold);
+          triggerTask('Add_Level_1');
+          notify(`LEVEL UP! Now Lv.${levelForThisThreshold}!`, 'success');
+          break;
+        }
+      }
+    }
 
     function getXPProgress() {
       const t = CONFIG.levelThresholds;
