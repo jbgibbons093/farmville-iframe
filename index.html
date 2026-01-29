@@ -642,7 +642,8 @@
       triggerTask(`Sub_Seeds_${crop.name}_1`);
       triggerTask(`Add_XP_${crop.plantXP}`);
 
-      // No local inventory update - Portals handles all state via Sync_Inventory
+      // Decrement seeds locally for batch operation validation (Sync_Inventory will correct)
+      gameState.inventory[seedKey]--;
       plot.state = 'growing';
       plot.cropType = cropType;
       plot.plantedAt = Date.now();
