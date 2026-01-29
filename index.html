@@ -1353,7 +1353,7 @@
         }
       });
 
-      // Check animals
+      // Check animals - collect all ready animals first, then stagger the notifications
       const animalChecks = [
         { type: 'cow', array: gameState.animals.cows, name: 'Cow' },
         { type: 'sheep', array: gameState.animals.sheep, name: 'Sheep' },
@@ -1363,6 +1363,8 @@
         { type: 'beehive', array: gameState.animals.beehives, name: 'Beehive' }
       ];
 
+      let readyQueue = []; // Queue of animals that just became ready
+
       animalChecks.forEach(({ type, array, name }) => {
         array.forEach((animal, i) => {
           if (animal.state === 'producing' && animal.readyAt) {
@@ -1371,15 +1373,23 @@
               console.log('[Hughberry] gameLoop: Animal ready detected:', type, i + 1, 'state:', animal.state, 'notified:', animal.notified);
               animal.state = 'ready';
               if (!animal.notified) {
-                console.log('[Hughberry] gameLoop: Calling animalBecameReady for', type, i + 1);
-                animalBecameReady(type, i + 1);
                 animal.notified = true;
+                readyQueue.push({ type, id: i + 1, name });
                 notify(`${name} ${i + 1} is ready!`, 'success');
                 needsRender = true;
               }
             }
           }
         });
+      });
+
+      // Stagger the ready notifications to prevent Portals task race conditions
+      // Each trigger needs 200ms+ for Portals to process and reset the task
+      readyQueue.forEach((item, index) => {
+        setTimeout(() => {
+          console.log('[Hughberry] gameLoop: Calling animalBecameReady for', item.type, item.id, '(delayed by', index * 250, 'ms)');
+          animalBecameReady(item.type, item.id);
+        }, index * 250);
       });
 
       // Always update active tab for timers
