@@ -273,9 +273,9 @@
     let xp = 0;
     let level = 0;
 
-    // Total XP required to reach each level (players start at level 0)
-    // Level 1=50, 2=150, 3=400, 4=800, 5=1500, 6=2500, 7=4000, 8=6000, 9=9000, 10=13000
-    const levelThresholds = [50, 150, 400, 800, 1500, 2500, 4000, 6000, 9000, 13000];
+    // XP required at each level to advance (XP resets to 0 on level-up)
+    // Level 0→1: 50, 1→2: 100, 2→3: 250, 3→4: 400, 4→5: 700, etc.
+    const levelThresholds = [50, 100, 250, 400, 700, 1000, 1500, 2000, 3000, 4000];
 
     // ============================================
     // UI UPDATE FUNCTIONS
@@ -288,17 +288,13 @@
       // Update level
       document.getElementById('level-value').textContent = level;
 
-      // Calculate XP progress for current level (handles level 0)
+      // XP resets each level - progress is current XP / threshold for current level
       const isMaxLevel = level >= levelThresholds.length;
-      const currentLevelXP = level === 0 ? 0 : levelThresholds[level - 1];
-      const nextLevelXP = isMaxLevel ? levelThresholds[levelThresholds.length - 1] : levelThresholds[level];
-      const xpInLevel = xp - currentLevelXP;
-      const xpNeeded = nextLevelXP - currentLevelXP;
-      const xpPercent = isMaxLevel ? 100 : Math.min(100, Math.max(0, (xpInLevel / xpNeeded) * 100));
-      const nextLevel = level + 1;
+      const xpNeeded = isMaxLevel ? 0 : levelThresholds[level];
+      const xpPercent = isMaxLevel ? 100 : Math.min(100, Math.max(0, (xp / xpNeeded) * 100));
 
-      // Update XP bar - show "current / total to Level X"
-      const xpText = isMaxLevel ? `${xp.toLocaleString()} (MAX)` : `${xp.toLocaleString()} / ${nextLevelXP.toLocaleString()}`;
+      // Update XP bar - show "current / needed"
+      const xpText = isMaxLevel ? `${xp.toLocaleString()} (MAX)` : `${xp.toLocaleString()} / ${xpNeeded.toLocaleString()}`;
       document.getElementById('xp-text').textContent = xpText;
       document.getElementById('xp-bar-fill').style.width = xpPercent + '%';
     }

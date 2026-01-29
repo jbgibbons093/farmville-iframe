@@ -268,9 +268,9 @@
         { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'No bee sting damage', unlockLevel: 6 },
         { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: '+50% crop yield', unlockLevel: 4 }
       ],
-      // Total XP required to reach each level (players start at level 0)
-      // Level 1=50, 2=150, 3=400, 4=800, 5=1500, 6=2500, 7=4000, 8=6000, 9=9000, 10=13000
-      levelThresholds: [50, 150, 400, 800, 1500, 2500, 4000, 6000, 9000, 13000],
+      // XP required at each level to advance (XP resets to 0 on level-up)
+      // Level 0→1: 50, 1→2: 100, 2→3: 250, 3→4: 400, 4→5: 700, etc.
+      levelThresholds: [50, 100, 250, 400, 700, 1000, 1500, 2000, 3000, 4000],
       unlocks: [
         { level: 0, title: 'New Farmer', desc: 'Plant Wheat, tend Cows for milk', items: ['Wheat', 'Cows'] },
         { level: 1, title: 'Getting Started', desc: 'Plant Carrots, tend Chickens for eggs', items: ['Carrot', 'Chickens'] },
@@ -856,42 +856,40 @@
 
     function checkLevelUp() {
       const t = CONFIG.levelThresholds;
-      // Check if XP qualifies for a higher level than current
-      for (let i = t.length - 1; i >= 0; i--) {
-        const levelForThisThreshold = i + 1; // t[0]=50 is for level 1, t[1]=150 is for level 2, etc.
-        if (gameState.xp >= t[i] && gameState.level < levelForThisThreshold) {
-          // Player should be at a higher level - trigger level up
-          console.log('[Hughberry] Level up detected! XP:', gameState.xp, 'Current level:', gameState.level, 'Should be:', levelForThisThreshold);
-          triggerTask('Add_Level_1');
-          notify(`LEVEL UP! Now Lv.${levelForThisThreshold}!`, 'success');
-          break;
-        }
+      if (gameState.level >= t.length) return; // Max level reached
+
+      // XP resets each level - check if current XP >= threshold for current level
+      const xpNeeded = t[gameState.level]; // t[0]=50 for level 0→1, t[1]=100 for level 1→2, etc.
+      if (gameState.xp >= xpNeeded) {
+        const newLevel = gameState.level + 1;
+        console.log('[Hughberry] Level up! XP:', gameState.xp, '>=', xpNeeded, '-> Level', newLevel);
+        triggerTask('Add_Level_1');
+        triggerTask('Reset_XP'); // Reset XP to 0 on level up
+        notify(`LEVEL UP! Now Lv.${newLevel}!`, 'success');
       }
     }
 
     function getXPProgress() {
+      // XP resets each level, so progress is simply current XP / threshold for current level
       const t = CONFIG.levelThresholds;
       if (gameState.level >= t.length) return 100;
-      // For level 0, range is 0 to t[0]. For level N, range is t[N-1] to t[N]
-      const currentLevelStart = gameState.level === 0 ? 0 : t[gameState.level - 1];
-      const nextLevelXP = t[gameState.level];
-      const xpInLevel = gameState.xp - currentLevelStart;
-      const xpNeededForLevel = nextLevelXP - currentLevelStart;
-      return Math.min(100, Math.max(0, (xpInLevel / xpNeededForLevel) * 100));
+      const xpNeeded = t[gameState.level];
+      return Math.min(100, Math.max(0, (gameState.xp / xpNeeded) * 100));
     }
 
     function getXPForNextLevel() {
+      // XP needed = threshold for current level - current XP
       const t = CONFIG.levelThresholds;
       if (gameState.level >= t.length) return 0;
       return t[gameState.level] - gameState.xp;
     }
 
     function getXPRangeForCurrentLevel() {
+      // XP resets each level, so range is 0 to threshold
       const t = CONFIG.levelThresholds;
-      if (gameState.level >= t.length) return { current: gameState.xp, start: t[t.length - 1], end: t[t.length - 1] };
-      const start = gameState.level === 0 ? 0 : t[gameState.level - 1];
-      const end = t[gameState.level];
-      return { current: gameState.xp, start: start, end: end, inLevel: gameState.xp - start, needed: end - start };
+      if (gameState.level >= t.length) return { current: gameState.xp, start: 0, end: 0, needed: 0 };
+      const xpNeeded = t[gameState.level];
+      return { current: gameState.xp, start: 0, end: xpNeeded, needed: xpNeeded - gameState.xp };
     }
 
     function formatTime(s) {
@@ -1244,18 +1242,20 @@
         </div>`;
       });
 
-      // XP requirements - levelThresholds[i] = total XP to reach level (i+1)
-      html += `</div><div class="section-title" style="margin-top:20px">&#x1F4CA; XP Requirements</div><div class="unlock-list">`;
+      // XP requirements - levelThresholds[i] = XP needed at level i to reach level (i+1)
+      html += `</div><div class="section-title" style="margin-top:20px">&#x1F4CA; XP Requirements (per level)</div><div class="unlock-list">`;
       CONFIG.levelThresholds.forEach((xp, i) => {
-        const level = i + 1; // levelThresholds[0]=50 is for Level 1, etc.
-        const unlocked = gameState.level >= level;
-        html += `<div class="unlock-item ${unlocked ? 'unlocked' : ''}">
-          <div class="unlock-level ${unlocked ? 'unlocked' : ''}">${level}</div>
+        const fromLevel = i;
+        const toLevel = i + 1;
+        const unlocked = gameState.level >= toLevel;
+        const current = gameState.level === fromLevel;
+        html += `<div class="unlock-item ${unlocked ? 'unlocked' : ''} ${current ? 'current' : ''}">
+          <div class="unlock-level ${unlocked ? 'unlocked' : ''}">${fromLevel}→${toLevel}</div>
           <div class="unlock-content">
-            <div class="unlock-title">Level ${level}</div>
-            <div class="unlock-desc">Requires ${xp.toLocaleString()} total XP</div>
+            <div class="unlock-title">Level ${fromLevel} → ${toLevel}</div>
+            <div class="unlock-desc">Requires ${xp.toLocaleString()} XP</div>
           </div>
-          <div class="unlock-status">${unlocked ? '&#x2705;' : '&#x1F512;'}</div>
+          <div class="unlock-status">${unlocked ? '&#x2705;' : (current ? '&#x1F4A1;' : '&#x1F512;')}</div>
         </div>`;
       });
       html += '</div>';
