@@ -584,8 +584,7 @@
       triggerTask(`Add_Crop_${cropName}_1`);
       triggerTask(`Add_XP_${harvestXP}`);
 
-      gameState.inventory[cropType] += 1;
-      addXP(harvestXP, 'harvesting');
+      // No local inventory/XP updates - Portals handles all state via Sync_Inventory
       notify(`+1 ${cropName}! +${harvestXP} XP`, 'success');
 
       plot.state = 'empty';
@@ -640,13 +639,13 @@
       triggerTask(`Sub_Seeds_${crop.name}_1`);
       triggerTask(`Add_XP_${crop.plantXP}`);
 
-      gameState.inventory[seedKey]--;
+      // No local inventory update - Portals handles all state via Sync_Inventory
       plot.state = 'growing';
       plot.cropType = cropType;
       plot.plantedAt = Date.now();
       plot.readyAt = Date.now() + (crop.growTime * 1000);
 
-      addXP(crop.plantXP, 'planting');
+      // No local XP update - Portals handles all state via Sync_Inventory
       notify(`Planted ${crop.name}! +${crop.plantXP} XP`, 'success');
       saveGameQuiet();
       return true;
@@ -830,11 +829,8 @@
         animal.notified = false;
       });
 
-      // Local state updates (will be synced from Portals)
+      // No local inventory/XP updates - Portals handles all state via Sync_Inventory
       const xpGained = readyCount * station.xpPerUnit;
-      addXP(xpGained, 'animals');
-      gameState.inventory[station.product] += readyCount;
-
       notify(`Collected ${readyCount} ${station.productName}! +${xpGained} XP`, 'success');
       saveGameQuiet();
       renderAnimals();
@@ -845,16 +841,10 @@
     function handleCollectionConfirmed(productType, count) {
       // Called when Portals confirms collection (collected_eggs_X, collected_milk_X, collected_honey_X, etc.)
       console.log(`[Hughberry] Collection confirmed: ${count} ${productType}`);
-
-      // For honey, we need to show the notification here since we don't track it locally
+      // No local state updates - Portals handles all state via Sync_Inventory
       if (productType === 'honey' && count > 0) {
         const xpGained = count * 5; // 5 XP per honey
-        gameState.inventory.honey += count;
-        addXP(xpGained, 'animals');
         notify(`Collected ${count} Honey! +${xpGained} XP`, 'success');
-        saveGameQuiet();
-        renderInventory();
-        renderDashboard();
       }
     }
 
