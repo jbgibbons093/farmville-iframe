@@ -292,6 +292,7 @@
         milk: 0, wool: 0, goat_meat: 0, truffle: 0, egg: 0, honey: 0,
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0, mead: 0
       },
+      uncollected: { milk: 0, eggs: 0, wool: 0, meat: 0, truffle: 0, honey: 0 },
       equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false },
       recipes: {
         recipe_flour: false, recipe_bread: false, recipe_cheese: false, recipe_stew: false,
@@ -419,7 +420,13 @@
         'RecipeButter': { target: 'recipe_butter', isRecipe: true },
         'RecipeCake': { target: 'recipe_cake', isRecipe: true },
         'RecipeMead': { target: 'recipe_mead', isRecipe: true },
-        'Has_Starter_Seeds': { target: 'claimedStarterSeeds', isFlag: true }
+        'Has_Starter_Seeds': { target: 'claimedStarterSeeds', isFlag: true },
+        'Milk_Uncollected': { target: 'milk', isUncollected: true },
+        'Eggs_Uncollected': { target: 'eggs', isUncollected: true },
+        'Wool_Uncollected': { target: 'wool', isUncollected: true },
+        'Meat_Uncollected': { target: 'meat', isUncollected: true },
+        'Truffle_Uncollected': { target: 'truffle', isUncollected: true },
+        'Honey_Uncollected': { target: 'honey', isUncollected: true }
       };
 
       const parts = msg.replace('Sync_Inventory_', '').split('_');
@@ -441,13 +448,14 @@
             i += 4; matched = true;
           }
         }
-        // Check two-word keys (Seeds_Wheat, Crop_Corn, Has_Basket, etc.)
+        // Check two-word keys (Seeds_Wheat, Crop_Corn, Has_Basket, Milk_Uncollected, etc.)
         if (!matched && i + 2 < parts.length) {
           const twoWordKey = parts[i] + '_' + parts[i + 1];
           if (varMapping[twoWordKey]) {
             const value = parseInt(parts[i + 2]) || 0;
             const mapping = varMapping[twoWordKey];
-            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            if (mapping.isUncollected) gameState.uncollected[mapping.target] = value;
+            else if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
