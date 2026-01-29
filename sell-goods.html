@@ -141,10 +141,13 @@
       const owned = gameState.inventory[key] || 0;
       if (owned < qty) { notify('Not enough to sell!'); return; }
 
+      // Update local state immediately
+      gameState.inventory[key] = owned - qty;
+      gameState.gold += price * qty;
+      render();
+
       triggerTask(taskPrefix + '_' + qty);
       notify('Sold for ' + (price * qty) + 'g!');
-      // Request sync to get updated values from Portals
-      setTimeout(function() { triggerTask('Sync_Inventory'); }, 200);
     }
 
     function renderGrid(items, containerId) {
