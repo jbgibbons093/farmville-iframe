@@ -143,6 +143,12 @@
         }
       }
 
+      // Decrement ingredients locally to prevent rapid-click exploits (Sync_Inventory will correct)
+      for (const [ing, qty] of Object.entries(recipe.ingredients)) {
+        gameState.inventory[ing] = (gameState.inventory[ing] || 0) - qty;
+      }
+      render();
+
       // Trigger craft task
       console.log('[Hughberry Crafting] Triggering:', recipe.taskName);
       triggerTask(recipe.taskName);

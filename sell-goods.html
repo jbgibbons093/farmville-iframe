@@ -141,7 +141,10 @@
       const owned = gameState.inventory[key] || 0;
       if (owned < qty) { notify('Not enough to sell!'); return; }
 
-      // Only trigger task - Portals handles all state, iframe syncs from Sync_Inventory
+      // Decrement locally to prevent rapid-click exploits (Sync_Inventory will correct)
+      gameState.inventory[key] = owned - qty;
+      render();
+
       triggerTask(taskPrefix + '_' + qty);
       notify('Sold for ' + (price * qty) + 'g!');
     }

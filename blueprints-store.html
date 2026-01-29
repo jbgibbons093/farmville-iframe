@@ -129,6 +129,11 @@
       if (gameState.level < equip.unlockLevel) { notify('Level too low!'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!'); return; }
 
+      // Update locally to prevent rapid-click exploits (Sync_Inventory will correct)
+      gameState.gold -= equip.price;
+      gameState.equipment[id] = true;
+      render();
+
       triggerTask(equip.taskName);
       notify('Purchased ' + equip.name + '!');
       // Request sync to get updated values from Portals
@@ -141,6 +146,11 @@
       if (gameState.recipes[id]) { notify('Already owned!'); return; }
       if (gameState.level < recipe.unlockLevel) { notify('Level too low!'); return; }
       if (gameState.gold < recipe.price) { notify('Not enough gold!'); return; }
+
+      // Update locally to prevent rapid-click exploits (Sync_Inventory will correct)
+      gameState.gold -= recipe.price;
+      gameState.recipes[id] = true;
+      render();
 
       triggerTask(recipe.taskName);
       notify('Purchased ' + recipe.name + '!');

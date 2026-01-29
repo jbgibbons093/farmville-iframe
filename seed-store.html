@@ -109,6 +109,10 @@
       if (gameState.gold < cost) { notify('Not enough gold!'); return; }
       if (gameState.level < seed.unlockLevel) { notify('Level too low!'); return; }
 
+      // Decrement gold locally to prevent rapid-click exploits (Sync_Inventory will correct)
+      gameState.gold -= cost;
+      render();
+
       triggerTask('Buy_Seeds_' + seed.name + '_' + qty);
       notify('Bought ' + qty + ' ' + seed.name + ' seeds!');
       // Request sync to get updated values from Portals
