@@ -1391,12 +1391,12 @@
       });
 
       // Stagger the ready notifications to prevent Portals task race conditions
-      // Each trigger needs 200ms+ for Portals to process and reset the task
+      // Each trigger needs 500ms for Portals to process, reset NotActive (100ms), and be ready again
       readyQueue.forEach((item, index) => {
         setTimeout(() => {
-          console.log('[Hughberry] gameLoop: Calling animalBecameReady for', item.type, item.id, '(delayed by', index * 250, 'ms)');
+          console.log('[Hughberry] gameLoop: Calling animalBecameReady for', item.type, item.id, '(delayed by', index * 500, 'ms)');
           animalBecameReady(item.type, item.id);
-        }, index * 250);
+        }, index * 500);
       });
 
       // Always update active tab for timers
