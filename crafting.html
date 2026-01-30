@@ -78,7 +78,7 @@
       { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 50, xp: 20, taskName: 'Craft_Blanket' },
       { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter' },
       { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' },
-      { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 3 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
+      { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 2 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
     ];
 
     const INGREDIENT_ICONS = {
@@ -157,7 +157,7 @@
       setTimeout(function() {
         console.log('[Hughberry Crafting] Triggering: Add_XP_' + xpAmount);
         triggerTask('Add_XP_' + xpAmount);
-      }, 100);
+      }, 250);
 
       notify('Crafted ' + recipe.name + '! +' + recipe.xp + ' XP');
     }
@@ -202,91 +202,128 @@
       document.getElementById('recipes-grid').innerHTML = html;
     }
 
-    function handleMessage(msg) {
+    // === Standard Sync_Inventory Parser (same in all iframes) ===
+    const SYNC_MAP = {
+      'Has_Milk_Pail': 'has_milk_pail', 'Has_Shearing_Kit': 'has_shearing_kit',
+      'Has_Butcher_Knife': 'has_butcher_knife', 'Has_Truffle_Spade': 'has_truffle_spade',
+      'Has_Starter_Seeds': 'has_starter_seeds',
+      'Seeds_Wheat': 'seeds_wheat', 'Seeds_Carrot': 'seeds_carrot', 'Seeds_Corn': 'seeds_corn',
+      'Seeds_Potato': 'seeds_potato', 'Seeds_Tomato': 'seeds_tomato', 'Seeds_Pumpkin': 'seeds_pumpkin',
+      'Crop_Wheat': 'crop_wheat', 'Crop_Carrot': 'crop_carrot', 'Crop_Corn': 'crop_corn',
+      'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
+      'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
+      'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
+      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
+      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
+      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
+      'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
+      'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
+      'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
+      'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
+      'Cake': 'cake', 'Mead': 'mead',
+      'RecipeFlour': 'has_recipe_flour', 'RecipeBread': 'has_recipe_bread',
+      'RecipeCheese': 'has_recipe_cheese', 'RecipeStew': 'has_recipe_stew',
+      'RecipeRagout': 'has_recipe_ragout', 'RecipePie': 'has_recipe_pie',
+      'RecipeMeatPie': 'has_recipe_meat_pie', 'RecipeBlanket': 'has_recipe_blanket',
+      'RecipeButter': 'has_recipe_butter', 'RecipeCake': 'has_recipe_cake',
+      'RecipeMead': 'has_recipe_mead'
+    };
+
+    function parseSyncMessage(msg) {
+      const parts = msg.replace('Sync_Inventory_', '').split('_');
+      const data = {};
+      let i = 0;
+      while (i < parts.length) {
+        let matched = false;
+        if (!matched && i + 3 < parts.length) {
+          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
+        }
+        if (!matched && i + 2 < parts.length) {
+          const k = parts[i] + '_' + parts[i+1];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
+        }
+        if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
+          data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
+        }
+        if (!matched) i++;
+      }
+      return data;
+    }
+    // === End Standard Parser ===
+
+    function handlePortalsMessage(msg) {
       console.log('[Hughberry Crafting] Received:', msg);
       if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
-        parseSync(msg);
+        const data = parseSyncMessage(msg);
+        // Inventory (crops as ingredients)
+        gameState.inventory.wheat = data.crop_wheat || 0;
+        gameState.inventory.carrot = data.crop_carrot || 0;
+        gameState.inventory.corn = data.crop_corn || 0;
+        gameState.inventory.potato = data.crop_potato || 0;
+        gameState.inventory.tomato = data.crop_tomato || 0;
+        gameState.inventory.pumpkin = data.crop_pumpkin || 0;
+        // Animal products
+        gameState.inventory.milk = data.milk || 0;
+        gameState.inventory.wool = data.wool || 0;
+        gameState.inventory.goat_meat = data.goat_meat || 0;
+        gameState.inventory.truffle = data.truffle || 0;
+        gameState.inventory.egg = data.egg || 0;
+        gameState.inventory.honey = data.honey || 0;
+        // Crafted items (used as ingredients for other recipes)
+        gameState.inventory.flour = data.flour || 0;
+        gameState.inventory.butter = data.butter || 0;
+        gameState.inventory.bread = data.bread || 0;
+        gameState.inventory.cheese = data.cheese || 0;
+        gameState.inventory.stew = data.stew || 0;
+        gameState.inventory.ragout = data.ragout || 0;
+        gameState.inventory.pie = data.pie || 0;
+        gameState.inventory.meat_pie = data.meat_pie || 0;
+        gameState.inventory.blanket = data.blanket || 0;
+        gameState.inventory.cake = data.cake || 0;
+        gameState.inventory.mead = data.mead || 0;
+        // Recipes
+        gameState.recipes.recipe_flour = (data.has_recipe_flour || 0) > 0;
+        gameState.recipes.recipe_bread = (data.has_recipe_bread || 0) > 0;
+        gameState.recipes.recipe_cheese = (data.has_recipe_cheese || 0) > 0;
+        gameState.recipes.recipe_stew = (data.has_recipe_stew || 0) > 0;
+        gameState.recipes.recipe_ragout = (data.has_recipe_ragout || 0) > 0;
+        gameState.recipes.recipe_pie = (data.has_recipe_pie || 0) > 0;
+        gameState.recipes.recipe_meat_pie = (data.has_recipe_meat_pie || 0) > 0;
+        gameState.recipes.recipe_blanket = (data.has_recipe_blanket || 0) > 0;
+        gameState.recipes.recipe_butter = (data.has_recipe_butter || 0) > 0;
+        gameState.recipes.recipe_cake = (data.has_recipe_cake || 0) > 0;
+        gameState.recipes.recipe_mead = (data.has_recipe_mead || 0) > 0;
         actionPending = false;
         render();
       }
     }
 
-    function parseSync(msg) {
-      const mapping = {
-        'Crop_Wheat': 'wheat', 'Crop_Carrot': 'carrot', 'Crop_Corn': 'corn',
-        'Crop_Potato': 'potato', 'Crop_Tomato': 'tomato', 'Crop_Pumpkin': 'pumpkin',
-        'Milk': 'milk', 'Wool': 'wool', 'Goat_Meat': 'goat_meat',
-        'Truffle': 'truffle', 'Egg': 'egg', 'Flour': 'flour', 'Butter': 'butter',
-        'Honey': 'honey', 'Mead': 'mead', 'Bread': 'bread', 'Cheese': 'cheese',
-        'Stew': 'stew', 'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket',
-        'Cake': 'cake'
-      };
-
-      const recipeMapping = {
-        'RecipeFlour': 'recipe_flour', 'RecipeBread': 'recipe_bread', 'RecipeCheese': 'recipe_cheese',
-        'RecipeStew': 'recipe_stew', 'RecipeRagout': 'recipe_ragout', 'RecipePie': 'recipe_pie',
-        'RecipeBlanket': 'recipe_blanket', 'RecipeButter': 'recipe_butter', 'RecipeCake': 'recipe_cake',
-        'RecipeMead': 'recipe_mead', 'RecipeMeatPie': 'recipe_meat_pie'
-      };
-
-      const parts = msg.replace('Sync_Inventory_', '').split('_');
-      console.log('[Hughberry Crafting] Parsing parts:', parts);
-      let i = 0;
-      while (i < parts.length) {
-        // Try 2-word match first for inventory
-        if (i + 2 < parts.length) {
-          const twoWord = parts[i] + '_' + parts[i+1];
-          if (mapping[twoWord]) {
-            gameState.inventory[mapping[twoWord]] = parseInt(parts[i+2]) || 0;
-            i += 3;
-            continue;
-          }
-        }
-        // Try 1-word match for recipes (new format: RecipeFlour, RecipeBread, etc.)
-        if (i + 1 < parts.length && recipeMapping[parts[i]]) {
-          const recipeKey = recipeMapping[parts[i]];
-          const hasRecipe = parseInt(parts[i+1]) > 0;
-          gameState.recipes[recipeKey] = hasRecipe;
-          console.log('[Hughberry Crafting] Recipe found:', parts[i], '->', recipeKey, '=', hasRecipe);
-          i += 2;
-          continue;
-        }
-        // Try 1-word match for inventory
-        if (i + 1 < parts.length && mapping[parts[i]]) {
-          gameState.inventory[mapping[parts[i]]] = parseInt(parts[i+1]) || 0;
-          i += 2;
-          continue;
-        }
-        i++;
-      }
-      console.log('[Hughberry Crafting] Final recipes state:', JSON.stringify(gameState.recipes));
+    // Message deduplication
+    let lastMessageId = '';
+    let lastMessageTime = 0;
+    function processMessage(msg, source) {
+      const now = Date.now();
+      const msgId = msg + '_' + Math.floor(now / 100);
+      if (msgId === lastMessageId && now - lastMessageTime < 200) return;
+      lastMessageId = msgId;
+      lastMessageTime = now;
+      handlePortalsMessage(msg);
     }
 
-    // Setup message listener with retry for SDK initialization
     function setupMessageListener() {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
-        PortalsSdk.setMessageListener(handleMessage);
+        PortalsSdk.setMessageListener(function(msg) { processMessage(msg, 'SDK'); });
         console.log('[Hughberry Crafting] SDK listener registered');
       } else {
-        console.log('[Hughberry Crafting] Waiting for SDK...');
         setTimeout(setupMessageListener, 100);
       }
     }
 
-    // Also listen via window.postMessage as fallback
     window.addEventListener('message', function(event) {
-      if (event.data && typeof event.data === 'string') {
-        console.log('[Hughberry Crafting] postMessage string:', event.data);
-        handleMessage(event.data);
-      }
-      else if (event.data && event.data.portalsMessage) {
-        console.log('[Hughberry Crafting] postMessage portalsMessage:', event.data.portalsMessage);
-        handleMessage(event.data.portalsMessage);
-      }
-      else if (event.data && event.data.message && typeof event.data.message === 'string') {
-        console.log('[Hughberry Crafting] postMessage message:', event.data.message);
-        handleMessage(event.data.message);
-      }
+      if (event.data && typeof event.data === 'string') processMessage(event.data, 'postMessage-string');
+      else if (event.data && event.data.portalsMessage) processMessage(event.data.portalsMessage, 'postMessage-portals');
+      else if (event.data && event.data.message && typeof event.data.message === 'string') processMessage(event.data.message, 'postMessage-message');
     });
 
     // Initialize

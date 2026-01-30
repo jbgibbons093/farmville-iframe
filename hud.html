@@ -339,14 +339,67 @@
       handlePortalsMessage(msg);
     }
 
+    // === Standard Sync_Inventory Parser (same in all iframes) ===
+    const SYNC_MAP = {
+      'Has_Milk_Pail': 'has_milk_pail', 'Has_Shearing_Kit': 'has_shearing_kit',
+      'Has_Butcher_Knife': 'has_butcher_knife', 'Has_Truffle_Spade': 'has_truffle_spade',
+      'Has_Starter_Seeds': 'has_starter_seeds',
+      'Seeds_Wheat': 'seeds_wheat', 'Seeds_Carrot': 'seeds_carrot', 'Seeds_Corn': 'seeds_corn',
+      'Seeds_Potato': 'seeds_potato', 'Seeds_Tomato': 'seeds_tomato', 'Seeds_Pumpkin': 'seeds_pumpkin',
+      'Crop_Wheat': 'crop_wheat', 'Crop_Carrot': 'crop_carrot', 'Crop_Corn': 'crop_corn',
+      'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
+      'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
+      'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
+      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
+      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
+      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
+      'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
+      'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
+      'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
+      'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
+      'Cake': 'cake', 'Mead': 'mead',
+      'RecipeFlour': 'has_recipe_flour', 'RecipeBread': 'has_recipe_bread',
+      'RecipeCheese': 'has_recipe_cheese', 'RecipeStew': 'has_recipe_stew',
+      'RecipeRagout': 'has_recipe_ragout', 'RecipePie': 'has_recipe_pie',
+      'RecipeMeatPie': 'has_recipe_meat_pie', 'RecipeBlanket': 'has_recipe_blanket',
+      'RecipeButter': 'has_recipe_butter', 'RecipeCake': 'has_recipe_cake',
+      'RecipeMead': 'has_recipe_mead'
+    };
+
+    function parseSyncMessage(msg) {
+      const parts = msg.replace('Sync_Inventory_', '').split('_');
+      const data = {};
+      let i = 0;
+      while (i < parts.length) {
+        let matched = false;
+        if (!matched && i + 3 < parts.length) {
+          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
+        }
+        if (!matched && i + 2 < parts.length) {
+          const k = parts[i] + '_' + parts[i+1];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
+        }
+        if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
+          data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
+        }
+        if (!matched) i++;
+      }
+      return data;
+    }
+    // === End Standard Parser ===
+
     function handlePortalsMessage(msg) {
       console.log('[HUD] Received message:', msg.substring(0, 100) + '...');
 
-      // Handle Sync_Inventory message
       if (msg.startsWith('Sync_Inventory_') || msg.includes('_Gold_')) {
-        parseInventorySync(msg);
+        const data = parseSyncMessage(msg);
+        if (data.gold !== undefined) gold = data.gold;
+        if (data.xp !== undefined) xp = data.xp;
+        if (data.level !== undefined) level = data.level;
+        updateHUD();
+        console.log('[HUD] Updated - Gold:', gold, 'XP:', xp, 'Level:', level);
       }
-      // Handle init message
       else if (msg.startsWith('init_')) {
         const parts = msg.split('_');
         if (parts.length >= 4) {
@@ -356,7 +409,6 @@
           updateHUD();
         }
       }
-      // Handle HUD-specific update
       else if (msg.startsWith('hud_')) {
         const parts = msg.split('_');
         if (parts.length >= 4) {
@@ -366,28 +418,6 @@
           updateHUD();
         }
       }
-    }
-
-    function parseInventorySync(msg) {
-      // Parse key-value pairs from sync message
-      // Format: Sync_Inventory_Gold_100_XP_50_Level_2_...
-
-      const getValue = (key) => {
-        const regex = new RegExp(key + '_(\\d+)');
-        const match = msg.match(regex);
-        return match ? parseInt(match[1]) : null;
-      };
-
-      const newGold = getValue('Gold');
-      const newXP = getValue('XP');
-      const newLevel = getValue('Level');
-
-      if (newGold !== null) gold = newGold;
-      if (newXP !== null) xp = newXP;
-      if (newLevel !== null) level = newLevel;
-
-      updateHUD();
-      console.log('[HUD] Updated - Gold:', gold, 'XP:', xp, 'Level:', level);
     }
 
     // Setup message listener with retry for SDK initialization

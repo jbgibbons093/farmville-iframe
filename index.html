@@ -237,8 +237,8 @@
     const CONFIG = {
       crops: {
         wheat: { id: 1, name: 'Wheat', icon: '&#x1F33E;', growTime: 30, yield: 1, sellPrice: 5, seedCost: 2, unlockLevel: 0, plantXP: 2, harvestXP: 5 },
-        carrot: { id: 2, name: 'Carrot', icon: '&#x1F955;', growTime: 45, yield: 1, sellPrice: 8, seedCost: 3, unlockLevel: 1, plantXP: 2, harvestXP: 5 },
-        corn: { id: 3, name: 'Corn', icon: '&#x1F33D;', growTime: 60, yield: 1, sellPrice: 10, seedCost: 5, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
+        carrot: { id: 2, name: 'Carrot', icon: '&#x1F955;', growTime: 45, yield: 1, sellPrice: 10, seedCost: 5, unlockLevel: 1, plantXP: 2, harvestXP: 5 },
+        corn: { id: 3, name: 'Corn', icon: '&#x1F33D;', growTime: 60, yield: 1, sellPrice: 8, seedCost: 3, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
         potato: { id: 4, name: 'Potato', icon: '&#x1F954;', growTime: 75, yield: 1, sellPrice: 12, seedCost: 6, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
         tomato: { id: 5, name: 'Tomato', icon: '&#x1F345;', growTime: 90, yield: 1, sellPrice: 15, seedCost: 8, unlockLevel: 3, plantXP: 4, harvestXP: 10 },
         pumpkin: { id: 6, name: 'Pumpkin', icon: '&#x1F383;', growTime: 120, yield: 1, sellPrice: 30, seedCost: 15, unlockLevel: 5, plantXP: 5, harvestXP: 15 }
@@ -262,7 +262,7 @@
         { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 50, xp: 20, taskName: 'Craft_Blanket' },
         { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter' },
         { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' },
-        { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 3 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
+        { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 2 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
       ],
       equipment: [
         { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'No bee sting damage', unlockLevel: 6 },
@@ -1101,7 +1101,8 @@
           { key: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;' },
           { key: 'blanket', name: 'Blanket', icon: '&#x1F9E3;' },
           { key: 'butter', name: 'Butter', icon: '&#x1F9C8;' },
-          { key: 'cake', name: 'Cake', icon: '&#x1F370;' }
+          { key: 'cake', name: 'Cake', icon: '&#x1F370;' },
+          { key: 'mead', name: 'Mead', icon: '&#x1F37A;' }
         ]}
       ];
       let html = '';
