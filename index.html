@@ -664,6 +664,9 @@
 
       notify(`Planted ${crop.name}! +${crop.plantXP} XP`, 'success');
       saveGameQuiet();
+
+      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
+      if (!skipLock) setTimeout(function() { actionPending = false; }, 3000);
       return true;
     }
 
@@ -702,6 +705,9 @@
       notify(`Planted ${planted} crops!`, 'success');
       saveGameQuiet();
       renderCrops();
+
+      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
+      setTimeout(function() { actionPending = false; }, 3000);
     }
 
     // Equipment requirements for starting animal activities

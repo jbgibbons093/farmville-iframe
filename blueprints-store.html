@@ -135,6 +135,9 @@
       actionPending = true;
       triggerTask(equip.taskName);
       notify('Purchased ' + equip.name + '!');
+
+      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
+      setTimeout(function() { actionPending = false; render(); }, 3000);
     }
 
     function buyRecipe(id) {
@@ -149,6 +152,9 @@
       actionPending = true;
       triggerTask(recipe.taskName);
       notify('Purchased ' + recipe.name + '!');
+
+      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
+      setTimeout(function() { actionPending = false; render(); }, 3000);
     }
 
     function render() {
