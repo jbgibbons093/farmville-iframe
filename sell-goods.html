@@ -90,25 +90,25 @@
         { key: 'pumpkin', name: 'Pumpkin', icon: '&#x1F383;', price: 30, taskPrefix: 'Sell_Crop_Pumpkin' }
       ],
       products: [
-        { key: 'milk', name: 'Milk', icon: '&#x1F95B;', price: 12, taskPrefix: 'Sell_Milk', singleOnly: true },
-        { key: 'wool', name: 'Wool', icon: '&#x1F9F6;', price: 15, taskPrefix: 'Sell_Wool', singleOnly: true },
-        { key: 'goat_meat', name: 'Goat Meat', icon: '&#x1F356;', price: 20, taskPrefix: 'Sell_Goat_Meat', singleOnly: true },
-        { key: 'truffle', name: 'Truffle', icon: '&#x1F344;', price: 50, taskPrefix: 'Sell_Truffle', singleOnly: true },
-        { key: 'egg', name: 'Egg', icon: '&#x1F95A;', price: 8, taskPrefix: 'Sell_Egg', singleOnly: true },
-        { key: 'honey', name: 'Honey', icon: '&#x1F36F;', price: 25, taskPrefix: 'Sell_Honey', singleOnly: true }
+        { key: 'milk', name: 'Milk', icon: '&#x1F95B;', price: 12, taskPrefix: 'Sell_Milk' },
+        { key: 'wool', name: 'Wool', icon: '&#x1F9F6;', price: 15, taskPrefix: 'Sell_Wool' },
+        { key: 'goat_meat', name: 'Goat Meat', icon: '&#x1F356;', price: 20, taskPrefix: 'Sell_Goat_Meat' },
+        { key: 'truffle', name: 'Truffle', icon: '&#x1F344;', price: 50, taskPrefix: 'Sell_Truffle' },
+        { key: 'egg', name: 'Egg', icon: '&#x1F95A;', price: 8, taskPrefix: 'Sell_Egg' },
+        { key: 'honey', name: 'Honey', icon: '&#x1F36F;', price: 25, taskPrefix: 'Sell_Honey' }
       ],
       crafted: [
-        { key: 'flour', name: 'Flour', icon: '&#x1F35E;', price: 20, taskPrefix: 'Sell_Flour', singleOnly: true },
-        { key: 'bread', name: 'Bread', icon: '&#x1F956;', price: 35, taskPrefix: 'Sell_Bread', singleOnly: true },
-        { key: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', price: 30, taskPrefix: 'Sell_Cheese', singleOnly: true },
-        { key: 'stew', name: 'Stew', icon: '&#x1F372;', price: 50, taskPrefix: 'Sell_Stew', singleOnly: true },
-        { key: 'ragout', name: 'Ragout', icon: '&#x1F356;', price: 75, taskPrefix: 'Sell_Ragout', singleOnly: true },
-        { key: 'pie', name: 'Pie', icon: '&#x1F967;', price: 80, taskPrefix: 'Sell_Pie', singleOnly: true },
-        { key: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', price: 90, taskPrefix: 'Sell_Meat_Pie', singleOnly: true },
-        { key: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', price: 50, taskPrefix: 'Sell_Blanket', singleOnly: true },
-        { key: 'butter', name: 'Butter', icon: '&#x1F9C8;', price: 30, taskPrefix: 'Sell_Butter', singleOnly: true },
-        { key: 'cake', name: 'Cake', icon: '&#x1F370;', price: 100, taskPrefix: 'Sell_Cake', singleOnly: true },
-        { key: 'mead', name: 'Mead', icon: '&#x1F37A;', price: 60, taskPrefix: 'Sell_Mead', singleOnly: true }
+        { key: 'flour', name: 'Flour', icon: '&#x1F35E;', price: 20, taskPrefix: 'Sell_Flour' },
+        { key: 'bread', name: 'Bread', icon: '&#x1F956;', price: 35, taskPrefix: 'Sell_Bread' },
+        { key: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', price: 30, taskPrefix: 'Sell_Cheese' },
+        { key: 'stew', name: 'Stew', icon: '&#x1F372;', price: 50, taskPrefix: 'Sell_Stew' },
+        { key: 'ragout', name: 'Ragout', icon: '&#x1F356;', price: 75, taskPrefix: 'Sell_Ragout' },
+        { key: 'pie', name: 'Pie', icon: '&#x1F967;', price: 80, taskPrefix: 'Sell_Pie' },
+        { key: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', price: 90, taskPrefix: 'Sell_Meat_Pie' },
+        { key: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', price: 50, taskPrefix: 'Sell_Blanket' },
+        { key: 'butter', name: 'Butter', icon: '&#x1F9C8;', price: 30, taskPrefix: 'Sell_Butter' },
+        { key: 'cake', name: 'Cake', icon: '&#x1F370;', price: 100, taskPrefix: 'Sell_Cake' },
+        { key: 'mead', name: 'Mead', icon: '&#x1F37A;', price: 60, taskPrefix: 'Sell_Mead' }
       ]
     };
 
@@ -159,13 +159,8 @@
         const canSell1 = owned >= 1;
         const canSell5 = owned >= 5;
 
-        let buttonsHtml;
-        if (item.singleOnly) {
-          buttonsHtml = '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 1, \'' + item.taskPrefix + '\', ' + item.price + ')" ' + (canSell1 ? '' : 'disabled') + '>Sell 1</button>';
-        } else {
-          buttonsHtml = '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 1, \'' + item.taskPrefix + '\', ' + item.price + ')" ' + (canSell1 ? '' : 'disabled') + '>Sell 1</button>' +
-            '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 5, \'' + item.taskPrefix + '\', ' + item.price + ')" ' + (canSell5 ? '' : 'disabled') + '>Sell 5</button>';
-        }
+        let buttonsHtml = '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 1, \'' + item.taskPrefix + '\', ' + item.price + ')" ' + (canSell1 ? '' : 'disabled') + '>Sell 1</button>' +
+          '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 5, \'' + item.taskPrefix + '\', ' + item.price + ')" ' + (canSell5 ? '' : 'disabled') + '>Sell 5</button>';
 
         html += '<div class="item ' + (owned === 0 ? 'zero' : '') + '">' +
           '<span class="item-icon">' + item.icon + '</span>' +
