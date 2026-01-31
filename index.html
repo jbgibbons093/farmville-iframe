@@ -237,19 +237,19 @@
     const CONFIG = {
       crops: {
         wheat: { id: 1, name: 'Wheat', icon: '&#x1F33E;', growTime: 30, yield: 1, sellPrice: 5, seedCost: 2, unlockLevel: 0, plantXP: 2, harvestXP: 5 },
-        carrot: { id: 2, name: 'Carrot', icon: '&#x1F955;', growTime: 45, yield: 1, sellPrice: 10, seedCost: 5, unlockLevel: 1, plantXP: 2, harvestXP: 5 },
-        corn: { id: 3, name: 'Corn', icon: '&#x1F33D;', growTime: 60, yield: 1, sellPrice: 8, seedCost: 3, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
-        potato: { id: 4, name: 'Potato', icon: '&#x1F954;', growTime: 75, yield: 1, sellPrice: 12, seedCost: 6, unlockLevel: 2, plantXP: 3, harvestXP: 8 },
-        tomato: { id: 5, name: 'Tomato', icon: '&#x1F345;', growTime: 90, yield: 1, sellPrice: 15, seedCost: 8, unlockLevel: 3, plantXP: 4, harvestXP: 10 },
-        pumpkin: { id: 6, name: 'Pumpkin', icon: '&#x1F383;', growTime: 120, yield: 1, sellPrice: 30, seedCost: 15, unlockLevel: 5, plantXP: 5, harvestXP: 15 }
+        carrot: { id: 2, name: 'Carrot', icon: '&#x1F955;', growTime: 45, yield: 1, sellPrice: 10, seedCost: 5, unlockLevel: 3, plantXP: 2, harvestXP: 5 },
+        corn: { id: 3, name: 'Corn', icon: '&#x1F33D;', growTime: 60, yield: 1, sellPrice: 8, seedCost: 3, unlockLevel: 7, plantXP: 3, harvestXP: 8 },
+        potato: { id: 4, name: 'Potato', icon: '&#x1F954;', growTime: 75, yield: 1, sellPrice: 12, seedCost: 6, unlockLevel: 10, plantXP: 3, harvestXP: 8 },
+        tomato: { id: 5, name: 'Tomato', icon: '&#x1F345;', growTime: 90, yield: 1, sellPrice: 15, seedCost: 8, unlockLevel: 16, plantXP: 4, harvestXP: 10 },
+        pumpkin: { id: 6, name: 'Pumpkin', icon: '&#x1F383;', growTime: 120, yield: 1, sellPrice: 30, seedCost: 15, unlockLevel: 23, plantXP: 5, harvestXP: 15 }
       },
       animals: {
-        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 0, startXP: 2, collectXP: 5 },
-        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5, unlockLevel: 1, startXP: 1, collectXP: 3 },
-        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 2, startXP: 3, collectXP: 6 },
-        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 3, startXP: 4, collectXP: 8 },
-        pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 4, startXP: 5, collectXP: 10 },
-        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 9, unlockLevel: 3, startXP: 2, collectXP: 5 }
+        cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 2, startXP: 2, collectXP: 5 },
+        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5, unlockLevel: 6, startXP: 1, collectXP: 3 },
+        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 13, startXP: 3, collectXP: 6 },
+        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 18, startXP: 4, collectXP: 8 },
+        pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 26, startXP: 5, collectXP: 10 },
+        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 9, unlockLevel: 21, startXP: 2, collectXP: 5 }
       },
       recipes: [
         { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 20, xp: 10, taskName: 'Craft_Flour' },
@@ -264,21 +264,48 @@
         { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' },
         { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 2 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
       ],
-      equipment: [
-        { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 500, desc: 'No bee sting damage', unlockLevel: 6 },
-        { id: 'basket', name: 'Harvest Basket', icon: '&#x1F9FA;', price: 300, desc: '+50% crop yield', unlockLevel: 4 }
-      ],
       // XP required at each level to advance (XP resets to 0 on level-up)
-      // Level 0→1: 50, 1→2: 100, 2→3: 250, 3→4: 400, 4→5: 700, etc.
-      levelThresholds: [50, 100, 250, 400, 700, 1000, 1500, 2000, 3000, 4000],
+      // 50 levels total, content unlocks at levels 0-31, prestige levels 32-50
+      levelThresholds: [
+        50, 75, 100, 125, 150, 200, 250, 300, 375, 450,
+        525, 600, 700, 800, 900, 1000, 1100, 1250, 1400, 1600,
+        1800, 2000, 2200, 2500, 2800, 3000, 3300, 3600, 4000, 4500,
+        5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500,
+        10000, 10500, 11000, 11500, 12000, 12500, 13000, 13500, 14000, 15000
+      ],
       unlocks: [
-        { level: 0, title: 'New Farmer', desc: 'Plant Wheat, tend Cows for milk', items: ['Wheat', 'Cows'] },
-        { level: 1, title: 'Getting Started', desc: 'Plant Carrots, tend Chickens for eggs', items: ['Carrot', 'Chickens'] },
-        { level: 2, title: 'Expanding Fields', desc: 'Plant Corn & Potatoes, tend Sheep', items: ['Corn', 'Potato', 'Sheep'] },
-        { level: 3, title: 'Growing Farm', desc: 'Plant Tomatoes, tend Goats for meat', items: ['Tomato', 'Goats'] },
-        { level: 4, title: 'Advanced Farming', desc: 'Tend Pigs for truffles, buy Harvest Basket', items: ['Pigs', 'Harvest Basket'] },
-        { level: 5, title: 'Master Farmer', desc: 'Plant Pumpkins for big profits', items: ['Pumpkin'] },
-        { level: 6, title: 'Expert', desc: 'Buy Bee Suit for beekeeping', items: ['Bee Suit', 'Beekeeping'] }
+        { level: 0, title: 'New Farmer', desc: 'Plant Wheat - your first crop!', items: ['Wheat Seeds'] },
+        { level: 1, title: 'Dairy Starter', desc: 'Buy the Milk Pail to work with cows', items: ['Milk Pail'] },
+        { level: 2, title: 'First Herd', desc: 'Cows are now available - collect milk!', items: ['Cows'] },
+        { level: 3, title: 'Root Crops', desc: 'Plant Carrots for better profits', items: ['Carrot Seeds'] },
+        { level: 4, title: 'Miller', desc: 'Learn to grind wheat into flour', items: ['Flour Recipe'] },
+        { level: 5, title: 'Egg Hunter', desc: 'Buy the Egg Basket to work with chickens', items: ['Egg Basket'] },
+        { level: 6, title: 'Poultry Farmer', desc: 'Chickens are now available - collect eggs!', items: ['Chickens'] },
+        { level: 7, title: 'Field Expansion', desc: 'Plant Corn for stews and profits', items: ['Corn Seeds'] },
+        { level: 8, title: 'Butter Churner', desc: 'Learn to churn milk into butter', items: ['Butter Recipe'] },
+        { level: 9, title: 'Cheese Maker', desc: 'Learn to make cheese from milk', items: ['Cheese Recipe'] },
+        { level: 10, title: 'Tuber Farmer', desc: 'Plant Potatoes for hearty profits', items: ['Potato Seeds'] },
+        { level: 11, title: 'Baker', desc: 'Learn to bake bread from flour and eggs', items: ['Bread Recipe'] },
+        { level: 12, title: 'Wool Worker', desc: 'Buy the Shearing Kit to work with sheep', items: ['Shearing Kit'] },
+        { level: 13, title: 'Shepherd', desc: 'Sheep are now available - collect wool!', items: ['Sheep'] },
+        { level: 14, title: 'Weaver', desc: 'Learn to weave wool into blankets', items: ['Blanket Recipe'] },
+        { level: 15, title: 'Stew Cook', desc: 'Learn to cook hearty vegetable stew', items: ['Stew Recipe'] },
+        { level: 16, title: 'Garden Master', desc: 'Plant Tomatoes for great profits', items: ['Tomato Seeds'] },
+        { level: 17, title: 'Butcher', desc: 'Buy the Butcher Knife to work with goats', items: ['Butcher Knife'] },
+        { level: 18, title: 'Goatherd', desc: 'Goats are now available - collect meat!', items: ['Goats'] },
+        { level: 19, title: 'Ragout Chef', desc: 'Learn to prepare savory meat ragout', items: ['Ragout Recipe'] },
+        { level: 20, title: 'Beekeeper', desc: 'Buy the Bee Suit for the apiary', items: ['Bee Suit'] },
+        { level: 21, title: 'Apiarist', desc: 'Beehives are now available - collect honey!', items: ['Beehives'] },
+        { level: 22, title: 'Brewmaster', desc: 'Learn to brew honey mead', items: ['Mead Recipe'] },
+        { level: 23, title: 'Pumpkin Grower', desc: 'Plant Pumpkins - the most profitable crop!', items: ['Pumpkin Seeds'] },
+        { level: 24, title: 'Pie Baker', desc: 'Learn to bake delicious pumpkin pie', items: ['Pie Recipe'] },
+        { level: 25, title: 'Truffle Hunter', desc: 'Buy the Truffle Spade to work with pigs', items: ['Truffle Spade'] },
+        { level: 26, title: 'Pig Farmer', desc: 'Pigs are now available - find truffles!', items: ['Pigs'] },
+        { level: 27, title: 'Meat Pie Master', desc: 'Learn to bake savory meat pies', items: ['Meat Pie Recipe'] },
+        { level: 28, title: 'Pastry Chef', desc: 'Learn to bake the ultimate cake!', items: ['Cake Recipe'] },
+        { level: 29, title: 'Gold Rush', desc: 'Bonus reward: +500 gold!', items: ['Gold Bonus +500g'] },
+        { level: 30, title: 'XP Surge', desc: 'Bonus reward: +200 XP!', items: ['XP Bonus +200'] },
+        { level: 31, title: 'Hughberry Legend', desc: 'All content unlocked - you are a legend!', items: ['Hughberry Legend'] }
       ]
     };
 

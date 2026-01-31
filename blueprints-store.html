@@ -75,26 +75,26 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const EQUIPMENT = [
-      { id: 'milk_pail', name: 'Milk Pail', icon: '&#x1FAA3;', price: 50, unlockLevel: 0, desc: 'Required to work with cows and collect milk (Starter)', taskName: 'Buy_Milk_Pail' },
-      { id: 'basket', name: 'Egg Basket', icon: '&#x1F9FA;', price: 150, unlockLevel: 1, desc: 'Required to work with chickens and collect eggs', taskName: 'Buy_Basket' },
-      { id: 'shearing_kit', name: 'Shearing Kit', icon: '&#x2702;', price: 250, unlockLevel: 2, desc: 'Required to work with sheep and collect wool', taskName: 'Buy_Shearing_Kit' },
-      { id: 'butcher_knife', name: 'Butcher Knife', icon: '&#x1F52A;', price: 350, unlockLevel: 3, desc: 'Required to work with goats and collect meat', taskName: 'Buy_Butcher_Knife' },
-      { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 400, unlockLevel: 3, desc: 'Required to collect honey from the apiary', taskName: 'Buy_Beesuit' },
-      { id: 'truffle_spade', name: 'Truffle Spade', icon: '&#x1F9F9;', price: 450, unlockLevel: 4, desc: 'Required to work with pigs and collect truffles', taskName: 'Buy_Truffle_Spade' }
+      { id: 'milk_pail', name: 'Milk Pail', icon: '&#x1FAA3;', price: 50, unlockLevel: 1, desc: 'Required to work with cows and collect milk', taskName: 'Buy_Milk_Pail' },
+      { id: 'basket', name: 'Egg Basket', icon: '&#x1F9FA;', price: 150, unlockLevel: 5, desc: 'Required to work with chickens and collect eggs', taskName: 'Buy_Basket' },
+      { id: 'shearing_kit', name: 'Shearing Kit', icon: '&#x2702;', price: 250, unlockLevel: 12, desc: 'Required to work with sheep and collect wool', taskName: 'Buy_Shearing_Kit' },
+      { id: 'butcher_knife', name: 'Butcher Knife', icon: '&#x1F52A;', price: 350, unlockLevel: 17, desc: 'Required to work with goats and collect meat', taskName: 'Buy_Butcher_Knife' },
+      { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', price: 400, unlockLevel: 20, desc: 'Required to collect honey from the apiary', taskName: 'Buy_Beesuit' },
+      { id: 'truffle_spade', name: 'Truffle Spade', icon: '&#x1F9F9;', price: 450, unlockLevel: 25, desc: 'Required to work with pigs and collect truffles', taskName: 'Buy_Truffle_Spade' }
     ];
 
     const RECIPES = [
-      { id: 'recipe_flour', name: 'Flour Recipe', icon: '&#x1F4DC;', price: 100, unlockLevel: 1, desc: 'Learn to grind wheat into flour', taskName: 'Buy_Recipe_Flour' },
-      { id: 'recipe_butter', name: 'Butter Recipe', icon: '&#x1F4DC;', price: 150, unlockLevel: 2, desc: 'Learn to churn milk into butter', taskName: 'Buy_Recipe_Butter' },
-      { id: 'recipe_cheese', name: 'Cheese Recipe', icon: '&#x1F4DC;', price: 200, unlockLevel: 2, desc: 'Learn to make cheese from milk', taskName: 'Buy_Recipe_Cheese' },
-      { id: 'recipe_bread', name: 'Bread Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 2, desc: 'Learn to bake fresh bread', taskName: 'Buy_Recipe_Bread' },
-      { id: 'recipe_blanket', name: 'Blanket Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 3, desc: 'Learn to weave wool into blankets', taskName: 'Buy_Recipe_Blanket' },
-      { id: 'recipe_stew', name: 'Stew Recipe', icon: '&#x1F4DC;', price: 300, unlockLevel: 3, desc: 'Learn to cook hearty vegetable stew', taskName: 'Buy_Recipe_Stew' },
-      { id: 'recipe_ragout', name: 'Ragout Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 4, desc: 'Learn to prepare savory meat ragout', taskName: 'Buy_Recipe_Ragout' },
-      { id: 'recipe_pie', name: 'Pie Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 4, desc: 'Learn to bake pumpkin pie', taskName: 'Buy_Recipe_Pie' },
-      { id: 'recipe_mead', name: 'Mead Recipe', icon: '&#x1F4DC;', price: 450, unlockLevel: 4, desc: 'Learn to brew honey mead', taskName: 'Buy_Recipe_Mead' },
-      { id: 'recipe_meat_pie', name: 'Meat Pie Recipe', icon: '&#x1F4DC;', price: 500, unlockLevel: 5, desc: 'Learn to bake savory meat pies', taskName: 'Buy_Recipe_Meat_Pie' },
-      { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 5, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
+      { id: 'recipe_flour', name: 'Flour Recipe', icon: '&#x1F4DC;', price: 100, unlockLevel: 4, desc: 'Learn to grind wheat into flour', taskName: 'Buy_Recipe_Flour' },
+      { id: 'recipe_butter', name: 'Butter Recipe', icon: '&#x1F4DC;', price: 150, unlockLevel: 8, desc: 'Learn to churn milk into butter', taskName: 'Buy_Recipe_Butter' },
+      { id: 'recipe_cheese', name: 'Cheese Recipe', icon: '&#x1F4DC;', price: 200, unlockLevel: 9, desc: 'Learn to make cheese from milk', taskName: 'Buy_Recipe_Cheese' },
+      { id: 'recipe_bread', name: 'Bread Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 11, desc: 'Learn to bake fresh bread', taskName: 'Buy_Recipe_Bread' },
+      { id: 'recipe_blanket', name: 'Blanket Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 14, desc: 'Learn to weave wool into blankets', taskName: 'Buy_Recipe_Blanket' },
+      { id: 'recipe_stew', name: 'Stew Recipe', icon: '&#x1F4DC;', price: 300, unlockLevel: 15, desc: 'Learn to cook hearty vegetable stew', taskName: 'Buy_Recipe_Stew' },
+      { id: 'recipe_ragout', name: 'Ragout Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 19, desc: 'Learn to prepare savory meat ragout', taskName: 'Buy_Recipe_Ragout' },
+      { id: 'recipe_mead', name: 'Mead Recipe', icon: '&#x1F4DC;', price: 450, unlockLevel: 22, desc: 'Learn to brew honey mead', taskName: 'Buy_Recipe_Mead' },
+      { id: 'recipe_pie', name: 'Pie Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 24, desc: 'Learn to bake pumpkin pie', taskName: 'Buy_Recipe_Pie' },
+      { id: 'recipe_meat_pie', name: 'Meat Pie Recipe', icon: '&#x1F4DC;', price: 500, unlockLevel: 27, desc: 'Learn to bake savory meat pies', taskName: 'Buy_Recipe_Meat_Pie' },
+      { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 28, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
     ];
 
     let gameState = { gold: 0, level: 0, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
