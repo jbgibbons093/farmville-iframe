@@ -610,9 +610,8 @@
         }
         if (!matched) i++;
       }
-      console.log('[Hughberry] Equipment after sync:', JSON.stringify(gameState.equipment));
-      console.log('[Hughberry] Honey after sync:', gameState.inventory.honey);
-      console.log('[Hughberry] Full inventory:', JSON.stringify(gameState.inventory));
+      console.log('[Hughberry] Talents after sync:', JSON.stringify(gameState.talents));
+      console.log('[Hughberry] Unspent Talent Points:', gameState.unspentTalentPoints);
       saveGameQuiet();
     }
 
