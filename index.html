@@ -888,7 +888,7 @@
           triggerTask(`Add_XP_${station.xpPerUnit}`);
           console.log('[Hughberry] Sent', station.addTask, 'and Add_XP_' + station.xpPerUnit, '(' + (i + 1) + '/' + readyCount + ')');
           pendingAnimalTasks[station.animalType]--;
-        }, i * 500);
+        }, i * 250);
       }
 
       // After all Add tasks, send Collect_{Product} to move collection object out of map
@@ -896,7 +896,7 @@
         triggerTask(station.collectTask);
         readyTaskTriggered[station.animalType] = false;
         console.log('[Hughberry] Sent', station.collectTask, '(hiding collection object)');
-      }, readyCount * 500);
+      }, readyCount * 250);
 
       notify(`Collected ${readyCount} ${station.productName}! +${xpGained} XP`, 'success');
       saveGameQuiet();
