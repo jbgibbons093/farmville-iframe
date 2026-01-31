@@ -461,7 +461,7 @@
     // Claim free starter seeds (one-time only)
     function claimStarterSeeds() {
       if (gameState.claimedStarterSeeds) {
-        showNotification('Already claimed!', 'error');
+        notify('Already claimed!', 'error');
         return;
       }
       // Trigger Portals task to give 5 wheat seeds and set the flag
@@ -469,7 +469,7 @@
       // Optimistically update local state
       gameState.claimedStarterSeeds = true;
       gameState.inventory.seeds_wheat += 5;
-      showNotification('+5 Wheat Seeds claimed!', 'success');
+      notify('+5 Wheat Seeds claimed!', 'success');
       renderDashboard();
     }
 
@@ -722,8 +722,6 @@
       const cropType = plot.cropType || 'wheat';
       const crop = CONFIG.crops[cropType];
       const cropName = crop ? crop.name : 'Wheat';
-      const harvestXP = crop ? crop.harvestXP : 5;
-
       triggerTask(`Harvest_Plot_${plotId}`);
       triggerTask(`Plot_${plotId}_Trigger`, 'SetActiveToNotActive');
       triggerTask(`Add_Crop_${cropName}_1`);
@@ -829,11 +827,11 @@
 
       actionPending = true;
       let planted = 0;
+      const plantXP = getPlantingXP(crop);
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
         triggerTask(`Plant_Plot_${idx + 1}`);
         triggerTask(`Sub_Seeds_${crop.name}_1`);
-        awardXP(getPlantingXP(crop));
 
         plot.state = 'growing';
         plot.cropType = c;
@@ -842,7 +840,11 @@
         planted++;
       }
 
-      notify(`Planted ${planted} crops!`, 'success');
+      // Award total XP once to avoid same-task collision in Portals
+      const totalPlantXP = planted * plantXP;
+      awardXP(totalPlantXP);
+
+      notify(`Planted ${planted} crops! +${totalPlantXP} XP`, 'success');
       saveGameQuiet();
       renderCrops();
 
@@ -1145,11 +1147,11 @@
             </div>
           </div>
           <div class="dashboard-card">
-            <div class="card-header"><span class="card-icon">&#x1F33E;</span><div class="card-title">Crops (24 plots)</div></div>
+            <div class="card-header"><span class="card-icon">&#x1F33E;</span><div class="card-title">Crops (${getActivePlotCount()} plots)</div></div>
             <div class="quick-stats">
               <div class="quick-stat"><span class="quick-stat-icon">&#x2705;</span><div><div class="quick-stat-value">${readyCrops}</div><div class="quick-stat-label">Ready</div></div></div>
               <div class="quick-stat"><span class="quick-stat-icon">&#x1F331;</span><div><div class="quick-stat-value">${growingCrops}</div><div class="quick-stat-label">Growing</div></div></div>
-              <div class="quick-stat"><span class="quick-stat-icon">&#x1F532;</span><div><div class="quick-stat-value">${24 - readyCrops - growingCrops}</div><div class="quick-stat-label">Empty</div></div></div>
+              <div class="quick-stat"><span class="quick-stat-icon">&#x1F532;</span><div><div class="quick-stat-value">${getActivePlotCount() - readyCrops - growingCrops}</div><div class="quick-stat-label">Empty</div></div></div>
             </div>
           </div>
           <div class="dashboard-card">
@@ -1234,8 +1236,9 @@
       gameState.plots.forEach((plot, i) => {
         if (plot.state === 'growing') {
           const c = CONFIG.crops[plot.cropType];
+          const growTime = getCropGrowTime(c);
           const remaining = Math.max(0, (plot.readyAt - Date.now()) / 1000);
-          const progress = ((c.growTime - remaining) / c.growTime) * 100;
+          const progress = ((growTime - remaining) / growTime) * 100;
 
           // Find and update the status text
           const plotCards = document.querySelectorAll('.plot-card.growing');
