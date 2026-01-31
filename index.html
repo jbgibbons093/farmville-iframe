@@ -312,6 +312,15 @@
     let gameState = {
       gold: 0, xp: 0, level: 0,
       unspentTalentPoints: 0,
+      talents: {
+        plotRow2: 0, greenThumb: 0, eagerPlanter: 0, plotRow3: 0,
+        bountifulHarvest: 0, rapidGrowth: 0, plotRow4: 0, cropMastery: 0,
+        cowHerd: 0, chickenFlock: 0, quickHands: 0, sheepPen: 0,
+        goatYard: 0, apiaryExpansion: 0, husbandryKnowledge: 0, pigSty: 0,
+        animalMastery: 0,
+        keenLearner: 0, farmHand: 0, stockman: 0, artisan: 0,
+        seasonedWorker: 0, bonusPoint1: 0, prodigy: 0, bonusPoint2: 0
+      },
       claimedStarterSeeds: false,
       xpHistory: { planting: 0, harvesting: 0, animals: 0, crafting: 0, selling: 0 },
       inventory: {
@@ -382,6 +391,73 @@
     function hideObject(n) { console.log('Hide object:', n); }
     function playSound(s) { console.log('Play sound:', s); }
 
+    // --- Talent Helper Functions ---
+    function awardXP(amount) {
+      if (amount <= 0) return;
+      const denominations = [40, 35, 30, 25, 20, 15, 10, 8, 6, 5, 4, 3, 2, 1];
+      let remaining = amount;
+      let tasks = [];
+      while (remaining > 0) {
+        for (const d of denominations) {
+          if (d <= remaining) {
+            tasks.push('Add_XP_' + d);
+            remaining -= d;
+            break;
+          }
+        }
+      }
+      tasks.forEach(function(task, i) {
+        setTimeout(function() { triggerTask(task); }, i * 350);
+      });
+    }
+
+    function getPlantingXP(crop) {
+      const t = gameState.talents;
+      return crop.plantXP + t.eagerPlanter * 2 + t.cropMastery * 3 + t.keenLearner + t.farmHand * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+    }
+
+    function getHarvestXP(crop) {
+      const t = gameState.talents;
+      return crop.harvestXP + t.cropMastery * 3 + t.keenLearner + t.farmHand * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+    }
+
+    function getAnimalStartXP(config) {
+      const t = gameState.talents;
+      return config.startXP + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+    }
+
+    function getAnimalCollectXP(station) {
+      const t = gameState.talents;
+      return station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+    }
+
+    function getCropGrowTime(crop) {
+      const t = gameState.talents;
+      const reduction = Math.min(0.9, (t.greenThumb + t.rapidGrowth) * 0.10);
+      return Math.max(Math.ceil(crop.growTime * (1 - reduction)), 3);
+    }
+
+    function getAnimalCooldown(config) {
+      const t = gameState.talents;
+      const reduction = Math.min(0.9, t.quickHands * 0.10);
+      return Math.max(Math.ceil(config.cooldown * (1 - reduction)), 9);
+    }
+
+    function getActivePlotCount() {
+      const t = gameState.talents;
+      return 6 + (t.plotRow2 > 0 ? 6 : 0) + (t.plotRow3 > 0 ? 6 : 0) + (t.plotRow4 > 0 ? 6 : 0);
+    }
+
+    function getActiveAnimalSlots(type) {
+      const t = gameState.talents;
+      const talentMap = { cow: t.cowHerd, chicken: t.chickenFlock, sheep: t.sheepPen, goat: t.goatYard, pig: t.pigSty, beehive: t.apiaryExpansion };
+      const maxSlots = CONFIG.animals[type] ? CONFIG.animals[type].count : 1;
+      return Math.min(1 + (talentMap[type] || 0), maxSlots);
+    }
+
+    function getHarvestBonusCrops() { return gameState.talents.bountifulHarvest; }
+    function getCollectionBonusProducts() { return gameState.talents.animalMastery; }
+
     // Claim free starter seeds (one-time only)
     function claimStarterSeeds() {
       if (gameState.claimedStarterSeeds) {
@@ -450,6 +526,31 @@
         'RecipeMead': { target: 'recipe_mead', isRecipe: true },
         'Has_Starter_Seeds': { target: 'claimedStarterSeeds', isFlag: true },
         'Unspent_Talent_Points': { target: 'unspentTalentPoints', isRoot: true },
+        'T_PlotRow2': { target: 'plotRow2', isTalent: true },
+        'T_GreenThumb': { target: 'greenThumb', isTalent: true },
+        'T_EagerPlanter': { target: 'eagerPlanter', isTalent: true },
+        'T_PlotRow3': { target: 'plotRow3', isTalent: true },
+        'T_BountifulHarvest': { target: 'bountifulHarvest', isTalent: true },
+        'T_RapidGrowth': { target: 'rapidGrowth', isTalent: true },
+        'T_PlotRow4': { target: 'plotRow4', isTalent: true },
+        'T_CropMastery': { target: 'cropMastery', isTalent: true },
+        'T_CowHerd': { target: 'cowHerd', isTalent: true },
+        'T_ChickenFlock': { target: 'chickenFlock', isTalent: true },
+        'T_QuickHands': { target: 'quickHands', isTalent: true },
+        'T_SheepPen': { target: 'sheepPen', isTalent: true },
+        'T_GoatYard': { target: 'goatYard', isTalent: true },
+        'T_ApiaryExpansion': { target: 'apiaryExpansion', isTalent: true },
+        'T_HusbandryKnowledge': { target: 'husbandryKnowledge', isTalent: true },
+        'T_PigSty': { target: 'pigSty', isTalent: true },
+        'T_AnimalMastery': { target: 'animalMastery', isTalent: true },
+        'T_KeenLearner': { target: 'keenLearner', isTalent: true },
+        'T_FarmHand': { target: 'farmHand', isTalent: true },
+        'T_Stockman': { target: 'stockman', isTalent: true },
+        'T_Artisan': { target: 'artisan', isTalent: true },
+        'T_SeasonedWorker': { target: 'seasonedWorker', isTalent: true },
+        'T_BonusPoint1': { target: 'bonusPoint1', isTalent: true },
+        'T_Prodigy': { target: 'prodigy', isTalent: true },
+        'T_BonusPoint2': { target: 'bonusPoint2', isTalent: true },
         'Milk_Uncollected': { target: 'milk', isUncollected: true },
         'Eggs_Uncollected': { target: 'eggs', isUncollected: true },
         'Wool_Uncollected': { target: 'wool', isUncollected: true },
@@ -488,6 +589,7 @@
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
+            else if (mapping.isTalent) gameState.talents[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             i += 3; matched = true;
           }
@@ -625,10 +727,17 @@
       triggerTask(`Harvest_Plot_${plotId}`);
       triggerTask(`Plot_${plotId}_Trigger`, 'SetActiveToNotActive');
       triggerTask(`Add_Crop_${cropName}_1`);
-      triggerTask(`Add_XP_${harvestXP}`);
+      const boostedHarvestXP = getHarvestXP(crop);
+      awardXP(boostedHarvestXP);
 
-      // No local inventory/XP updates - Portals handles all state via Sync_Inventory
-      notify(`+1 ${cropName}! +${harvestXP} XP`, 'success');
+      // Bonus crops from Bountiful Harvest talent
+      const bonusCrops = getHarvestBonusCrops();
+      for (let b = 0; b < bonusCrops; b++) {
+        setTimeout(function() { triggerTask(`Add_Crop_${cropName}_1`); }, (b + 1) * 350);
+      }
+
+      const totalCrops = 1 + bonusCrops;
+      notify(`+${totalCrops} ${cropName}! +${boostedHarvestXP} XP`, 'success');
 
       plot.state = 'empty';
       plot.cropType = null;
@@ -684,14 +793,15 @@
 
       triggerTask(`Plant_Plot_${plotId}`);
       triggerTask(`Sub_Seeds_${crop.name}_1`);
-      triggerTask(`Add_XP_${crop.plantXP}`);
+      const plantXP = getPlantingXP(crop);
+      awardXP(plantXP);
 
       plot.state = 'growing';
       plot.cropType = cropType;
       plot.plantedAt = Date.now();
-      plot.readyAt = Date.now() + (crop.growTime * 1000);
+      plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
 
-      notify(`Planted ${crop.name}! +${crop.plantXP} XP`, 'success');
+      notify(`Planted ${crop.name}! +${plantXP} XP`, 'success');
       saveGameQuiet();
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
@@ -711,7 +821,8 @@
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return; }
 
       // Find empty plots and plant up to availableSeeds
-      const emptyPlots = gameState.plots.map((p, i) => ({ plot: p, idx: i })).filter(x => x.plot.state === 'empty');
+      const activePlots = getActivePlotCount();
+      const emptyPlots = gameState.plots.map((p, i) => ({ plot: p, idx: i })).filter(x => x.plot.state === 'empty' && x.idx < activePlots);
       const toPlant = Math.min(emptyPlots.length, availableSeeds);
 
       if (toPlant < 1) { notify('No empty plots!', 'error'); return; }
@@ -722,12 +833,12 @@
         const { plot, idx } = emptyPlots[i];
         triggerTask(`Plant_Plot_${idx + 1}`);
         triggerTask(`Sub_Seeds_${crop.name}_1`);
-        triggerTask(`Add_XP_${crop.plantXP}`);
+        awardXP(getPlantingXP(crop));
 
         plot.state = 'growing';
         plot.cropType = c;
         plot.plantedAt = Date.now();
-        plot.readyAt = Date.now() + (crop.growTime * 1000);
+        plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
         planted++;
       }
 
@@ -766,16 +877,17 @@
 
       if (animal.state !== 'idle') { notify(`${config.name} ${id} is busy!`, 'error'); return; }
 
-      // Add XP for starting animal
-      triggerTask(`Add_XP_${config.startXP}`);
+      // Add XP for starting animal (talent-boosted)
+      const animalXP = getAnimalStartXP(config);
+      awardXP(animalXP);
 
+      const cooldown = getAnimalCooldown(config);
       animal.state = 'producing';
-      animal.readyAt = Date.now() + (config.cooldown * 1000);
+      animal.readyAt = Date.now() + (cooldown * 1000);
       animal.notified = false;
-      console.log('[Hughberry] startAnimalActivity:', animalType, id, 'readyAt:', animal.readyAt, 'cooldown:', config.cooldown, 'seconds');
+      console.log('[Hughberry] startAnimalActivity:', animalType, id, 'readyAt:', animal.readyAt, 'cooldown:', cooldown, 'seconds');
 
-      // No local XP update - Portals handles all state via Sync_Inventory
-      notify(`Started ${config.name} ${id}! +${config.startXP} XP`, 'success');
+      notify(`Started ${config.name} ${id}! +${animalXP} XP`, 'success');
       saveGameQuiet();
       renderAnimals();
     }
@@ -891,7 +1003,8 @@
         notify(`No ${station.productName.toLowerCase()} ready to collect!`, 'error');
         return;
       }
-      const readyAnimals = animals.filter(a => a.state === 'ready');
+      const activeSlots = getActiveAnimalSlots(station.animalType);
+      const readyAnimals = animals.filter((a, i) => i < activeSlots && a.state === 'ready');
       const readyCount = readyAnimals.length;
       console.log('[Hughberry] Ready count:', readyCount, 'states:', animals.map(a => a.state));
 
@@ -912,21 +1025,31 @@
       readyTaskTriggered[station.animalType] = false;
       console.log('[Hughberry] Sent', station.collectTask, '(hiding collection object)');
 
-      // Send staggered Add_{Product}_1 and Add_XP tasks to Portals
+      // Send staggered Add_{Product}_1 tasks to Portals
       // Each task self-resets, so we stagger 350ms to give Portals time to process each one
       const addDelay = 350;
-      const xpGained = readyCount * station.xpPerUnit;
-      for (let i = 0; i < readyCount; i++) {
+      const xpPerUnit = getAnimalCollectXP(station);
+      const bonusPerAnimal = getCollectionBonusProducts();
+      const totalProducts = readyCount + (readyCount * bonusPerAnimal);
+      const xpGained = readyCount * xpPerUnit;
+
+      // Stagger product tasks: base products + bonus products
+      for (let i = 0; i < totalProducts; i++) {
         pendingAnimalTasks[station.animalType]++;
-        setTimeout(() => {
-          triggerTask(station.addTask);
-          triggerTask(`Add_XP_${station.xpPerUnit}`);
-          console.log('[Hughberry] Sent', station.addTask, 'and Add_XP_' + station.xpPerUnit, '(' + (i + 1) + '/' + readyCount + ')');
-          pendingAnimalTasks[station.animalType]--;
-        }, i * addDelay);
+        (function(idx) {
+          setTimeout(function() {
+            triggerTask(station.addTask);
+            console.log('[Hughberry] Sent', station.addTask, '(' + (idx + 1) + '/' + totalProducts + ')');
+            pendingAnimalTasks[station.animalType]--;
+          }, idx * addDelay);
+        })(i);
       }
 
-      notify(`Collected ${readyCount} ${station.productName}! +${xpGained} XP`, 'success');
+      // Award XP after all product tasks are sent
+      setTimeout(function() { awardXP(xpGained); }, totalProducts * addDelay);
+
+      const bonusText = bonusPerAnimal > 0 ? ` (+${readyCount * bonusPerAnimal} bonus)` : '';
+      notify(`Collected ${totalProducts} ${station.productName}${bonusText}! +${xpGained} XP`, 'success');
       saveGameQuiet();
       renderAnimals();
       renderInventory();
@@ -1074,15 +1197,21 @@
       const unlockedCrops = Object.entries(CONFIG.crops).filter(([k, v]) => gameState.level >= v.unlockLevel);
       let html = `<div class="crops-header"><div class="section-title">&#x1F33E; Crop Management</div><div class="crops-controls"><div class="control-group"><span class="control-label">Auto-Replant</span><div class="toggle-switch ${gameState.settings.autoReplant ? 'on' : ''}" onclick="toggleAutoReplant()"></div></div><div class="control-group"><span class="control-label">Priority</span><select id="priority-select" onchange="setPriority(this.value)">${unlockedCrops.map(([k, v]) => `<option value="${k}" ${gameState.settings.priorityCrop === k ? 'selected' : ''}>${v.name}</option>`).join('')}</select></div><button class="action-btn" onclick="plantAllEmpty()">&#x1F331; Plant All</button></div></div><div class="crops-grid">`;
 
+      const activePlotCount = getActivePlotCount();
       gameState.plots.forEach((plot, i) => {
         const num = i + 1;
-        if (plot.state === 'empty') {
+        if (i >= activePlotCount) {
+          // Locked plot - show greyed out
+          const nextTalent = i < 12 ? 'Plot Row 2' : i < 18 ? 'Plot Row 3' : 'Plot Row 4';
+          html += `<div class="plot-card locked"><span class="plot-number">#${num}</span><div class="plot-icon" style="opacity:0.3">&#x1F532;</div><div class="plot-name" style="color:#666">Locked</div><div class="plot-hint" style="color:#888;font-size:10px">Talent: ${nextTalent}</div></div>`;
+        } else if (plot.state === 'empty') {
           html += `<div class="plot-card empty"><span class="plot-number">#${num}</span><div class="plot-icon">&#x1F532;</div><div class="plot-name">Empty</div><select class="plot-select" id="sel-${num}">${unlockedCrops.map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select><button class="plot-btn" onclick="plantFromSelect(${num})">Plant</button></div>`;
         } else if (plot.state === 'growing') {
           const c = CONFIG.crops[plot.cropType];
+          const growTime = getCropGrowTime(c);
           const remaining = Math.max(0, (plot.readyAt - Date.now()) / 1000);
-          const progress = ((c.growTime - remaining) / c.growTime) * 100;
-          html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(remaining)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${progress}%"></div></div></div>`;
+          const progress = ((growTime - remaining) / growTime) * 100;
+          html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(remaining)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${Math.min(100, progress)}%"></div></div></div>`;
         } else {
           const c = CONFIG.crops[plot.cropType];
           html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`;
@@ -1254,8 +1383,20 @@
 
       animalTypes.forEach(({ type, array, config, title }) => {
         const unlocked = gameState.level >= config.unlockLevel;
-        html += `<div class="animals-section"><div class="section-title">${config.icon} ${title} ${!unlocked ? `(Lv.${config.unlockLevel})` : ''}</div><div class="animals-grid">`;
-        html += array.map((a, i) => renderAnimalCard(a, i, type, config)).join('');
+        const activeSlots = getActiveAnimalSlots(type);
+        html += `<div class="animals-section"><div class="section-title">${config.icon} ${title} ${!unlocked ? `(Lv.${config.unlockLevel})` : ''} <span style="font-size:11px;color:#888">(${activeSlots}/${config.count} slots)</span></div><div class="animals-grid">`;
+        array.forEach((a, i) => {
+          if (i < activeSlots) {
+            html += renderAnimalCard(a, i, type, config);
+          } else {
+            html += `<div class="animal-card locked">
+              <div class="animal-icon" style="opacity:0.3">${config.icon}</div>
+              <div class="animal-name">${config.name} ${i + 1}</div>
+              <div class="locked-text" style="color:#888;font-size:10px">Talent Locked</div>
+              <button class="animal-btn" disabled>Locked</button>
+            </div>`;
+          }
+        });
         html += `</div></div>`;
       });
 
@@ -1414,8 +1555,10 @@
     function gameLoop() {
       let needsRender = false;
 
-      // Check crops
+      // Check crops (only active plots)
+      const loopActivePlots = getActivePlotCount();
       gameState.plots.forEach((p, i) => {
+        if (i >= loopActivePlots) return;
         if (p.state === 'growing' && Date.now() >= p.readyAt) {
           p.state = 'ready';
           triggerTask(`Ready_Plot_${i + 1}`);
@@ -1437,7 +1580,9 @@
       let readyQueue = []; // Queue of animals that just became ready
 
       animalChecks.forEach(({ type, array, name }) => {
+        const activeSlots = getActiveAnimalSlots(type);
         array.forEach((animal, i) => {
+          if (i >= activeSlots) return;
           if (animal.state === 'producing' && animal.readyAt) {
             const timeLeft = animal.readyAt - Date.now();
             if (timeLeft <= 0) {

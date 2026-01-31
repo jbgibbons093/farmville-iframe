@@ -89,7 +89,7 @@
       honey: '&#x1F36F;'
     };
 
-    let gameState = { inventory: {}, recipes: {} };
+    let gameState = { inventory: {}, recipes: {}, talents: { keenLearner: 0, artisan: 0, seasonedWorker: 0, prodigy: 0 } };
     let actionPending = false;
 
     function triggerTask(taskName) {
@@ -111,6 +111,31 @@
       } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
         PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Close_Iframe', TaskTargetState: 'SetNotActiveToActive' }));
       }
+    }
+
+    // --- Talent Helper Functions ---
+    function awardXP(amount) {
+      if (amount <= 0) return;
+      const denominations = [40, 35, 30, 25, 20, 15, 10, 8, 6, 5, 4, 3, 2, 1];
+      let remaining = amount;
+      let tasks = [];
+      while (remaining > 0) {
+        for (const d of denominations) {
+          if (d <= remaining) {
+            tasks.push('Add_XP_' + d);
+            remaining -= d;
+            break;
+          }
+        }
+      }
+      tasks.forEach(function(task, i) {
+        setTimeout(function() { triggerTask(task); }, i * 350);
+      });
+    }
+
+    function getCraftingXP(recipe) {
+      const t = gameState.talents;
+      return recipe.xp + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3;
     }
 
     function notify(msg) {
@@ -152,14 +177,14 @@
       console.log('[Hughberry Crafting] Triggering:', recipe.taskName);
       triggerTask(recipe.taskName);
 
-      // Trigger XP task after short delay to avoid message collision
-      const xpAmount = recipe.xp;
+      // Award talent-boosted XP after short delay to avoid message collision
+      const craftXP = getCraftingXP(recipe);
       setTimeout(function() {
-        console.log('[Hughberry Crafting] Triggering: Add_XP_' + xpAmount);
-        triggerTask('Add_XP_' + xpAmount);
+        console.log('[Hughberry Crafting] Awarding XP:', craftXP);
+        awardXP(craftXP);
       }, 250);
 
-      notify('Crafted ' + recipe.name + '! +' + recipe.xp + ' XP');
+      notify('Crafted ' + recipe.name + '! +' + craftXP + ' XP');
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
       setTimeout(function() { actionPending = false; render(); }, 3000);
@@ -192,7 +217,7 @@
           '<div class="recipe-header">' +
             '<span class="recipe-name"><span class="recipe-icon">' + recipe.icon + '</span>' + recipe.name + '</span>' +
             '<div class="recipe-value">' +
-              '<div class="recipe-xp">+' + recipe.xp + ' XP</div>' +
+              '<div class="recipe-xp">+' + getCraftingXP(recipe) + ' XP</div>' +
             '</div>' +
           '</div>' +
           (!hasRecipe ? '<div class="recipe-locked-notice">Buy this recipe from the Blueprint Store</div>' : '') +
@@ -229,7 +254,9 @@
       'RecipeRagout': 'has_recipe_ragout', 'RecipePie': 'has_recipe_pie',
       'RecipeMeatPie': 'has_recipe_meat_pie', 'RecipeBlanket': 'has_recipe_blanket',
       'RecipeButter': 'has_recipe_butter', 'RecipeCake': 'has_recipe_cake',
-      'RecipeMead': 'has_recipe_mead'
+      'RecipeMead': 'has_recipe_mead',
+      'T_KeenLearner': 't_keenlearner', 'T_Artisan': 't_artisan',
+      'T_SeasonedWorker': 't_seasonedworker', 'T_Prodigy': 't_prodigy'
     };
 
     function parseSyncMessage(msg) {
@@ -297,6 +324,11 @@
         gameState.recipes.recipe_butter = (data.has_recipe_butter || 0) > 0;
         gameState.recipes.recipe_cake = (data.has_recipe_cake || 0) > 0;
         gameState.recipes.recipe_mead = (data.has_recipe_mead || 0) > 0;
+        // Talents
+        gameState.talents.keenLearner = data.t_keenlearner || 0;
+        gameState.talents.artisan = data.t_artisan || 0;
+        gameState.talents.seasonedWorker = data.t_seasonedworker || 0;
+        gameState.talents.prodigy = data.t_prodigy || 0;
         actionPending = false;
         render();
       }
