@@ -878,8 +878,14 @@
         animal.notified = false;
       });
 
+      // Send Collect_{Product} immediately to hide collection object in 3D world
+      triggerTask(station.collectTask);
+      readyTaskTriggered[station.animalType] = false;
+      console.log('[Hughberry] Sent', station.collectTask, '(hiding collection object)');
+
       // Send staggered Add_{Product}_1 and Add_XP tasks to Portals
-      // Each task self-resets, so we stagger to give Portals time to process each one
+      // Each task self-resets, so we stagger 350ms to give Portals time to process each one
+      const addDelay = 350;
       const xpGained = readyCount * station.xpPerUnit;
       for (let i = 0; i < readyCount; i++) {
         pendingAnimalTasks[station.animalType]++;
@@ -888,15 +894,8 @@
           triggerTask(`Add_XP_${station.xpPerUnit}`);
           console.log('[Hughberry] Sent', station.addTask, 'and Add_XP_' + station.xpPerUnit, '(' + (i + 1) + '/' + readyCount + ')');
           pendingAnimalTasks[station.animalType]--;
-        }, i * 250);
+        }, i * addDelay);
       }
-
-      // After all Add tasks, send Collect_{Product} to move collection object out of map
-      setTimeout(() => {
-        triggerTask(station.collectTask);
-        readyTaskTriggered[station.animalType] = false;
-        console.log('[Hughberry] Sent', station.collectTask, '(hiding collection object)');
-      }, readyCount * 250);
 
       notify(`Collected ${readyCount} ${station.productName}! +${xpGained} XP`, 'success');
       saveGameQuiet();
