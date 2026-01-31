@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hughberry Farms - Talents</title>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 10px;
+}
+
+.talent-container {
+  width: 100%;
+  max-width: 700px;
+  max-height: 92vh;
+  background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
+  border: 4px solid #8B4513;
+  border-radius: 20px;
+  box-shadow: 0 0 0 2px #5a3a1a, 0 20px 60px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #fff;
+}
+
+/* ── Header ── */
+.talent-header {
+  background: linear-gradient(180deg, #6B3FA0 0%, #4e2d78 100%);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #7c4dba;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon { font-size: 24px; }
+
+.header-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 22px;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+}
+
+.points-badge {
+  background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #FFD700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  white-space: nowrap;
+}
+
+.close-btn {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.2);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.close-btn:hover {
+  background: rgba(192, 57, 43, 0.8);
+  border-color: #e74c3c;
+}
+
+/* ── Tree Tabs ── */
+.tree-tabs {
+  display: flex;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 2px solid #5a3a1a;
+  flex-shrink: 0;
+}
+
+.tree-tab {
+  flex: 1;
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: #aaa;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'Nunito', sans-serif;
+}
+.tree-tab:hover { color: #ddd; background: rgba(255,255,255,0.05); }
+.tree-tab.active {
+  color: #FFD700;
+  border-bottom-color: #FFD700;
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.tree-tab .tab-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+.tree-tab .tab-label { display: block; }
+.tree-tab .tab-points {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-top: 1px;
+}
+.tree-tab.active .tab-points { color: #c9a84c; }
+
+/* ── Tree Content ── */
+.tree-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px 16px;
+}
+
+.tree-content::-webkit-scrollbar { width: 8px; }
+.tree-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+.tree-content::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 4px; }
+.tree-content::-webkit-scrollbar-thumb:hover { background: #8B4513; }
+
+/* ── Tier Section ── */
+.tier-section {
+  margin-bottom: 16px;
+}
+
+.tier-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border-left: 3px solid #5a3a1a;
+}
+
+.tier-label {
+  font-weight: 800;
+  font-size: 13px;
+  color: #c9a84c;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tier-requirement {
+  font-size: 11px;
+  color: #888;
+  font-weight: 600;
+}
+.tier-requirement.locked { color: #e74c3c; }
+.tier-requirement.unlocked { color: #27ae60; }
+
+.tier-section.locked .tier-header {
+  border-left-color: #555;
+  opacity: 0.6;
+}
+
+/* ── Talent Grid ── */
+.talent-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Talent Card ── */
+.talent-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(90, 69, 48, 0.5);
+  border-radius: 12px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.talent-card.available {
+  border-color: #27ae60;
+  background: rgba(39, 174, 96, 0.06);
+}
+
+.talent-card.maxed {
+  border-color: #FFD700;
+  background: rgba(255, 215, 0, 0.06);
+}
+
+.talent-card.locked {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+}
+
+.talent-icon {
+  font-size: 28px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.talent-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.talent-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.talent-card.maxed .talent-name { color: #FFD700; }
+
+.talent-desc {
+  font-size: 11px;
+  color: #aaa;
+  line-height: 1.3;
+}
+.talent-card.available .talent-desc { color: #bbb; }
+
+/* ── Rank Pips ── */
+.talent-ranks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rank-pips {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.rank-pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #5a3a1a;
+  background: transparent;
+  transition: all 0.2s;
+}
+.rank-pip.filled {
+  background: #27ae60;
+  border-color: #2ecc71;
+  box-shadow: 0 0 4px rgba(46, 204, 113, 0.4);
+}
+.talent-card.maxed .rank-pip.filled {
+  background: #FFD700;
+  border-color: #FFD700;
+  box-shadow: 0 0 4px rgba(255, 215, 0, 0.4);
+}
+
+.rank-label {
+  font-size: 11px;
+  color: #888;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Invest Button ── */
+.invest-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #196f3d;
+  background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  box-shadow: 0 2px 0 #145a32;
+  line-height: 1;
+}
+.invest-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #145a32;
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+}
+.invest-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 #145a32;
+}
+.invest-btn:disabled {
+  background: rgba(255,255,255,0.08);
+  border-color: #444;
+  color: #555;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.lock-icon {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+/* ── Tree Summary ── */
+.tree-summary {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 215, 0, 0.06);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #c9a84c;
+  font-weight: 700;
+}
+
+.summary-value {
+  font-size: 13px;
+  color: #FFD700;
+  font-weight: 800;
+}
+
+/* ── Notifications ── */
+#notifications {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.notification {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  animation: notifIn 0.3s ease, notifOut 0.3s ease 2.7s forwards;
+  text-align: center;
+  white-space: nowrap;
+}
+.notification.success {
+  background: linear-gradient(145deg, #27ae60, #1e8449);
+  border: 2px solid #2ecc71;
+  color: #fff;
+}
+.notification.error {
+  background: linear-gradient(145deg, #c0392b, #96281b);
+  border: 2px solid #e74c3c;
+  color: #fff;
+}
+.notification.info {
+  background: linear-gradient(145deg, #2980b9, #1a5276);
+  border: 2px solid #3498db;
+  color: #fff;
+}
+
+@keyframes notifIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes notifOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 500px) {
+  .talent-container { max-height: 95vh; border-radius: 14px; }
+  .talent-header { padding: 10px 14px; }
+  .header-title { font-size: 18px; }
+  .tree-content { padding: 10px 12px 14px; }
+  .talent-card { padding: 8px 10px; gap: 8px; }
+  .talent-icon { font-size: 22px; width: 32px; height: 32px; }
+  .talent-name { font-size: 13px; }
+  .talent-desc { font-size: 10px; }
+  .invest-btn, .lock-icon { width: 30px; height: 30px; font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="talent-container">
+  <div class="talent-header">
+    <div class="header-left">
+      <span class="header-icon">&#127793;</span>
+      <span class="header-title">Talents</span>
+    </div>
+    <div class="points-badge" id="pointsBadge">0 Points</div>
+    <button class="close-btn" onclick="closeIframe()" title="Close">&#10005;</button>
+  </div>
+
+  <div class="tree-tabs">
+    <button class="tree-tab active" data-tree="farming" onclick="switchTree('farming')">
+      <span class="tab-icon">&#127807;</span>
+      <span class="tab-label">Farming</span>
+      <span class="tab-points" id="tabPointsFarming">0 / 17</span>
+    </button>
+    <button class="tree-tab" data-tree="animal" onclick="switchTree('animal')">
+      <span class="tab-icon">&#128004;</span>
+      <span class="tab-label">Animals</span>
+      <span class="tab-points" id="tabPointsAnimal">0 / 35</span>
+    </button>
+    <button class="tree-tab" data-tree="economy" onclick="switchTree('economy')">
+      <span class="tab-icon">&#128218;</span>
+      <span class="tab-label">Economy</span>
+      <span class="tab-points" id="tabPointsEconomy">0 / 20</span>
+    </button>
+  </div>
+
+  <div class="tree-content" id="treeContent"></div>
+</div>
+
+<div id="notifications"></div>
+
+<script src="https://connect.portals.com/sdk/portals-sdk.js"></script>
+<script>
+// ── Talent Definitions ──
+var TALENT_TREES = {
+  farming: {
+    name: 'Farming',
+    maxPoints: 17,
+    tiers: [
+      {
+        tier: 1, gate: 0,
+        talents: [
+          { key: 'PlotRow2', name: 'Plot Row 2', icon: '\u{1F331}', maxRank: 1,
+            desc: 'Unlock plots 7-12 (12 total)' },
+          { key: 'GreenThumb', name: 'Green Thumb', icon: '\u{1F33F}', maxRank: 3,
+            desc: '-10% crop grow time per rank' },
+          { key: 'EagerPlanter', name: 'Eager Planter', icon: '\u2728', maxRank: 3,
+            desc: '+2 planting XP per rank' }
+        ]
+      },
+      {
+        tier: 2, gate: 5,
+        talents: [
+          { key: 'PlotRow3', name: 'Plot Row 3', icon: '\u{1F331}', maxRank: 1,
+            desc: 'Unlock plots 13-18 (18 total)' },
+          { key: 'BountifulHarvest', name: 'Bountiful Harvest', icon: '\u{1F33E}', maxRank: 2,
+            desc: '+1 bonus crop per harvest per rank' },
+          { key: 'RapidGrowth', name: 'Rapid Growth', icon: '\u26A1', maxRank: 3,
+            desc: '-10% crop grow time per rank' }
+        ]
+      },
+      {
+        tier: 3, gate: 10,
+        talents: [
+          { key: 'PlotRow4', name: 'Plot Row 4', icon: '\u{1F331}', maxRank: 1,
+            desc: 'Unlock plots 19-24 (all 24)' },
+          { key: 'CropMastery', name: 'Crop Mastery', icon: '\u{1F3C6}', maxRank: 3,
+            desc: '+3 XP to all crop activities per rank' }
+        ]
+      }
+    ]
+  },
+  animal: {
+    name: 'Animal Husbandry',
+    maxPoints: 35,
+    tiers: [
+      {
+        tier: 1, gate: 0,
+        talents: [
+          { key: 'CowHerd', name: 'Cow Herd', icon: '\u{1F404}', maxRank: 5,
+            desc: '+1 active cow per rank (1\u21926)' },
+          { key: 'ChickenFlock', name: 'Chicken Flock', icon: '\u{1F414}', maxRank: 4,
+            desc: '+1 active chicken per rank (1\u21925)' },
+          { key: 'QuickHands', name: 'Quick Hands', icon: '\u{1F590}', maxRank: 3,
+            desc: '-10% animal cooldown per rank' }
+        ]
+      },
+      {
+        tier: 2, gate: 5,
+        talents: [
+          { key: 'SheepPen', name: 'Sheep Pen', icon: '\u{1F411}', maxRank: 4,
+            desc: '+1 active sheep per rank (1\u21925)' },
+          { key: 'GoatYard', name: 'Goat Yard', icon: '\u{1F410}', maxRank: 4,
+            desc: '+1 active goat per rank (1\u21925)' },
+          { key: 'ApiaryExpansion', name: 'Apiary Expansion', icon: '\u{1F41D}', maxRank: 5,
+            desc: '+1 active beehive per rank (1\u21926)' },
+          { key: 'HusbandryKnowledge', name: 'Husbandry Knowledge', icon: '\u{1F4DA}', maxRank: 3,
+            desc: '+2 XP per animal collection per rank' }
+        ]
+      },
+      {
+        tier: 3, gate: 10,
+        talents: [
+          { key: 'PigSty', name: 'Pig Sty', icon: '\u{1F437}', maxRank: 5,
+            desc: '+1 active pig per rank (1\u21926)' },
+          { key: 'AnimalMastery', name: 'Animal Mastery', icon: '\u{1F3C6}', maxRank: 2,
+            desc: '+1 bonus product per collection per rank' }
+        ]
+      }
+    ]
+  },
+  economy: {
+    name: 'Economy',
+    maxPoints: 20,
+    tiers: [
+      {
+        tier: 1, gate: 0,
+        talents: [
+          { key: 'KeenLearner', name: 'Keen Learner', icon: '\u{1F4D6}', maxRank: 3,
+            desc: '+1 XP to all activities per rank' },
+          { key: 'FarmHand', name: 'Farm Hand', icon: '\u{1F9D1}\u200D\u{1F33E}', maxRank: 3,
+            desc: '+2 XP to planting & harvesting per rank' },
+          { key: 'Stockman', name: 'Stockman', icon: '\u{1F920}', maxRank: 3,
+            desc: '+2 XP to animal starts & collections per rank' }
+        ]
+      },
+      {
+        tier: 2, gate: 5,
+        talents: [
+          { key: 'Artisan', name: 'Artisan', icon: '\u{1F528}', maxRank: 3,
+            desc: '+3 XP to all crafting per rank' },
+          { key: 'SeasonedWorker', name: 'Seasoned Worker', icon: '\u{1F4AA}', maxRank: 3,
+            desc: '+2 XP to all activities per rank' },
+          { key: 'BonusPoint1', name: 'Bonus Talent Point I', icon: '\u{1F381}', maxRank: 1,
+            desc: 'Gain 1 extra talent point immediately' }
+        ]
+      },
+      {
+        tier: 3, gate: 10,
+        talents: [
+          { key: 'Prodigy', name: 'Prodigy', icon: '\u{1F31F}', maxRank: 3,
+            desc: '+3 XP to all activities per rank' },
+          { key: 'BonusPoint2', name: 'Bonus Talent Point II', icon: '\u{1F381}', maxRank: 1,
+            desc: 'Gain 1 extra talent point immediately' }
+        ]
+      }
+    ]
+  }
+};
+
+// ── Game State ──
+var talentState = {};
+var playerLevel = 0;
+var unspentTalentPoints = 0;
+var activeTree = 'farming';
+var actionPending = false;
+
+// Initialize all talent ranks to 0
+(function() {
+  var trees = ['farming', 'animal', 'economy'];
+  for (var t = 0; t < trees.length; t++) {
+    var tiers = TALENT_TREES[trees[t]].tiers;
+    for (var i = 0; i < tiers.length; i++) {
+      for (var j = 0; j < tiers[i].talents.length; j++) {
+        talentState[tiers[i].talents[j].key] = 0;
+      }
+    }
+  }
+})();
+
+// ── Talent Calculations ──
+function getTotalInvested() {
+  var total = 0;
+  var keys = Object.keys(talentState);
+  for (var i = 0; i < keys.length; i++) {
+    total += talentState[keys[i]];
+  }
+  return total;
+}
+
+function getBonusPoints() {
+  return (talentState.BonusPoint1 || 0) + (talentState.BonusPoint2 || 0);
+}
+
+function getUnspentPoints() {
+  return unspentTalentPoints;
+}
+
+function getPointsInTree(treeName) {
+  var total = 0;
+  var tiers = TALENT_TREES[treeName].tiers;
+  for (var i = 0; i < tiers.length; i++) {
+    for (var j = 0; j < tiers[i].talents.length; j++) {
+      total += talentState[tiers[i].talents[j].key] || 0;
+    }
+  }
+  return total;
+}
+
+function isTierUnlocked(treeName, gate) {
+  if (gate === 0) return true;
+  return getPointsInTree(treeName) >= gate;
+}
+
+function canInvest(treeName, talent, tierGate) {
+  if (actionPending) return false;
+  if (getUnspentPoints() <= 0) return false;
+  if (!isTierUnlocked(treeName, tierGate)) return false;
+  var current = talentState[talent.key] || 0;
+  if (current >= talent.maxRank) return false;
+  return true;
+}
+
+// ── Invest Point ──
+function investPoint(treeName, talentKey) {
+  // Find the talent definition
+  var talent = null;
+  var tierGate = 0;
+  var tiers = TALENT_TREES[treeName].tiers;
+  for (var i = 0; i < tiers.length; i++) {
+    for (var j = 0; j < tiers[i].talents.length; j++) {
+      if (tiers[i].talents[j].key === talentKey) {
+        talent = tiers[i].talents[j];
+        tierGate = tiers[i].gate;
+        break;
+      }
+    }
+    if (talent) break;
+  }
+
+  if (!talent) return;
+  if (!canInvest(treeName, talent, tierGate)) {
+    if (getUnspentPoints() <= 0) notify('No talent points available', 'error');
+    else if (!isTierUnlocked(treeName, tierGate)) notify('Tier locked - need more points in this tree', 'error');
+    return;
+  }
+
+  actionPending = true;
+  triggerTask('Invest_' + talentKey);
+
+  // Optimistic update for responsive UI
+  talentState[talentKey] = (talentState[talentKey] || 0) + 1;
+  // BonusPoint talents give a point back (net zero), all others cost 1
+  if (talentKey !== 'BonusPoint1' && talentKey !== 'BonusPoint2') {
+    unspentTalentPoints = Math.max(0, unspentTalentPoints - 1);
+  }
+  notify(talent.name + ' ' + talentState[talentKey] + '/' + talent.maxRank, 'success');
+  renderAll();
+
+  // Release pending after sync window
+  setTimeout(function() { actionPending = false; }, 1500);
+}
+
+// ── Portals SDK ──
+function triggerTask(taskName, targetState) {
+  targetState = targetState || 'SetNotActiveToActive';
+  console.log('[Talents] triggerTask:', taskName);
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+    PortalsSdk.sendMessageToUnity(JSON.stringify({
+      TaskName: taskName,
+      TaskTargetState: targetState
+    }));
+  }
+}
+
+function closeIframe() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+    PortalsSdk.closeIframe();
+  } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+    PortalsSdk.sendMessageToUnity(JSON.stringify({
+      TaskName: 'Close_Iframe',
+      TaskTargetState: 'SetNotActiveToActive'
+    }));
+  }
+}
+
+// ── Message Handling ──
+var lastMessageId = '';
+var lastMessageTime = 0;
+
+function processMessage(msg, source) {
+  var now = Date.now();
+  var msgId = msg + '_' + Math.floor(now / 100);
+  if (msgId === lastMessageId && now - lastMessageTime < 200) {
+    return;
+  }
+  lastMessageId = msgId;
+  lastMessageTime = now;
+  handlePortalsMessage(msg);
+}
+
+function handlePortalsMessage(msg) {
+  if (typeof msg !== 'string') return;
+  if (msg.indexOf('Sync_Inventory') === 0) {
+    parseAndSyncInventory(msg);
+    renderAll();
+  }
+}
+
+function parseAndSyncInventory(msg) {
+  var parts = msg.split('_');
+  var i = 0;
+
+  // Two-word talent variable keys we care about
+  var twoWordKeys = {
+    'T_PlotRow2': 'PlotRow2',
+    'T_GreenThumb': 'GreenThumb',
+    'T_EagerPlanter': 'EagerPlanter',
+    'T_PlotRow3': 'PlotRow3',
+    'T_BountifulHarvest': 'BountifulHarvest',
+    'T_RapidGrowth': 'RapidGrowth',
+    'T_PlotRow4': 'PlotRow4',
+    'T_CropMastery': 'CropMastery',
+    'T_CowHerd': 'CowHerd',
+    'T_ChickenFlock': 'ChickenFlock',
+    'T_QuickHands': 'QuickHands',
+    'T_SheepPen': 'SheepPen',
+    'T_GoatYard': 'GoatYard',
+    'T_ApiaryExpansion': 'ApiaryExpansion',
+    'T_HusbandryKnowledge': 'HusbandryKnowledge',
+    'T_PigSty': 'PigSty',
+    'T_AnimalMastery': 'AnimalMastery',
+    'T_KeenLearner': 'KeenLearner',
+    'T_FarmHand': 'FarmHand',
+    'T_Stockman': 'Stockman',
+    'T_Artisan': 'Artisan',
+    'T_SeasonedWorker': 'SeasonedWorker',
+    'T_BonusPoint1': 'BonusPoint1',
+    'T_Prodigy': 'Prodigy',
+    'T_BonusPoint2': 'BonusPoint2'
+  };
+
+  while (i < parts.length) {
+    // Try three-word key (Unspent + Talent + Points + value)
+    if (i + 3 < parts.length) {
+      var threeWord = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2];
+      if (threeWord === 'Unspent_Talent_Points') {
+        unspentTalentPoints = parseInt(parts[i + 3]) || 0;
+        i += 4;
+        continue;
+      }
+    }
+    // Try two-word key (e.g. T + PlotRow2 + value)
+    if (i + 2 < parts.length) {
+      var twoWord = parts[i] + '_' + parts[i + 1];
+      if (twoWordKeys[twoWord] !== undefined) {
+        var val = parseInt(parts[i + 2]) || 0;
+        talentState[twoWordKeys[twoWord]] = val;
+        i += 3;
+        continue;
+      }
+    }
+    // One-word key
+    if (parts[i] === 'Level' && i + 1 < parts.length) {
+      playerLevel = parseInt(parts[i + 1]) || 0;
+      i += 2;
+      continue;
+    }
+    i++;
+  }
+}
+
+function setupMessageListener() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+    PortalsSdk.setMessageListener(function(msg) {
+      processMessage(msg, 'SDK');
+    });
+    console.log('[Talents] SDK listener registered');
+  } else {
+    console.log('[Talents] Waiting for SDK...');
+    setTimeout(setupMessageListener, 100);
+  }
+}
+
+window.addEventListener('message', function(event) {
+  if (event.data && typeof event.data === 'string') {
+    processMessage(event.data, 'postMessage-string');
+  }
+  else if (event.data && event.data.portalsMessage) {
+    processMessage(event.data.portalsMessage, 'postMessage-portals');
+  }
+  else if (event.data && event.data.message && typeof event.data.message === 'string') {
+    processMessage(event.data.message, 'postMessage-message');
+  }
+});
+
+setupMessageListener();
+setTimeout(function() { triggerTask('Sync_Inventory'); }, 500);
+
+// ── UI Rendering ──
+function switchTree(treeName) {
+  activeTree = treeName;
+  var tabs = document.querySelectorAll('.tree-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.toggle('active', tabs[i].getAttribute('data-tree') === treeName);
+  }
+  renderTree();
+}
+
+function renderAll() {
+  // Points badge
+  var pts = getUnspentPoints();
+  document.getElementById('pointsBadge').textContent = pts + (pts === 1 ? ' Point' : ' Points');
+
+  // Tab point counters
+  document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 17';
+  document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 35';
+  document.getElementById('tabPointsEconomy').textContent = getPointsInTree('economy') + ' / 20';
+
+  renderTree();
+}
+
+function renderTree() {
+  var tree = TALENT_TREES[activeTree];
+  var container = document.getElementById('treeContent');
+  var html = '';
+  var treePoints = getPointsInTree(activeTree);
+  var unspent = getUnspentPoints();
+
+  // Tree summary
+  html += '<div class="tree-summary">';
+  html += '<span class="summary-label">' + tree.name + ' Points Invested</span>';
+  html += '<span class="summary-value">' + treePoints + ' / ' + tree.maxPoints + '</span>';
+  html += '</div>';
+
+  for (var ti = 0; ti < tree.tiers.length; ti++) {
+    var tierData = tree.tiers[ti];
+    var tierUnlocked = isTierUnlocked(activeTree, tierData.gate);
+
+    html += '<div class="tier-section' + (tierUnlocked ? '' : ' locked') + '">';
+
+    // Tier header
+    html += '<div class="tier-header">';
+    html += '<span class="tier-label">Tier ' + tierData.tier + '</span>';
+    if (tierData.gate === 0) {
+      html += '<span class="tier-requirement unlocked">Unlocked</span>';
+    } else if (tierUnlocked) {
+      html += '<span class="tier-requirement unlocked">' + treePoints + '/' + tierData.gate + ' points &#10003;</span>';
+    } else {
+      html += '<span class="tier-requirement locked">Requires ' + tierData.gate + ' points (' + treePoints + '/' + tierData.gate + ')</span>';
+    }
+    html += '</div>';
+
+    // Talent cards
+    html += '<div class="talent-grid">';
+    for (var j = 0; j < tierData.talents.length; j++) {
+      var talent = tierData.talents[j];
+      var currentRank = talentState[talent.key] || 0;
+      var isMaxed = currentRank >= talent.maxRank;
+      var isAvailable = !isMaxed && tierUnlocked && unspent > 0 && !actionPending;
+      var isLocked = !tierUnlocked;
+
+      var cardClass = 'talent-card';
+      if (isMaxed) cardClass += ' maxed';
+      else if (isAvailable) cardClass += ' available';
+      else if (isLocked) cardClass += ' locked';
+
+      html += '<div class="' + cardClass + '">';
+      html += '<div class="talent-icon">' + talent.icon + '</div>';
+      html += '<div class="talent-info">';
+      html += '<div class="talent-name">' + talent.name + '</div>';
+      html += '<div class="talent-desc">' + talent.desc + '</div>';
+      html += '</div>';
+
+      // Rank pips + label
+      html += '<div class="talent-ranks">';
+      html += '<div class="rank-pips">';
+      for (var p = 0; p < talent.maxRank; p++) {
+        html += '<div class="rank-pip' + (p < currentRank ? ' filled' : '') + '"></div>';
+      }
+      html += '</div>';
+      html += '<div class="rank-label">' + currentRank + '/' + talent.maxRank + '</div>';
+      html += '</div>';
+
+      // Action button
+      if (isLocked) {
+        html += '<div class="lock-icon">&#128274;</div>';
+      } else if (isMaxed) {
+        html += '<div class="lock-icon">&#10003;</div>';
+      } else {
+        html += '<button class="invest-btn"' +
+          (isAvailable ? ' onclick="investPoint(\'' + activeTree + '\',\'' + talent.key + '\')"' : ' disabled') +
+          '>+</button>';
+      }
+
+      html += '</div>';
+    }
+    html += '</div>'; // talent-grid
+    html += '</div>'; // tier-section
+  }
+
+  container.innerHTML = html;
+}
+
+function notify(msg, type) {
+  type = type || 'success';
+  var notif = document.createElement('div');
+  notif.className = 'notification ' + type;
+  notif.textContent = msg;
+  document.getElementById('notifications').appendChild(notif);
+  setTimeout(function() { notif.remove(); }, 3000);
+}
+
+// Initial render
+renderAll();
+</script>
+</body>
+</html>
