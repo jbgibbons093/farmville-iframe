@@ -752,18 +752,9 @@
     }
 
     function animalBecameReady(animalType, id) {
-      // Trigger the generic ready task for this animal type (e.g., Chicken_Ready, Cow_Ready)
-      // This increments the uncollected count and shows the collection station indicator
-      // Special case: beehive uses Honey_Ready (not Beehive_Ready)
-      let taskName;
-      if (animalType === 'beehive') {
-        taskName = 'Honey_Ready';
-      } else {
-        const capitalType = animalType.charAt(0).toUpperCase() + animalType.slice(1);
-        taskName = `${capitalType}_Ready`;
-      }
-      console.log('[Hughberry] animalBecameReady called:', animalType, id, '-> triggering', taskName);
-      triggerTask(taskName);
+      // Ready triggers are now handled in the gameLoop via readyTaskTriggered flag.
+      // Only triggers {Animal}_Ready once per type (first animal ready) to show collection object.
+      console.log('[Hughberry] animalBecameReady:', animalType, id);
     }
 
     // Collection station configuration
@@ -773,7 +764,9 @@
         animalArray: 'chickens',
         product: 'egg',
         productName: 'Egg',
+        addTask: 'Add_Egg_1',
         collectTask: 'Collect_Eggs',
+        readyTask: 'Chicken_Ready',
         xpPerUnit: 3,
         equipment: 'basket',
         equipmentName: 'Egg Basket'
@@ -783,7 +776,9 @@
         animalArray: 'cows',
         product: 'milk',
         productName: 'Milk',
+        addTask: 'Add_Milk_1',
         collectTask: 'Collect_Milk',
+        readyTask: 'Cow_Ready',
         xpPerUnit: 5,
         equipment: 'milk_pail',
         equipmentName: 'Milk Pail'
@@ -793,7 +788,9 @@
         animalArray: 'sheep',
         product: 'wool',
         productName: 'Wool',
+        addTask: 'Add_Wool_1',
         collectTask: 'Collect_Wool',
+        readyTask: 'Sheep_Ready',
         xpPerUnit: 6,
         equipment: 'shearing_kit',
         equipmentName: 'Shearing Kit'
@@ -803,7 +800,9 @@
         animalArray: 'goats',
         product: 'goat_meat',
         productName: 'Goat Meat',
+        addTask: 'Add_Goat_Meat_1',
         collectTask: 'Collect_Meat',
+        readyTask: 'Goat_Ready',
         xpPerUnit: 8,
         equipment: 'butcher_knife',
         equipmentName: 'Butcher Knife'
@@ -813,7 +812,9 @@
         animalArray: 'pigs',
         product: 'truffle',
         productName: 'Truffle',
+        addTask: 'Add_Truffle_1',
         collectTask: 'Collect_Truffle',
+        readyTask: 'Pig_Ready',
         xpPerUnit: 10,
         equipment: 'truffle_spade',
         equipmentName: 'Truffle Spade'
@@ -823,7 +824,9 @@
         animalArray: 'beehives',
         product: 'honey',
         productName: 'Honey',
+        addTask: 'Add_Honey_1',
         collectTask: 'Collect_Honey',
+        readyTask: 'Honey_Ready',
         xpPerUnit: 5,
         equipment: 'beesuit',
         equipmentName: 'Bee Suit'
@@ -845,9 +848,9 @@
         return;
       }
 
-      // Block collection if animal ready triggers are still being sent to Portals
-      if (pendingReadyTasks[station.animalType] > 0) {
-        notify(`Still counting ${station.productName.toLowerCase()}... try again in a moment!`, 'error');
+      // Block collection if a previous collection is still sending staggered tasks
+      if (pendingAnimalTasks[station.animalType] > 0) {
+        notify(`Still collecting ${station.productName.toLowerCase()}... try again in a moment!`, 'error');
         return;
       }
 
@@ -868,9 +871,6 @@
         return;
       }
 
-      // Trigger the collect task - Portals will handle adding inventory and XP
-      triggerTask(station.collectTask);
-
       // Reset all ready animals to idle
       readyAnimals.forEach(animal => {
         animal.state = 'idle';
@@ -878,8 +878,26 @@
         animal.notified = false;
       });
 
-      // No local inventory/XP updates - Portals handles all state via Sync_Inventory
+      // Send staggered Add_{Product}_1 and Add_XP tasks to Portals
+      // Each task self-resets, so we stagger to give Portals time to process each one
       const xpGained = readyCount * station.xpPerUnit;
+      for (let i = 0; i < readyCount; i++) {
+        pendingAnimalTasks[station.animalType]++;
+        setTimeout(() => {
+          triggerTask(station.addTask);
+          triggerTask(`Add_XP_${station.xpPerUnit}`);
+          console.log('[Hughberry] Sent', station.addTask, 'and Add_XP_' + station.xpPerUnit, '(' + (i + 1) + '/' + readyCount + ')');
+          pendingAnimalTasks[station.animalType]--;
+        }, i * 500);
+      }
+
+      // After all Add tasks, send Collect_{Product} to move collection object out of map
+      setTimeout(() => {
+        triggerTask(station.collectTask);
+        readyTaskTriggered[station.animalType] = false;
+        console.log('[Hughberry] Sent', station.collectTask, '(hiding collection object)');
+      }, readyCount * 500);
+
       notify(`Collected ${readyCount} ${station.productName}! +${xpGained} XP`, 'success');
       saveGameQuiet();
       renderAnimals();
@@ -1396,15 +1414,13 @@
         });
       });
 
-      // Stagger the ready notifications to prevent Portals task race conditions
-      // Each trigger needs 500ms for Portals to process, reset NotActive (100ms), and be ready again
-      readyQueue.forEach((item, index) => {
-        pendingReadyTasks[item.type]++;
-        setTimeout(() => {
-          console.log('[Hughberry] gameLoop: Calling animalBecameReady for', item.type, item.id, '(delayed by', index * 500, 'ms)');
-          animalBecameReady(item.type, item.id);
-          pendingReadyTasks[item.type]--;
-        }, index * 500);
+      // Trigger {Animal}_Ready once per type to show collection object in 3D world
+      readyQueue.forEach((item) => {
+        if (!readyTaskTriggered[item.type]) {
+          readyTaskTriggered[item.type] = true;
+          triggerTask(READY_TASK_MAP[item.type]);
+          console.log('[Hughberry] Triggered', READY_TASK_MAP[item.type], '(first', item.type, 'ready - showing collection object)');
+        }
       });
 
       // Always update active tab for timers
@@ -1414,7 +1430,9 @@
       else if (activeTab === 'animals') renderAnimals();
     }
 
-    let pendingReadyTasks = { cow: 0, sheep: 0, goat: 0, pig: 0, chicken: 0, beehive: 0 };
+    let pendingAnimalTasks = { cow: 0, sheep: 0, goat: 0, pig: 0, chicken: 0, beehive: 0 };
+    let readyTaskTriggered = { cow: false, chicken: false, sheep: false, goat: false, pig: false, beehive: false };
+    const READY_TASK_MAP = { cow: 'Cow_Ready', chicken: 'Chicken_Ready', sheep: 'Sheep_Ready', goat: 'Goat_Ready', pig: 'Pig_Ready', beehive: 'Honey_Ready' };
     let gameLoopInterval = null;
 
     function startGameLoop() {
