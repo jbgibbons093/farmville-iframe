@@ -1044,14 +1044,18 @@
               <div class="quick-stat"><span class="quick-stat-icon">&#x1F95B;</span><div><div class="quick-stat-value">${totalProducts}</div><div class="quick-stat-label">Products</div></div></div>
             </div>
           </div>
-          <div class="dashboard-card${gameState.unspentTalentPoints > 0 ? ' highlight' : ''}" style="${gameState.unspentTalentPoints > 0 ? 'border-color: #7c4dba; box-shadow: 0 0 20px rgba(107, 63, 160, 0.4); animation: pulseGreen 2s infinite;' : ''}">
-            <div class="card-header"><span class="card-icon">&#x1F33F;</span><div class="card-title" style="${gameState.unspentTalentPoints > 0 ? 'color: #b388ff;' : ''}">Talent Points</div></div>
+          ${(function() {
+            const tp = Math.max(0, gameState.unspentTalentPoints);
+            const hasPoints = tp > 0;
+            return `<div class="dashboard-card${hasPoints ? ' highlight' : ''}" style="${hasPoints ? 'border-color: #7c4dba; box-shadow: 0 0 20px rgba(107, 63, 160, 0.4); animation: pulseGreen 2s infinite;' : ''}">
+            <div class="card-header"><span class="card-icon">&#x1F33F;</span><div class="card-title" style="${hasPoints ? 'color: #b388ff;' : ''}">Talent Points</div></div>
             <div class="quick-stats">
-              <div class="quick-stat"><span class="quick-stat-icon">&#x2728;</span><div><div class="quick-stat-value" style="${gameState.unspentTalentPoints > 0 ? 'color: #b388ff;' : ''}">${gameState.unspentTalentPoints}</div><div class="quick-stat-label">Unspent</div></div></div>
+              <div class="quick-stat"><span class="quick-stat-icon">&#x2728;</span><div><div class="quick-stat-value" style="${hasPoints ? 'color: #b388ff;' : ''}">${tp}</div><div class="quick-stat-label">Unspent</div></div></div>
               <div class="quick-stat"><span class="quick-stat-icon">&#x1F3AF;</span><div><div class="quick-stat-value">${gameState.level}</div><div class="quick-stat-label">Total Earned</div></div></div>
             </div>
-            <div style="text-align: center; margin-top: 8px; font-size: ${gameState.unspentTalentPoints > 0 ? '12' : '11'}px; color: ${gameState.unspentTalentPoints > 0 ? '#b388ff; font-weight: 700' : '#888'};">Press <kbd style="background: #4a3a2a; padding: 2px 6px; border-radius: 4px; font-family: monospace;">Y</kbd> ${gameState.unspentTalentPoints > 0 ? 'to spend talents!' : 'for Talents'}</div>
-          </div>
+            <div style="text-align: center; margin-top: 8px; font-size: ${hasPoints ? '12' : '11'}px; color: ${hasPoints ? '#b388ff; font-weight: 700' : '#888'};">Press <kbd style="background: #4a3a2a; padding: 2px 6px; border-radius: 4px; font-family: monospace;">Y</kbd> ${hasPoints ? 'to spend talents!' : 'for Talents'}</div>
+          </div>`;
+          })()}
           ${!gameState.claimedStarterSeeds ? `
           <div class="dashboard-card" style="border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); animation: pulseGreen 2s infinite;">
             <div class="card-header"><span class="card-icon">&#x1F381;</span><div class="card-title" style="color: #2ecc71;">Free Starter Seeds!</div></div>

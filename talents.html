@@ -688,15 +688,19 @@ function triggerTask(taskName, targetState) {
 }
 
 function closeIframe() {
+  console.log('[Talents] Close requested');
   if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
     PortalsSdk.closeIframe();
-  } else if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-    PortalsSdk.sendMessageToUnity(JSON.stringify({
-      TaskName: 'Close_Iframe',
-      TaskTargetState: 'SetNotActiveToActive'
-    }));
   }
 }
+
+// Keyboard controls - ESC to close
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeIframe();
+  }
+});
 
 // ── Message Handling ──
 var lastMessageId = '';
@@ -791,8 +795,7 @@ function setupMessageListener() {
     });
     console.log('[Talents] SDK listener registered');
   } else {
-    console.log('[Talents] Waiting for SDK...');
-    setTimeout(setupMessageListener, 100);
+    setTimeout(setupMessageListener, 200);
   }
 }
 
