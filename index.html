@@ -249,7 +249,7 @@
         sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 13, startXP: 3, collectXP: 6 },
         goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 18, startXP: 4, collectXP: 8 },
         pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 26, startXP: 5, collectXP: 10 },
-        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 9, unlockLevel: 21, startXP: 2, collectXP: 5 }
+        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 6, unlockLevel: 21, startXP: 2, collectXP: 5 }
       },
       recipes: [
         { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 20, xp: 10, taskName: 'Craft_Flour' },
@@ -363,7 +363,7 @@
         gameState.animals.goats.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
         gameState.animals.chickens.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
       }
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < 6; i++) {
         gameState.animals.beehives.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
       }
     }
