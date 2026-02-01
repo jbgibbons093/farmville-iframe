@@ -733,7 +733,7 @@
       }
 
       const totalCrops = 1 + bonusCrops;
-      notify(`+${totalCrops} ${cropName}! +${boostedHarvestXP} XP`, 'success');
+      notify(`+${totalCrops} ${cropName}! +${boostedHarvestXP} XP`, 'success', 'harvest');
 
       plot.state = 'empty';
       plot.cropType = null;
@@ -1066,7 +1066,8 @@
       setTimeout(function() { awardXP(xpGained); }, totalProducts * addDelay);
 
       const bonusText = bonusPerAnimal > 0 ? ` (+${readyCount * bonusPerAnimal} bonus)` : '';
-      notify(`Collected ${totalProducts} ${station.productName}${bonusText}! +${xpGained} XP`, 'success');
+      var animalSound = station.animalType === 'beehive' ? 'bee' : station.animalType;
+      notify(`Collected ${totalProducts} ${station.productName}${bonusText}! +${xpGained} XP`, 'success', animalSound);
       saveGameQuiet();
       renderAnimals();
       renderInventory();
@@ -1079,7 +1080,7 @@
       // No local state updates - Portals handles all state via Sync_Inventory
       if (productType === 'honey' && count > 0) {
         const xpGained = count * 5; // 5 XP per honey
-        notify(`Collected ${count} Honey! +${xpGained} XP`, 'success');
+        notify(`Collected ${count} Honey! +${xpGained} XP`, 'success', 'bee');
       }
     }
 
@@ -1113,8 +1114,7 @@
       if (levelsGained > 0) {
         // Reset XP in Portals to the remaining amount after all level-ups
         triggerTask('Reset_XP');
-        playSound('levelup');
-        notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success');
+        notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success', 'levelup');
       }
     }
 
@@ -1565,7 +1565,12 @@
       }
     });
 
-    // === Sound Effects (Web Audio API) ===
+    // === Sound Effects (MP3 + Web Audio API fallback) ===
+    var _mp3Sounds = {};
+    (function() {
+      var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', cow: 'cow.mp3', chicken: 'chicken.mp3', sheep: 'sheep.mp3', goat: 'goat.mp3', pig: 'pig.mp3', bee: 'bee.mp3' };
+      for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = 0.3; _mp3Sounds[k] = a; }
+    })();
     var _audioCtx = null;
     function _getAudioCtx() {
       if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1574,10 +1579,9 @@
     }
     function playSound(type) {
       try {
+        if (_mp3Sounds[type]) { _mp3Sounds[type].currentTime = 0; _mp3Sounds[type].play().catch(function(){}); return; }
         var ctx = _getAudioCtx();
-        var g = ctx.createGain();
-        g.connect(ctx.destination);
-        var t = ctx.currentTime;
+        var g = ctx.createGain(); g.connect(ctx.destination); var t = ctx.currentTime;
         if (type === 'success') {
           var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
           o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.1);
@@ -1588,41 +1592,20 @@
           o.frequency.setValueAtTime(180, t);
           g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.15);
           o.start(t); o.stop(t + 0.15);
-        } else if (type === 'purchase') {
-          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
-          o.frequency.setValueAtTime(880, t); o.frequency.setValueAtTime(1109, t + 0.08);
-          g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.18);
-          o.start(t); o.stop(t + 0.18);
-        } else if (type === 'levelup') {
-          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
-          o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.12);
-          o.frequency.setValueAtTime(784, t + 0.24);
-          g.gain.setValueAtTime(0.2, t); g.gain.linearRampToValueAtTime(0, t + 0.4);
-          o.start(t); o.stop(t + 0.4);
-        } else if (type === 'craft') {
-          var o = ctx.createOscillator(); o.type = 'triangle'; o.connect(g);
-          o.frequency.setValueAtTime(1200, t); o.frequency.exponentialRampToValueAtTime(600, t + 0.1);
-          g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.12);
-          o.start(t); o.stop(t + 0.12);
-        } else if (type === 'click') {
-          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
-          o.frequency.setValueAtTime(700, t);
-          g.gain.setValueAtTime(0.08, t); g.gain.linearRampToValueAtTime(0, t + 0.05);
-          o.start(t); o.stop(t + 0.05);
         }
       } catch (e) { /* audio not supported */ }
     }
 
-    function notify(msg, type = 'success') {
-      playSound(type);
+    function notify(msg, type = 'success', sound) {
+      if (sound !== false) playSound(sound || type);
       const c = document.getElementById('notifications');
       // Cap notifications at 5 - remove oldest if at limit
       while (c.children.length >= 5) {
         c.removeChild(c.firstChild);
       }
       const n = document.createElement('div');
-      n.className = `notification ${type}`;
-      n.innerHTML = `<span class="notification-icon">${type === 'success' ? '&#x2705;' : '&#x274C;'}</span><span class="notification-text">${msg}</span>`;
+      n.className = `notification ${type === 'success' || type === 'error' ? type : 'success'}`;
+      n.innerHTML = `<span class="notification-icon">${type === 'error' ? '&#x274C;' : '&#x2705;'}</span><span class="notification-text">${msg}</span>`;
       c.appendChild(n);
       setTimeout(() => n.remove(), 3000);
     }
