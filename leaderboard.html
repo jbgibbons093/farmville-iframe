@@ -680,23 +680,19 @@ function executeRebirth() {
   hideRebirthConfirm();
   updateRebirthButton();
 
-  var name = playerName || 'Unknown';
+  // 1. Trigger Portals reset IMMEDIATELY
+  triggerTask('Trigger_Rebirth');
 
-  // 1. Record in Supabase
+  // 2. Optimistic UI update
+  rebirthCount += 1;
+  document.getElementById('rebirthBadge').textContent = rebirthCount + (rebirthCount === 1 ? ' Rebirth' : ' Rebirths');
+  notify('Rebirth successful! All progress reset.', 'success');
+
+  // 3. Record in Supabase (background, non-blocking)
+  var name = playerName || 'Unknown';
   recordRebirth(name)
   .then(function(result) {
     console.log('[Leaderboard] Rebirth recorded in DB:', result);
-
-    // 2. Trigger Portals reset
-    triggerTask('Trigger_Rebirth');
-
-    // 3. Optimistic UI update
-    rebirthCount += 1;
-    document.getElementById('rebirthBadge').textContent = rebirthCount + (rebirthCount === 1 ? ' Rebirth' : ' Rebirths');
-
-    notify('Rebirth successful! All progress reset.', 'success');
-
-    // 4. Refresh leaderboard after a short delay
     setTimeout(function() {
       fetchLeaderboard();
       rebirthPending = false;
@@ -705,12 +701,7 @@ function executeRebirth() {
   })
   .catch(function(err) {
     console.error('[Leaderboard] Rebirth DB error:', err);
-    // Still trigger Portals reset even if DB fails - player shouldn't be stuck
-    triggerTask('Trigger_Rebirth');
-    rebirthCount += 1;
-    document.getElementById('rebirthBadge').textContent = rebirthCount + (rebirthCount === 1 ? ' Rebirth' : ' Rebirths');
-    notify('Rebirth complete (leaderboard sync pending)', 'success');
-
+    notify('Leaderboard sync pending', 'error');
     setTimeout(function() {
       rebirthPending = false;
       updateRebirthButton();
