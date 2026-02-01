@@ -245,11 +245,11 @@
       },
       animals: {
         cow: { name: 'Cow', icon: '&#x1F404;', product: 'milk', productName: 'Milk', cooldown: 90, count: 6, unlockLevel: 2, startXP: 2, collectXP: 5 },
-        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 5, unlockLevel: 6, startXP: 1, collectXP: 3 },
-        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 13, startXP: 3, collectXP: 6 },
-        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 18, startXP: 4, collectXP: 8 },
+        chicken: { name: 'Chicken', icon: '&#x1F414;', product: 'egg', productName: 'Egg', cooldown: 60, count: 6, unlockLevel: 6, startXP: 1, collectXP: 3 },
+        sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 6, unlockLevel: 13, startXP: 3, collectXP: 6 },
+        goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 6, unlockLevel: 18, startXP: 4, collectXP: 8 },
         pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 26, startXP: 5, collectXP: 10 },
-        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 9, unlockLevel: 21, startXP: 2, collectXP: 5 }
+        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 6, unlockLevel: 21, startXP: 2, collectXP: 5 }
       },
       // XP required at each level to advance (XP resets to 0 on level-up)
       // 50 levels total, content unlocks at levels 0-31, prestige levels 32-50
@@ -343,14 +343,10 @@
       gameState.animals.beehives = [];
       for (let i = 0; i < 6; i++) {
         gameState.animals.cows.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-        gameState.animals.pigs.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-      }
-      for (let i = 0; i < 5; i++) {
+        gameState.animals.chickens.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
         gameState.animals.sheep.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
         gameState.animals.goats.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-        gameState.animals.chickens.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
-      }
-      for (let i = 0; i < 9; i++) {
+        gameState.animals.pigs.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
         gameState.animals.beehives.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
       }
     }
