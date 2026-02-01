@@ -117,7 +117,56 @@
       }
     }
 
-    function notify(msg) {
+    // === Sound Effects (Web Audio API) ===
+    var _audioCtx = null;
+    function _getAudioCtx() {
+      if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      return _audioCtx;
+    }
+    function playSound(type) {
+      try {
+        var ctx = _getAudioCtx();
+        var g = ctx.createGain();
+        g.connect(ctx.destination);
+        var t = ctx.currentTime;
+        if (type === 'success') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.1);
+          g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.2);
+          o.start(t); o.stop(t + 0.2);
+        } else if (type === 'error') {
+          var o = ctx.createOscillator(); o.type = 'square'; o.connect(g);
+          o.frequency.setValueAtTime(180, t);
+          g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.15);
+          o.start(t); o.stop(t + 0.15);
+        } else if (type === 'purchase') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(880, t); o.frequency.setValueAtTime(1109, t + 0.08);
+          g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.18);
+          o.start(t); o.stop(t + 0.18);
+        } else if (type === 'levelup') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.12);
+          o.frequency.setValueAtTime(784, t + 0.24);
+          g.gain.setValueAtTime(0.2, t); g.gain.linearRampToValueAtTime(0, t + 0.4);
+          o.start(t); o.stop(t + 0.4);
+        } else if (type === 'craft') {
+          var o = ctx.createOscillator(); o.type = 'triangle'; o.connect(g);
+          o.frequency.setValueAtTime(1200, t); o.frequency.exponentialRampToValueAtTime(600, t + 0.1);
+          g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.12);
+          o.start(t); o.stop(t + 0.12);
+        } else if (type === 'click') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(700, t);
+          g.gain.setValueAtTime(0.08, t); g.gain.linearRampToValueAtTime(0, t + 0.05);
+          o.start(t); o.stop(t + 0.05);
+        }
+      } catch (e) { /* audio not supported */ }
+    }
+
+    function notify(msg, soundType) {
+      if (soundType) playSound(soundType);
       const el = document.getElementById('notification');
       el.textContent = msg;
       el.style.display = 'block';
@@ -129,13 +178,13 @@
 
       const equip = EQUIPMENT.find(e => e.id === id);
       if (!equip) return;
-      if (gameState.equipment[id]) { notify('Already owned!'); return; }
-      if (gameState.level < equip.unlockLevel) { notify('Level too low!'); return; }
-      if (gameState.gold < equip.price) { notify('Not enough gold!'); return; }
+      if (gameState.equipment[id]) { notify('Already owned!', 'error'); return; }
+      if (gameState.level < equip.unlockLevel) { notify('Level too low!', 'error'); return; }
+      if (gameState.gold < equip.price) { notify('Not enough gold!', 'error'); return; }
 
       actionPending = true;
       triggerTask(equip.taskName);
-      notify('Purchased ' + equip.name + '!');
+      notify('Purchased ' + equip.name + '!', 'purchase');
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
       setTimeout(function() { actionPending = false; render(); }, 3000);
@@ -146,13 +195,13 @@
 
       const recipe = RECIPES.find(r => r.id === id);
       if (!recipe) return;
-      if (gameState.recipes[id]) { notify('Already owned!'); return; }
-      if (gameState.level < recipe.unlockLevel) { notify('Level too low!'); return; }
-      if (gameState.gold < recipe.price) { notify('Not enough gold!'); return; }
+      if (gameState.recipes[id]) { notify('Already owned!', 'error'); return; }
+      if (gameState.level < recipe.unlockLevel) { notify('Level too low!', 'error'); return; }
+      if (gameState.gold < recipe.price) { notify('Not enough gold!', 'error'); return; }
 
       actionPending = true;
       triggerTask(recipe.taskName);
-      notify('Purchased ' + recipe.name + '!');
+      notify('Purchased ' + recipe.name + '!', 'purchase');
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
       setTimeout(function() { actionPending = false; render(); }, 3000);

@@ -139,7 +139,56 @@
       return recipe.xp + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3;
     }
 
-    function notify(msg) {
+    // === Sound Effects (Web Audio API) ===
+    var _audioCtx = null;
+    function _getAudioCtx() {
+      if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      return _audioCtx;
+    }
+    function playSound(type) {
+      try {
+        var ctx = _getAudioCtx();
+        var g = ctx.createGain();
+        g.connect(ctx.destination);
+        var t = ctx.currentTime;
+        if (type === 'success') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.1);
+          g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.2);
+          o.start(t); o.stop(t + 0.2);
+        } else if (type === 'error') {
+          var o = ctx.createOscillator(); o.type = 'square'; o.connect(g);
+          o.frequency.setValueAtTime(180, t);
+          g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.15);
+          o.start(t); o.stop(t + 0.15);
+        } else if (type === 'purchase') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(880, t); o.frequency.setValueAtTime(1109, t + 0.08);
+          g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.18);
+          o.start(t); o.stop(t + 0.18);
+        } else if (type === 'levelup') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.12);
+          o.frequency.setValueAtTime(784, t + 0.24);
+          g.gain.setValueAtTime(0.2, t); g.gain.linearRampToValueAtTime(0, t + 0.4);
+          o.start(t); o.stop(t + 0.4);
+        } else if (type === 'craft') {
+          var o = ctx.createOscillator(); o.type = 'triangle'; o.connect(g);
+          o.frequency.setValueAtTime(1200, t); o.frequency.exponentialRampToValueAtTime(600, t + 0.1);
+          g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.12);
+          o.start(t); o.stop(t + 0.12);
+        } else if (type === 'click') {
+          var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+          o.frequency.setValueAtTime(700, t);
+          g.gain.setValueAtTime(0.08, t); g.gain.linearRampToValueAtTime(0, t + 0.05);
+          o.start(t); o.stop(t + 0.05);
+        }
+      } catch (e) { /* audio not supported */ }
+    }
+
+    function notify(msg, soundType) {
+      if (soundType) playSound(soundType);
       const el = document.getElementById('notification');
       if (notifyTimeout) clearTimeout(notifyTimeout);
       el.textContent = msg;
@@ -160,7 +209,7 @@
       // Check if player owns the recipe
       if (!gameState.recipes['recipe_' + recipeId]) {
         console.log('[Hughberry Crafting] Recipe not owned:', 'recipe_' + recipeId);
-        notify('You need to buy this recipe first!');
+        notify('You need to buy this recipe first!', 'error');
         return;
       }
 
@@ -168,7 +217,7 @@
       for (const [ing, qty] of Object.entries(recipe.ingredients)) {
         if ((gameState.inventory[ing] || 0) < qty) {
           console.log('[Hughberry Crafting] Missing ingredient:', ing, 'have:', gameState.inventory[ing] || 0, 'need:', qty);
-          notify('Missing ingredients!');
+          notify('Missing ingredients!', 'error');
           return;
         }
       }
@@ -193,7 +242,7 @@
         awardXP(craftXP);
       }, 250);
 
-      notify('Crafted ' + recipe.name + '! +' + craftXP + ' XP');
+      notify('Crafted ' + recipe.name + '! +' + craftXP + ' XP', 'craft');
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
       setTimeout(function() { actionPending = false; render(); }, 3000);
