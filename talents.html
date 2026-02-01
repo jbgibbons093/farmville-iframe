@@ -646,6 +646,7 @@ var playerGold = 0;
 var unspentTalentPoints = 0;
 var activeTree = 'farming';
 var actionPending = false;
+var buyPending = false;
 
 // Initialize all talent ranks to 0
 (function() {
@@ -734,22 +735,23 @@ function investPoint(treeName, talentKey) {
 var BUY_POINT_COST = 500;
 
 function buyTalentPoint() {
-  if (actionPending) return;
+  if (buyPending) return;
   if (playerGold < BUY_POINT_COST) {
     notify('Need ' + BUY_POINT_COST + ' gold (have ' + playerGold + ')', 'error');
     return;
   }
 
-  actionPending = true;
+  buyPending = true;
   triggerTask('Buy_Talent_Point');
 
-  // Optimistic update
+  // Optimistic update - point is immediately spendable
   playerGold -= BUY_POINT_COST;
   unspentTalentPoints += 1;
   notify('Purchased 1 Talent Point for ' + BUY_POINT_COST + 'g', 'success');
   renderAll();
 
-  setTimeout(function() { actionPending = false; }, 1500);
+  // Short cooldown just to prevent double-buy clicks
+  setTimeout(function() { buyPending = false; renderAll(); }, 400);
 }
 
 // ── Portals SDK ──
@@ -800,6 +802,7 @@ function handlePortalsMessage(msg) {
   if (msg.indexOf('Sync_Inventory') === 0) {
     parseAndSyncInventory(msg);
     actionPending = false;
+    buyPending = false;
     renderAll();
   }
 }
@@ -930,7 +933,7 @@ function renderAll() {
   // Gold display & buy button
   document.getElementById('goldDisplay').textContent = playerGold;
   var buyBtn = document.getElementById('buyPointBtn');
-  if (playerGold >= BUY_POINT_COST && !actionPending) {
+  if (playerGold >= BUY_POINT_COST && !buyPending) {
     buyBtn.disabled = false;
     buyBtn.onclick = buyTalentPoint;
   } else {
