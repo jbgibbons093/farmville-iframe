@@ -249,21 +249,8 @@
         sheep: { name: 'Sheep', icon: '&#x1F411;', product: 'wool', productName: 'Wool', cooldown: 120, count: 5, unlockLevel: 13, startXP: 3, collectXP: 6 },
         goat: { name: 'Goat', icon: '&#x1F410;', product: 'goat_meat', productName: 'Goat_Meat', cooldown: 90, count: 5, unlockLevel: 18, startXP: 4, collectXP: 8 },
         pig: { name: 'Pig', icon: '&#x1F437;', product: 'truffle', productName: 'Truffle', cooldown: 90, count: 6, unlockLevel: 26, startXP: 5, collectXP: 10 },
-        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 6, unlockLevel: 21, startXP: 2, collectXP: 5 }
+        beehive: { name: 'Beehive', icon: '&#x1F41D;', product: 'honey', productName: 'Honey', cooldown: 120, count: 9, unlockLevel: 21, startXP: 2, collectXP: 5 }
       },
-      recipes: [
-        { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 20, xp: 10, taskName: 'Craft_Flour' },
-        { id: 'bread', name: 'Bread', icon: '&#x1F956;', ingredients: { flour: 1, egg: 1 }, sellPrice: 35, xp: 15, taskName: 'Craft_Bread' },
-        { id: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Cheese' },
-        { id: 'stew', name: 'Stew', icon: '&#x1F372;', ingredients: { potato: 1, carrot: 1, corn: 1 }, sellPrice: 50, xp: 25, taskName: 'Craft_Stew' },
-        { id: 'ragout', name: 'Ragout', icon: '&#x1F356;', ingredients: { goat_meat: 1, potato: 1, carrot: 1 }, sellPrice: 75, xp: 30, taskName: 'Craft_Ragout' },
-        { id: 'pie', name: 'Pie', icon: '&#x1F967;', ingredients: { flour: 1, pumpkin: 1, egg: 1 }, sellPrice: 80, xp: 30, taskName: 'Craft_Pie' },
-        { id: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', ingredients: { goat_meat: 1, flour: 1, egg: 1 }, sellPrice: 90, xp: 35, taskName: 'Craft_Meat_Pie' },
-        { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 50, xp: 20, taskName: 'Craft_Blanket' },
-        { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter' },
-        { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 100, xp: 40, taskName: 'Craft_Cake' },
-        { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 2 }, sellPrice: 60, xp: 25, taskName: 'Craft_Mead' }
-      ],
       // XP required at each level to advance (XP resets to 0 on level-up)
       // 50 levels total, content unlocks at levels 0-31, prestige levels 32-50
       levelThresholds: [
@@ -363,13 +350,14 @@
         gameState.animals.goats.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
         gameState.animals.chickens.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
       }
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 9; i++) {
         gameState.animals.beehives.push({ id: i + 1, state: 'idle', readyAt: null, notified: false });
       }
     }
     initAnimals();
 
     let actionPending = false;
+    let dashboardDirty = true;
 
     function triggerTask(taskName, targetState) {
       if (!targetState) targetState = 'SetNotActiveToActive';
@@ -379,18 +367,12 @@
       console.log('[Hughberry] Task:', taskName, targetState);
     }
 
-    function sendToPortals(cmd) { console.log('To Portals:', cmd); }
     function closeMenu() {
       console.log('[Hughberry] Close menu requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();
       }
     }
-    function setVariable(n, v) { console.log('Set variable:', n, v); }
-    function showObject(n) { console.log('Show object:', n); }
-    function hideObject(n) { console.log('Hide object:', n); }
-    function playSound(s) { console.log('Play sound:', s); }
-
     // --- Talent Helper Functions ---
     function awardXP(amount) {
       if (amount <= 0) return;
@@ -513,17 +495,17 @@
         'Has_Shearing_Kit': { target: 'shearing_kit', isEquipment: true },
         'Has_Butcher_Knife': { target: 'butcher_knife', isEquipment: true },
         'Has_Truffle_Spade': { target: 'truffle_spade', isEquipment: true },
-        'RecipeFlour': { target: 'recipe_flour', isRecipe: true },
-        'RecipeBread': { target: 'recipe_bread', isRecipe: true },
-        'RecipeCheese': { target: 'recipe_cheese', isRecipe: true },
-        'RecipeStew': { target: 'recipe_stew', isRecipe: true },
-        'RecipeRagout': { target: 'recipe_ragout', isRecipe: true },
-        'RecipePie': { target: 'recipe_pie', isRecipe: true },
-        'RecipeMeatPie': { target: 'recipe_meat_pie', isRecipe: true },
-        'RecipeBlanket': { target: 'recipe_blanket', isRecipe: true },
-        'RecipeButter': { target: 'recipe_butter', isRecipe: true },
-        'RecipeCake': { target: 'recipe_cake', isRecipe: true },
-        'RecipeMead': { target: 'recipe_mead', isRecipe: true },
+        'Has_Recipe_Flour': { target: 'recipe_flour', isRecipe: true },
+        'Has_Recipe_Bread': { target: 'recipe_bread', isRecipe: true },
+        'Has_Recipe_Cheese': { target: 'recipe_cheese', isRecipe: true },
+        'Has_Recipe_Stew': { target: 'recipe_stew', isRecipe: true },
+        'Has_Recipe_Ragout': { target: 'recipe_ragout', isRecipe: true },
+        'Has_Recipe_Pie': { target: 'recipe_pie', isRecipe: true },
+        'Has_Recipe_Meat_Pie': { target: 'recipe_meat_pie', isRecipe: true },
+        'Has_Recipe_Blanket': { target: 'recipe_blanket', isRecipe: true },
+        'Has_Recipe_Butter': { target: 'recipe_butter', isRecipe: true },
+        'Has_Recipe_Cake': { target: 'recipe_cake', isRecipe: true },
+        'Has_Recipe_Mead': { target: 'recipe_mead', isRecipe: true },
         'Has_Starter_Seeds': { target: 'claimedStarterSeeds', isFlag: true },
         'Unspent_Talent_Points': { target: 'unspentTalentPoints', isRoot: true },
         'T_PlotRow2': { target: 'plotRow2', isTalent: true },
@@ -563,11 +545,26 @@
       let i = 0;
       while (i < parts.length) {
         let matched = false;
-        // Check three-word keys first (Has_Milk_Pail, Has_Shearing_Kit, Has_Butcher_Knife, Has_Truffle_Spade)
-        if (i + 3 < parts.length) {
+        // Check four-word keys first (Has_Recipe_Meat_Pie)
+        if (i + 4 < parts.length) {
+          const fourWordKey = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2] + '_' + parts[i + 3];
+          if (varMapping[fourWordKey]) {
+            const value = Math.max(0, parseInt(parts[i + 4]) || 0);
+            const mapping = varMapping[fourWordKey];
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
+            else if (mapping.isFlag) gameState[mapping.target] = value > 0;
+            else if (mapping.isRoot) gameState[mapping.target] = value;
+            else gameState.inventory[mapping.target] = value;
+            console.log('[Hughberry] Parsed 4-word:', fourWordKey, '=', value);
+            i += 5; matched = true;
+          }
+        }
+        // Check three-word keys (Has_Milk_Pail, Has_Shearing_Kit, Has_Butcher_Knife, Has_Truffle_Spade, Has_Recipe_*)
+        if (!matched && i + 3 < parts.length) {
           const threeWordKey = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2];
           if (varMapping[threeWordKey]) {
-            const value = parseInt(parts[i + 3]) || 0;
+            const value = Math.max(0, parseInt(parts[i + 3]) || 0);
             const mapping = varMapping[threeWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -582,7 +579,7 @@
         if (!matched && i + 2 < parts.length) {
           const twoWordKey = parts[i] + '_' + parts[i + 1];
           if (varMapping[twoWordKey]) {
-            const value = parseInt(parts[i + 2]) || 0;
+            const value = Math.max(0, parseInt(parts[i + 2]) || 0);
             const mapping = varMapping[twoWordKey];
             if (mapping.isUncollected) gameState.uncollected[mapping.target] = value;
             else if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
@@ -598,7 +595,7 @@
         if (!matched && i + 1 < parts.length) {
           const oneWordKey = parts[i];
           if (varMapping[oneWordKey]) {
-            const value = parseInt(parts[i + 1]) || 0;
+            const value = Math.max(0, parseInt(parts[i + 1]) || 0);
             const mapping = varMapping[oneWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -612,6 +609,7 @@
       }
       console.log('[Hughberry] Talents after sync:', JSON.stringify(gameState.talents));
       console.log('[Hughberry] Unspent Talent Points:', gameState.unspentTalentPoints);
+      dashboardDirty = true;
       saveGameQuiet();
     }
 
@@ -677,9 +675,9 @@
 
       if (cmd === 'init') {
         if (parts.length >= 4) {
-          gameState.gold = parseInt(parts[1]) || 100;
-          gameState.level = parseInt(parts[2]) || 1;
-          gameState.xp = parseInt(parts[3]) || 0;
+          const gv = parseInt(parts[1]); gameState.gold = isNaN(gv) ? 100 : gv;
+          const lv = parseInt(parts[2]); gameState.level = isNaN(lv) ? 1 : lv;
+          const xv = parseInt(parts[3]); gameState.xp = isNaN(xv) ? 0 : xv;
         }
         loadFromStorage();
         updateAllUI();
@@ -740,6 +738,7 @@
       plot.cropType = null;
       plot.plantedAt = null;
       plot.readyAt = null;
+      dashboardDirty = true;
 
       if (gameState.settings.autoReplant) {
         const p = gameState.settings.priorityCrop;
@@ -788,6 +787,9 @@
 
       if (!skipLock) actionPending = true;
 
+      // Optimistic seed deduction to prevent rapid planting from exceeding available seeds
+      gameState.inventory[seedKey]--;
+
       triggerTask(`Plant_Plot_${plotId}`);
       triggerTask(`Sub_Seeds_${crop.name}_1`);
       const plantXP = getPlantingXP(crop);
@@ -829,8 +831,17 @@
       const plantXP = getPlantingXP(crop);
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
-        triggerTask(`Plant_Plot_${idx + 1}`);
-        triggerTask(`Sub_Seeds_${crop.name}_1`);
+
+        // Stagger task triggers by 300ms per plot to avoid Portals race conditions
+        (function(plotRef, plotIdx, delay) {
+          setTimeout(function() {
+            triggerTask(`Plant_Plot_${plotIdx + 1}`);
+            triggerTask(`Sub_Seeds_${crop.name}_1`);
+          }, delay);
+        })(plot, idx, i * 300);
+
+        // Optimistic local seed deduction for rapid planting
+        gameState.inventory[seedKey]--;
 
         plot.state = 'growing';
         plot.cropType = c;
@@ -847,8 +858,8 @@
       saveGameQuiet();
       renderCrops();
 
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; }, 3000);
+      // Safety timeout: reset actionPending after all staggered tasks have sent
+      setTimeout(function() { actionPending = false; }, toPlant * 300 + 3000);
     }
 
     // Equipment requirements for starting animal activities
@@ -893,12 +904,6 @@
       renderAnimals();
     }
 
-    function animalBecameReady(animalType, id) {
-      // Ready triggers are now handled in the gameLoop via readyTaskTriggered flag.
-      // Only triggers {Animal}_Ready once per type (first animal ready) to show collection object.
-      console.log('[Hughberry] animalBecameReady:', animalType, id);
-    }
-
     // Collection station configuration
     const COLLECTION_STATIONS = {
       egg_basket: {
@@ -925,7 +930,7 @@
         equipment: 'milk_pail',
         equipmentName: 'Milk Pail'
       },
-      wool_bin: {
+      wool_station: {
         animalType: 'sheep',
         animalArray: 'sheep',
         product: 'wool',
@@ -949,7 +954,7 @@
         equipment: 'butcher_knife',
         equipmentName: 'Butcher Knife'
       },
-      truffle_crate: {
+      truffle_grounds: {
         animalType: 'pig',
         animalArray: 'pigs',
         product: 'truffle',
@@ -1072,16 +1077,32 @@
 
     function checkLevelUp() {
       const t = CONFIG.levelThresholds;
-      if (gameState.level >= t.length) return; // Max level reached
+      let levelsGained = 0;
 
-      // XP resets each level - check if current XP >= threshold for current level
-      const xpNeeded = t[gameState.level]; // t[0]=50 for level 0→1, t[1]=100 for level 1→2, etc.
-      if (gameState.xp >= xpNeeded) {
+      while (gameState.level < t.length) {
+        const xpNeeded = t[gameState.level];
+        if (gameState.xp < xpNeeded) break;
+
+        // Compute remaining XP after this level-up
+        gameState.xp -= xpNeeded;
         const newLevel = gameState.level + 1;
-        console.log('[Hughberry] Level up! XP:', gameState.xp, '>=', xpNeeded, '-> Level', newLevel);
-        triggerTask('Add_Level_1');
-        triggerTask('Reset_XP'); // Reset XP to 0 on level up
-        notify(`LEVEL UP! Now Lv.${newLevel}!`, 'success');
+        console.log('[Hughberry] Level up! Excess XP:', gameState.xp, 'after needing', xpNeeded, '-> Level', newLevel);
+        levelsGained++;
+
+        // Trigger level-up tasks staggered to avoid Portals collision
+        (function(delay) {
+          setTimeout(function() {
+            triggerTask('Add_Level_1');
+          }, delay);
+        })((levelsGained - 1) * 400);
+
+        gameState.level = newLevel;
+      }
+
+      if (levelsGained > 0) {
+        // Reset XP in Portals to the remaining amount after all level-ups
+        triggerTask('Reset_XP');
+        notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success');
       }
     }
 
@@ -1422,37 +1443,22 @@
 
         <div class="section-title">Planting XP</div>
         <div class="xp-history">
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Plant Wheat</span><span class="xp-entry-amount">+2 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F955; Plant Carrot</span><span class="xp-entry-amount">+2 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33D; Plant Corn</span><span class="xp-entry-amount">+3 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F954; Plant Potato</span><span class="xp-entry-amount">+3 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F345; Plant Tomato</span><span class="xp-entry-amount">+4 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F383; Plant Pumpkin</span><span class="xp-entry-amount">+5 XP</span></div>
+          ${Object.entries(CONFIG.crops).map(([k, c]) => `<div class="xp-entry"><span class="xp-entry-activity">${c.icon} Plant ${c.name}</span><span class="xp-entry-amount">+${getPlantingXP(c)} XP</span></div>`).join('')}
         </div>
 
         <div class="section-title">Harvesting XP</div>
         <div class="xp-history">
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33E; Harvest Wheat</span><span class="xp-entry-amount">+5 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F955; Harvest Carrot</span><span class="xp-entry-amount">+5 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F33D; Harvest Corn</span><span class="xp-entry-amount">+8 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F954; Harvest Potato</span><span class="xp-entry-amount">+8 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F345; Harvest Tomato</span><span class="xp-entry-amount">+10 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F383; Harvest Pumpkin</span><span class="xp-entry-amount">+15 XP</span></div>
+          ${Object.entries(CONFIG.crops).map(([k, c]) => `<div class="xp-entry"><span class="xp-entry-activity">${c.icon} Harvest ${c.name}</span><span class="xp-entry-amount">+${getHarvestXP(c)} XP</span></div>`).join('')}
         </div>
 
         <div class="section-title">Animal XP (Start + Collect)</div>
         <div class="xp-history">
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F414; Chicken (Start)</span><span class="xp-entry-amount">+1 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F414; Chicken (Collect Egg)</span><span class="xp-entry-amount">+3 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F404; Cow (Start)</span><span class="xp-entry-amount">+2 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F404; Cow (Collect Milk)</span><span class="xp-entry-amount">+5 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F411; Sheep (Start)</span><span class="xp-entry-amount">+3 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F411; Sheep (Collect Wool)</span><span class="xp-entry-amount">+6 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F410; Goat (Start)</span><span class="xp-entry-amount">+4 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F410; Goat (Collect Meat)</span><span class="xp-entry-amount">+8 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F437; Pig (Start)</span><span class="xp-entry-amount">+5 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F437; Pig (Collect Truffle)</span><span class="xp-entry-amount">+10 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F41D; Collect Honey</span><span class="xp-entry-amount">+5 XP</span></div>
+          ${Object.entries(CONFIG.animals).map(([k, a]) => {
+            const station = Object.values(COLLECTION_STATIONS).find(s => s.animalType === k);
+            const collectXP = station ? getAnimalCollectXP(station) : a.collectXP;
+            return `<div class="xp-entry"><span class="xp-entry-activity">${a.icon} ${a.name} (Start)</span><span class="xp-entry-amount">+${getAnimalStartXP(a)} XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">${a.icon} ${a.name} (Collect ${a.productName})</span><span class="xp-entry-amount">+${collectXP} XP</span></div>`;
+          }).join('')}
         </div>
 
         <div class="section-title">Crafting XP</div>
@@ -1540,6 +1546,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') { e.preventDefault(); closeMenu(); }
       if (e.key >= '1' && e.key <= '6') {
+        if (document.activeElement && (document.activeElement.tagName === 'SELECT' || document.activeElement.tagName === 'INPUT')) return;
         const tabs = ['dashboard', 'crops', 'inventory', 'animals', 'xp', 'unlocks'];
         document.querySelector(`[data-tab="${tabs[parseInt(e.key) - 1]}"]`)?.click();
       }
@@ -1547,6 +1554,10 @@
 
     function notify(msg, type = 'success') {
       const c = document.getElementById('notifications');
+      // Cap notifications at 5 - remove oldest if at limit
+      while (c.children.length >= 5) {
+        c.removeChild(c.firstChild);
+      }
       const n = document.createElement('div');
       n.className = `notification ${type}`;
       n.innerHTML = `<span class="notification-icon">${type === 'success' ? '&#x2705;' : '&#x274C;'}</span><span class="notification-text">${msg}</span>`;
@@ -1612,7 +1623,9 @@
 
       // Always update active tab for timers
       const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
-      if (activeTab === 'dashboard') renderDashboard();
+      if (activeTab === 'dashboard') {
+        if (dashboardDirty || needsRender) { renderDashboard(); dashboardDirty = false; }
+      }
       else if (activeTab === 'crops') updateCropTimers(); // Use lightweight timer update instead of full re-render
       else if (activeTab === 'animals') renderAnimals();
     }

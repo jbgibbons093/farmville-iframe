@@ -25,12 +25,13 @@
     .item-info { flex: 1; }
     .item-name { font-size: 18px; font-weight: 700; }
     .item-desc { font-size: 13px; color: #aaa; margin-top: 4px; }
+    .item-locked { font-size: 11px; color: #e74c3c; }
     .item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .item-price { font-size: 20px; font-weight: 800; color: #FFD700; }
     .item-owned-tag { font-size: 14px; font-weight: 700; color: #27ae60; }
     .buy-btn { background: linear-gradient(180deg, #c0392b 0%, #96281b 100%); border: 2px solid #e74c3c; color: #fff; padding: 10px 25px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .buy-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
-    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
     .footer { background: rgba(0,0,0,0.4); padding: 12px 20px; text-align: center; border-top: 2px solid #c0392b; }
     .footer-hint { font-size: 12px; color: #888; }
     .close-btn { background: linear-gradient(180deg, #c0392b 0%, #96281b 100%); border: 2px solid #e74c3c; color: #fff; width: 36px; height: 36px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -166,7 +167,7 @@
       EQUIPMENT.forEach(equip => {
         const owned = gameState.equipment[equip.id];
         const locked = gameState.level < equip.unlockLevel;
-        const canBuy = !owned && !locked && gameState.gold >= equip.price;
+        const canBuy = !owned && !locked && !actionPending && gameState.gold >= equip.price;
 
         equipHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
           '<span class="item-icon">' + equip.icon + '</span>' +
@@ -179,7 +180,7 @@
             (owned ?
               '<div class="item-owned-tag">OWNED</div>' :
               '<div class="item-price">' + equip.price + 'g</div>' +
-              '<button class="buy-btn" onclick="buyEquipment(\'' + equip.id + '\')" ' + (canBuy ? '' : 'disabled') + '>Purchase</button>'
+              '<button class="buy-btn" ' + (canBuy ? 'onclick="buyEquipment(\'' + equip.id + '\')"' : 'disabled') + '>Purchase</button>'
             ) +
           '</div>' +
         '</div>';
@@ -191,7 +192,7 @@
       RECIPES.forEach(recipe => {
         const owned = gameState.recipes[recipe.id];
         const locked = gameState.level < recipe.unlockLevel;
-        const canBuy = !owned && !locked && gameState.gold >= recipe.price;
+        const canBuy = !owned && !locked && !actionPending && gameState.gold >= recipe.price;
 
         recipeHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
           '<span class="item-icon">' + recipe.icon + '</span>' +
@@ -204,7 +205,7 @@
             (owned ?
               '<div class="item-owned-tag">OWNED</div>' :
               '<div class="item-price">' + recipe.price + 'g</div>' +
-              '<button class="buy-btn" onclick="buyRecipe(\'' + recipe.id + '\')" ' + (canBuy ? '' : 'disabled') + '>Purchase</button>'
+              '<button class="buy-btn" ' + (canBuy ? 'onclick="buyRecipe(\'' + recipe.id + '\')"' : 'disabled') + '>Purchase</button>'
             ) +
           '</div>' +
         '</div>';
@@ -231,12 +232,12 @@
       'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
       'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
       'Cake': 'cake', 'Mead': 'mead',
-      'RecipeFlour': 'has_recipe_flour', 'RecipeBread': 'has_recipe_bread',
-      'RecipeCheese': 'has_recipe_cheese', 'RecipeStew': 'has_recipe_stew',
-      'RecipeRagout': 'has_recipe_ragout', 'RecipePie': 'has_recipe_pie',
-      'RecipeMeatPie': 'has_recipe_meat_pie', 'RecipeBlanket': 'has_recipe_blanket',
-      'RecipeButter': 'has_recipe_butter', 'RecipeCake': 'has_recipe_cake',
-      'RecipeMead': 'has_recipe_mead'
+      'Has_Recipe_Flour': 'has_recipe_flour', 'Has_Recipe_Bread': 'has_recipe_bread',
+      'Has_Recipe_Cheese': 'has_recipe_cheese', 'Has_Recipe_Stew': 'has_recipe_stew',
+      'Has_Recipe_Ragout': 'has_recipe_ragout', 'Has_Recipe_Pie': 'has_recipe_pie',
+      'Has_Recipe_Meat_Pie': 'has_recipe_meat_pie', 'Has_Recipe_Blanket': 'has_recipe_blanket',
+      'Has_Recipe_Butter': 'has_recipe_butter', 'Has_Recipe_Cake': 'has_recipe_cake',
+      'Has_Recipe_Mead': 'has_recipe_mead'
     };
 
     function parseSyncMessage(msg) {
@@ -245,14 +246,22 @@
       let i = 0;
       while (i < parts.length) {
         let matched = false;
+        // Try 4-word key first (e.g. Has_Recipe_Meat_Pie)
+        if (!matched && i + 4 < parts.length) {
+          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+4]) || 0; i += 5; matched = true; }
+        }
+        // Try 3-word key (e.g. Has_Recipe_Flour, Has_Milk_Pail)
         if (!matched && i + 3 < parts.length) {
           const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
           if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
         }
+        // Try 2-word key (e.g. Seeds_Wheat, Crop_Carrot)
         if (!matched && i + 2 < parts.length) {
           const k = parts[i] + '_' + parts[i+1];
           if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
         }
+        // Try 1-word key (e.g. Gold, XP, Level)
         if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
           data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
         }

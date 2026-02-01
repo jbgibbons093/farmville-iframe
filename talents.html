@@ -443,7 +443,7 @@ body {
     </button>
     <button class="tree-tab" data-tree="economy" onclick="switchTree('economy')">
       <span class="tab-icon">&#128218;</span>
-      <span class="tab-label">Economy</span>
+      <span class="tab-label">General</span>
       <span class="tab-points" id="tabPointsEconomy">0 / 20</span>
     </button>
   </div>
@@ -534,7 +534,7 @@ var TALENT_TREES = {
     ]
   },
   economy: {
-    name: 'Economy',
+    name: 'General',
     maxPoints: 20,
     tiers: [
       {
@@ -593,19 +593,6 @@ var actionPending = false;
 })();
 
 // ── Talent Calculations ──
-function getTotalInvested() {
-  var total = 0;
-  var keys = Object.keys(talentState);
-  for (var i = 0; i < keys.length; i++) {
-    total += talentState[keys[i]];
-  }
-  return total;
-}
-
-function getBonusPoints() {
-  return (talentState.BonusPoint1 || 0) + (talentState.BonusPoint2 || 0);
-}
-
 function getUnspentPoints() {
   return unspentTalentPoints;
 }
@@ -721,11 +708,13 @@ function handlePortalsMessage(msg) {
   if (typeof msg !== 'string') return;
   if (msg.indexOf('Sync_Inventory') === 0) {
     parseAndSyncInventory(msg);
+    actionPending = false;
     renderAll();
   }
 }
 
 function parseAndSyncInventory(msg) {
+  msg = msg.replace('Sync_Inventory_', '');
   var parts = msg.split('_');
   var i = 0;
 
@@ -813,6 +802,14 @@ window.addEventListener('message', function(event) {
 
 setupMessageListener();
 setTimeout(function() { triggerTask('Sync_Inventory'); }, 500);
+
+// ── Visibility/Focus Handlers ──
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) { triggerTask('Sync_Inventory'); }
+});
+window.addEventListener('focus', function() {
+  triggerTask('Sync_Inventory');
+});
 
 // ── UI Rendering ──
 function switchTree(treeName) {

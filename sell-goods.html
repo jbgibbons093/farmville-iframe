@@ -98,17 +98,17 @@
         { key: 'honey', name: 'Honey', icon: '&#x1F36F;', price: 25, taskPrefix: 'Sell_Honey', singleOnly: true }
       ],
       crafted: [
-        { key: 'flour', name: 'Flour', icon: '&#x1F35E;', price: 20, taskPrefix: 'Sell_Flour', singleOnly: true },
+        { key: 'flour', name: 'Flour', icon: '&#x1F35E;', price: 10, taskPrefix: 'Sell_Flour', singleOnly: true },
         { key: 'bread', name: 'Bread', icon: '&#x1F956;', price: 35, taskPrefix: 'Sell_Bread', singleOnly: true },
-        { key: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', price: 30, taskPrefix: 'Sell_Cheese', singleOnly: true },
+        { key: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', price: 45, taskPrefix: 'Sell_Cheese', singleOnly: true },
         { key: 'stew', name: 'Stew', icon: '&#x1F372;', price: 50, taskPrefix: 'Sell_Stew', singleOnly: true },
         { key: 'ragout', name: 'Ragout', icon: '&#x1F356;', price: 75, taskPrefix: 'Sell_Ragout', singleOnly: true },
-        { key: 'pie', name: 'Pie', icon: '&#x1F967;', price: 80, taskPrefix: 'Sell_Pie', singleOnly: true },
+        { key: 'pie', name: 'Pie', icon: '&#x1F967;', price: 100, taskPrefix: 'Sell_Pie', singleOnly: true },
         { key: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', price: 90, taskPrefix: 'Sell_Meat_Pie', singleOnly: true },
-        { key: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', price: 50, taskPrefix: 'Sell_Blanket', singleOnly: true },
+        { key: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', price: 60, taskPrefix: 'Sell_Blanket', singleOnly: true },
         { key: 'butter', name: 'Butter', icon: '&#x1F9C8;', price: 30, taskPrefix: 'Sell_Butter', singleOnly: true },
-        { key: 'cake', name: 'Cake', icon: '&#x1F370;', price: 100, taskPrefix: 'Sell_Cake', singleOnly: true },
-        { key: 'mead', name: 'Mead', icon: '&#x1F37A;', price: 60, taskPrefix: 'Sell_Mead', singleOnly: true }
+        { key: 'cake', name: 'Cake', icon: '&#x1F370;', price: 150, taskPrefix: 'Sell_Cake', singleOnly: true },
+        { key: 'mead', name: 'Mead', icon: '&#x1F37A;', price: 100, taskPrefix: 'Sell_Mead', singleOnly: true }
       ]
     };
 
@@ -131,11 +131,13 @@
       }
     }
 
+    var notifyTimeout = null;
     function notify(msg) {
-      const el = document.getElementById('notification');
+      var el = document.getElementById('notification');
       el.textContent = msg;
       el.style.display = 'block';
-      setTimeout(() => el.style.display = 'none', 2000);
+      if (notifyTimeout) clearTimeout(notifyTimeout);
+      notifyTimeout = setTimeout(function() { el.style.display = 'none'; }, 2000);
     }
 
     function sellItem(key, qty, taskPrefix, price) {
@@ -231,12 +233,12 @@
       'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
       'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
       'Cake': 'cake', 'Mead': 'mead',
-      'RecipeFlour': 'has_recipe_flour', 'RecipeBread': 'has_recipe_bread',
-      'RecipeCheese': 'has_recipe_cheese', 'RecipeStew': 'has_recipe_stew',
-      'RecipeRagout': 'has_recipe_ragout', 'RecipePie': 'has_recipe_pie',
-      'RecipeMeatPie': 'has_recipe_meat_pie', 'RecipeBlanket': 'has_recipe_blanket',
-      'RecipeButter': 'has_recipe_butter', 'RecipeCake': 'has_recipe_cake',
-      'RecipeMead': 'has_recipe_mead'
+      'Has_Recipe_Flour': 'has_recipe_flour', 'Has_Recipe_Bread': 'has_recipe_bread',
+      'Has_Recipe_Cheese': 'has_recipe_cheese', 'Has_Recipe_Stew': 'has_recipe_stew',
+      'Has_Recipe_Ragout': 'has_recipe_ragout', 'Has_Recipe_Pie': 'has_recipe_pie',
+      'Has_Recipe_Meat_Pie': 'has_recipe_meat_pie', 'Has_Recipe_Blanket': 'has_recipe_blanket',
+      'Has_Recipe_Butter': 'has_recipe_butter', 'Has_Recipe_Cake': 'has_recipe_cake',
+      'Has_Recipe_Mead': 'has_recipe_mead'
     };
 
     function parseSyncMessage(msg) {
@@ -245,6 +247,11 @@
       let i = 0;
       while (i < parts.length) {
         let matched = false;
+        // 4-word key check
+        if (i + 4 < parts.length) {
+          var key4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (SYNC_MAP[key4]) { data[SYNC_MAP[key4]] = parseInt(parts[i+4]) || 0; i += 5; matched = true; }
+        }
         if (!matched && i + 3 < parts.length) {
           const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
           if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }

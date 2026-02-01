@@ -30,7 +30,7 @@
     .btn-row { display: flex; gap: 6px; }
     .buy-btn { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 2px solid #2ecc71; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .buy-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 10px rgba(39,174,96,0.5); }
-    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
     .footer { background: rgba(0,0,0,0.4); padding: 12px 20px; text-align: center; border-top: 2px solid #27ae60; }
     .footer-hint { font-size: 12px; color: #888; }
     .close-btn { background: linear-gradient(180deg, #c0392b 0%, #96281b 100%); border: 2px solid #e74c3c; color: #fff; width: 36px; height: 36px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
@@ -127,8 +127,8 @@
       Object.entries(SEEDS).forEach(([key, seed]) => {
         const owned = gameState.seeds[key] || 0;
         const locked = gameState.level < seed.unlockLevel;
-        const canBuy1 = !locked && gameState.gold >= seed.cost;
-        const canBuy5 = !locked && gameState.gold >= seed.cost * 5;
+        const canBuy1 = !locked && !actionPending && gameState.gold >= seed.cost;
+        const canBuy5 = !locked && !actionPending && gameState.gold >= seed.cost * 5;
 
         html += '<div class="item">' +
           '<span class="item-icon">' + seed.icon + '</span>' +
@@ -140,8 +140,8 @@
           '<div class="item-actions">' +
             '<div class="item-price">' + seed.cost + 'g each</div>' +
             '<div class="btn-row">' +
-              '<button class="buy-btn" onclick="buySeeds(\'' + key + '\', 1)" ' + (canBuy1 ? '' : 'disabled') + '>Buy 1</button>' +
-              '<button class="buy-btn" onclick="buySeeds(\'' + key + '\', 5)" ' + (canBuy5 ? '' : 'disabled') + '>Buy 5</button>' +
+              '<button class="buy-btn" ' + (canBuy1 ? 'onclick="buySeeds(\'' + key + '\', 1)"' : 'disabled') + '>Buy 1</button>' +
+              '<button class="buy-btn" ' + (canBuy5 ? 'onclick="buySeeds(\'' + key + '\', 5)"' : 'disabled') + '>Buy 5</button>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -168,12 +168,12 @@
       'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
       'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
       'Cake': 'cake', 'Mead': 'mead',
-      'RecipeFlour': 'has_recipe_flour', 'RecipeBread': 'has_recipe_bread',
-      'RecipeCheese': 'has_recipe_cheese', 'RecipeStew': 'has_recipe_stew',
-      'RecipeRagout': 'has_recipe_ragout', 'RecipePie': 'has_recipe_pie',
-      'RecipeMeatPie': 'has_recipe_meat_pie', 'RecipeBlanket': 'has_recipe_blanket',
-      'RecipeButter': 'has_recipe_butter', 'RecipeCake': 'has_recipe_cake',
-      'RecipeMead': 'has_recipe_mead'
+      'Has_Recipe_Flour': 'has_recipe_flour', 'Has_Recipe_Bread': 'has_recipe_bread',
+      'Has_Recipe_Cheese': 'has_recipe_cheese', 'Has_Recipe_Stew': 'has_recipe_stew',
+      'Has_Recipe_Ragout': 'has_recipe_ragout', 'Has_Recipe_Pie': 'has_recipe_pie',
+      'Has_Recipe_Meat_Pie': 'has_recipe_meat_pie', 'Has_Recipe_Blanket': 'has_recipe_blanket',
+      'Has_Recipe_Butter': 'has_recipe_butter', 'Has_Recipe_Cake': 'has_recipe_cake',
+      'Has_Recipe_Mead': 'has_recipe_mead'
     };
 
     function parseSyncMessage(msg) {
@@ -182,6 +182,10 @@
       let i = 0;
       while (i < parts.length) {
         let matched = false;
+        if (!matched && i + 4 < parts.length) {
+          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+4]) || 0; i += 5; matched = true; }
+        }
         if (!matched && i + 3 < parts.length) {
           const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
           if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
