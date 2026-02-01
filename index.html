@@ -1672,7 +1672,7 @@
       if (activeTab === 'dashboard') {
         if (dashboardDirty || needsRender) { renderDashboard(); dashboardDirty = false; }
       }
-      else if (activeTab === 'crops') updateCropTimers(); // Use lightweight timer update instead of full re-render
+      else if (activeTab === 'crops') { if (needsRender) renderCrops(); else updateCropTimers(); }
       else if (activeTab === 'animals') renderAnimals();
     }
 
