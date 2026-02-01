@@ -123,6 +123,11 @@
     .animal-btn { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 2px solid #2ecc71; color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
     .animal-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #4a4a4a; border-color: #666; }
     .locked-text { font-size: 10px; color: #e74c3c; font-weight: 600; }
+    .animals-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+    .animals-controls { display: flex; align-items: center; gap: 14px; }
+    .section-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: #FFD700; }
+    .animal-start-all-btn { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 2px solid #2ecc71; color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .animal-start-all-btn:hover { background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); transform: translateY(-1px); }
 
     /* XP & Unlocks */
     .xp-history { }
@@ -298,6 +303,7 @@
 
     let gameState = {
       gold: 0, xp: 0, level: 0,
+      rebirthCount: 0,
       unspentTalentPoints: 0,
       talents: {
         plotRow2: 0, greenThumb: 0, eagerPlanter: 0, plotRow3: 0,
@@ -325,7 +331,7 @@
       },
       plots: [],
       animals: { cows: [], sheep: [], goats: [], pigs: [], chickens: [], beehives: [] },
-      settings: { autoReplant: false, priorityCrop: 'wheat' }
+      settings: { autoReplant: false, priorityCrop: 'wheat', autoRestartAnimals: false }
     };
 
     // Initialize 24 plots
@@ -537,7 +543,9 @@
         'Wool_Uncollected': { target: 'wool', isUncollected: true },
         'Meat_Uncollected': { target: 'meat', isUncollected: true },
         'Truffle_Uncollected': { target: 'truffle', isUncollected: true },
-        'Honey_Uncollected': { target: 'honey', isUncollected: true }
+        'Honey_Uncollected': { target: 'honey', isUncollected: true },
+        'Rebirth_Count': { target: 'rebirthCount', isRoot: true },
+        'Username': { target: '_skip', isSkip: true }
       };
 
       const parts = msg.replace('Sync_Inventory_', '').split('_');
@@ -1038,6 +1046,19 @@
         animal.notified = false;
       });
 
+      // Auto-restart animals if setting is enabled
+      if (gameState.settings.autoRestartAnimals) {
+        const cooldown = getAnimalCooldown(CONFIG.animals[station.animalType]);
+        readyAnimals.forEach(animal => {
+          animal.state = 'producing';
+          animal.readyAt = Date.now() + (cooldown * 1000);
+          animal.notified = false;
+        });
+        const restartXP = getAnimalStartXP(CONFIG.animals[station.animalType]) * readyCount;
+        awardXP(restartXP);
+        console.log('[Hughberry] Auto-restarted', readyCount, station.animalType, 'animals, +' + restartXP + ' XP');
+      }
+
       // Send Collect_{Product} immediately to hide collection object in 3D world
       triggerTask(station.collectTask);
       readyTaskTriggered[station.animalType] = false;
@@ -1300,6 +1321,43 @@
       saveGameQuiet();
     }
 
+    function toggleAutoRestartAnimals() {
+      gameState.settings.autoRestartAnimals = !gameState.settings.autoRestartAnimals;
+      saveGameQuiet();
+      renderAnimals();
+      notify(`Auto-restart animals ${gameState.settings.autoRestartAnimals ? 'ON' : 'OFF'}`, 'success');
+    }
+
+    function startAllAnimals(type) {
+      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens, beehive: gameState.animals.beehives };
+      const animals = animalArrays[type];
+      const config = CONFIG.animals[type];
+      if (!animals || !config) return;
+      if (gameState.level < config.unlockLevel) return;
+      const reqEquip = ANIMAL_EQUIPMENT[type];
+      if (reqEquip && !gameState.equipment[reqEquip.id]) return;
+
+      const activeSlots = getActiveAnimalSlots(type);
+      let started = 0;
+      animals.forEach((animal, i) => {
+        if (i < activeSlots && animal.state === 'idle') {
+          const cooldown = getAnimalCooldown(config);
+          animal.state = 'producing';
+          animal.readyAt = Date.now() + (cooldown * 1000);
+          animal.notified = false;
+          started++;
+        }
+      });
+
+      if (started > 0) {
+        const animalXP = getAnimalStartXP(config) * started;
+        awardXP(animalXP);
+        notify(`Started ${started} ${config.name}${started > 1 ? 's' : ''}! +${animalXP} XP`, 'success');
+        saveGameQuiet();
+        renderAnimals();
+      }
+    }
+
     function renderInventory() {
       const sections = [
         { title: 'Crops', items: [
@@ -1407,7 +1465,7 @@
         </div>`;
       }
 
-      let html = '';
+      let html = `<div class="animals-header"><div class="section-title">&#x1F404; Animal Management</div><div class="animals-controls"><div class="control-group"><span class="control-label">Auto-Restart</span><div class="toggle-switch ${gameState.settings.autoRestartAnimals ? 'on' : ''}" onclick="toggleAutoRestartAnimals()"></div></div></div></div>`;
       const animalTypes = [
         { type: 'cow', array: gameState.animals.cows, config: CONFIG.animals.cow, title: 'Cows (Milk)' },
         { type: 'chicken', array: gameState.animals.chickens, config: CONFIG.animals.chicken, title: 'Chickens (Egg)' },
@@ -1420,7 +1478,11 @@
       animalTypes.forEach(({ type, array, config, title }) => {
         const unlocked = gameState.level >= config.unlockLevel;
         const activeSlots = getActiveAnimalSlots(type);
-        html += `<div class="animals-section"><div class="section-title">${config.icon} ${title} ${!unlocked ? `(Lv.${config.unlockLevel})` : ''} <span style="font-size:11px;color:#888">(${activeSlots}/${config.count} slots)</span></div><div class="animals-grid">`;
+        const reqEquip = ANIMAL_EQUIPMENT[type];
+        const hasEquipment = !reqEquip || gameState.equipment[reqEquip.id];
+        const hasIdleAnimals = unlocked && hasEquipment && array.some((a, i) => i < activeSlots && a.state === 'idle');
+        const startAllBtn = hasIdleAnimals ? `<button class="animal-start-all-btn" onclick="startAllAnimals('${type}')">&#x25B6; Start All</button>` : '';
+        html += `<div class="animals-section"><div class="section-title-row"><span>${config.icon} ${title} ${!unlocked ? `(Lv.${config.unlockLevel})` : ''} <span style="font-size:11px;color:#888">(${activeSlots}/${config.count} slots)</span></span>${startAllBtn}</div><div class="animals-grid">`;
         array.forEach((a, i) => {
           if (i < activeSlots) {
             html += renderAnimalCard(a, i, type, config);
