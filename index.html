@@ -358,6 +358,8 @@
 
     let actionPending = false;
     let dashboardDirty = true;
+    let staggeringSeedKey = null;
+    let staggerEndTime = 0;
 
     function triggerTask(taskName, targetState) {
       if (!targetState) targetState = 'SetNotActiveToActive';
@@ -587,6 +589,9 @@
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else if (mapping.isTalent) gameState.talents[mapping.target] = value;
+            else if (staggeringSeedKey === mapping.target && Date.now() < staggerEndTime) {
+              console.log('[Hughberry] Skipping sync overwrite for', mapping.target, 'during stagger');
+            }
             else gameState.inventory[mapping.target] = value;
             i += 3; matched = true;
           }
@@ -684,7 +689,7 @@
       }
       else if (msg.startsWith('Sync_Inventory')) {
         parseAndSyncInventory(msg);
-        actionPending = false;
+        if (Date.now() >= staggerEndTime) actionPending = false;
         checkLevelUp(); // Detect level-ups and trigger Add_Level_1 to Portals
         updateAllUI();
       }
@@ -791,7 +796,7 @@
       gameState.inventory[seedKey]--;
 
       triggerTask(`Plant_Plot_${plotId}`);
-      triggerTask(`Sub_Seeds_${crop.name}_1`);
+      setTimeout(function() { triggerTask(`Sub_Seeds_${crop.name}_1`); }, 150);
       const plantXP = getPlantingXP(crop);
       awardXP(plantXP);
 
@@ -827,18 +832,24 @@
       if (toPlant < 1) { notify('No empty plots!', 'error'); return; }
 
       actionPending = true;
+      staggeringSeedKey = seedKey;
+      staggerEndTime = Date.now() + (toPlant * 350) + 1500;
+
       let planted = 0;
       const plantXP = getPlantingXP(crop);
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
 
-        // Stagger task triggers by 300ms per plot to avoid Portals race conditions
-        (function(plotRef, plotIdx, delay) {
+        // Stagger task triggers by 350ms per plot to avoid Portals race conditions
+        // Sub_Seeds fires 150ms after Plant_Plot to avoid same-instant "Iframe Message" collision
+        (function(plotIdx, delay) {
           setTimeout(function() {
             triggerTask(`Plant_Plot_${plotIdx + 1}`);
-            triggerTask(`Sub_Seeds_${crop.name}_1`);
           }, delay);
-        })(plot, idx, i * 300);
+          setTimeout(function() {
+            triggerTask(`Sub_Seeds_${crop.name}_1`);
+          }, delay + 150);
+        })(idx, i * 350);
 
         // Optimistic local seed deduction for rapid planting
         gameState.inventory[seedKey]--;
@@ -858,8 +869,12 @@
       saveGameQuiet();
       renderCrops();
 
-      // Safety timeout: reset actionPending after all staggered tasks have sent
-      setTimeout(function() { actionPending = false; }, toPlant * 300 + 3000);
+      // Safety timeout: reset actionPending and stagger guard after all tasks have sent
+      setTimeout(function() {
+        actionPending = false;
+        staggeringSeedKey = null;
+        staggerEndTime = 0;
+      }, toPlant * 350 + 3000);
     }
 
     // Equipment requirements for starting animal activities
