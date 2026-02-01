@@ -845,8 +845,16 @@ function parseAndSyncInventory(msg) {
         continue;
       }
       if (parts[i] === 'playerName') {
-        playerName = parts[i+1] || '';
-        i += 2;
+        // |username| arrives quoted from Portals (e.g. "bus"), strip quotes
+        // If name has underscores, rejoin remaining parts
+        var nameParts = [];
+        var j = i + 1;
+        while (j < parts.length) {
+          nameParts.push(parts[j]);
+          j++;
+        }
+        playerName = nameParts.join('_').replace(/"/g, '');
+        i = parts.length; // consumed everything to end
         continue;
       }
       if (parts[i] === 'Has' && i + 2 < parts.length) {
