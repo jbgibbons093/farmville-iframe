@@ -762,8 +762,15 @@
     // ============================================
 
     // Close function - use SDK closeIframe
+    function triggerTask(taskName) {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
+      }
+    }
+
     function closeGuide() {
       console.log('[Guide] Close guide requested');
+      triggerTask('HUD');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();
       }
