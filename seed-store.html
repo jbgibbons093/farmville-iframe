@@ -89,6 +89,7 @@
     }
 
     function closeIframe() {
+      playSound('click');
       console.log('[Hughberry SeedStore] Close requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();

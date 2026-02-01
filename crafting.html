@@ -106,6 +106,7 @@
     }
 
     function closeIframe() {
+      playSound('click');
       console.log('[Hughberry Crafting] Close requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();

@@ -675,6 +675,7 @@ function triggerTask(taskName, targetState) {
 }
 
 function closeIframe() {
+  playSound('click');
   console.log('[Talents] Close requested');
   if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
     PortalsSdk.closeIframe();

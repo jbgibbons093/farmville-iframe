@@ -123,6 +123,7 @@
     }
 
     function closeIframe() {
+      playSound('click');
       console.log('[Hughberry SellGoods] Close requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();

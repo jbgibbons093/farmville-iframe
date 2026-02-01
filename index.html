@@ -366,6 +366,7 @@
     }
 
     function closeMenu() {
+      playSound('click');
       console.log('[Hughberry] Close menu requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();

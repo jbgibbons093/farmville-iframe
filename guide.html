@@ -761,6 +761,10 @@
     // HUGHBERRY FARMS - GAME GUIDE OVERLAY
     // ============================================
 
+    // === Sound Effects ===
+    var _clickSound = new Audio('click.mp3'); _clickSound.preload = 'auto'; _clickSound.volume = 0.3;
+    function playSound() { try { _clickSound.currentTime = 0; _clickSound.play().catch(function(){}); } catch(e){} }
+
     // Close function - use SDK closeIframe
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -769,6 +773,7 @@
     }
 
     function closeGuide() {
+      playSound();
       console.log('[Guide] Close guide requested');
       triggerTask('HUD');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
