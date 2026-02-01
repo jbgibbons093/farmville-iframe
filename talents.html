@@ -71,6 +71,68 @@ body {
   white-space: nowrap;
 }
 
+/* ── Buy Point Bar ── */
+.buy-point-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 2px solid #5a3a1a;
+  flex-shrink: 0;
+}
+
+.gold-display {
+  font-weight: 700;
+  font-size: 14px;
+  color: #FFD700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gold-icon { font-size: 16px; }
+
+.buy-point-btn {
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 2px solid #196f3d;
+  background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 0 #145a32;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.buy-point-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 #145a32;
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+}
+.buy-point-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 #145a32;
+}
+.buy-point-btn:disabled {
+  background: rgba(255,255,255,0.08);
+  border-color: #444;
+  color: #555;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  pointer-events: none;
+}
+
+.buy-cost {
+  color: #FFD700;
+  font-size: 12px;
+}
+
 .close-btn {
   background: rgba(0,0,0,0.3);
   border: 2px solid rgba(255,255,255,0.2);
@@ -448,6 +510,11 @@ body {
     </button>
   </div>
 
+  <div class="buy-point-bar">
+    <span class="gold-display"><span class="gold-icon">&#129689;</span> <span id="goldDisplay">0</span> Gold</span>
+    <button class="buy-point-btn" id="buyPointBtn" onclick="buyTalentPoint()" disabled>Buy Point <span class="buy-cost">500g</span></button>
+  </div>
+
   <div class="tree-content" id="treeContent"></div>
 </div>
 
@@ -575,6 +642,7 @@ var TALENT_TREES = {
 // ── Game State ──
 var talentState = {};
 var playerLevel = 0;
+var playerGold = 0;
 var unspentTalentPoints = 0;
 var activeTree = 'farming';
 var actionPending = false;
@@ -662,6 +730,28 @@ function investPoint(treeName, talentKey) {
   setTimeout(function() { actionPending = false; }, 1500);
 }
 
+// ── Buy Talent Point ──
+var BUY_POINT_COST = 500;
+
+function buyTalentPoint() {
+  if (actionPending) return;
+  if (playerGold < BUY_POINT_COST) {
+    notify('Need ' + BUY_POINT_COST + ' gold (have ' + playerGold + ')', 'error');
+    return;
+  }
+
+  actionPending = true;
+  triggerTask('Buy_Talent_Point');
+
+  // Optimistic update
+  playerGold -= BUY_POINT_COST;
+  unspentTalentPoints += 1;
+  notify('Purchased 1 Talent Point for ' + BUY_POINT_COST + 'g', 'success');
+  renderAll();
+
+  setTimeout(function() { actionPending = false; }, 1500);
+}
+
 // ── Portals SDK ──
 function triggerTask(taskName, targetState) {
   targetState = targetState || 'SetNotActiveToActive';
@@ -745,7 +835,8 @@ function parseAndSyncInventory(msg) {
     'T_SeasonedWorker': 'SeasonedWorker',
     'T_BonusPoint1': 'BonusPoint1',
     'T_Prodigy': 'Prodigy',
-    'T_BonusPoint2': 'BonusPoint2'
+    'T_BonusPoint2': 'BonusPoint2',
+    'Rebirth_Count': '_skip'
   };
 
   while (i < parts.length) {
@@ -768,10 +859,19 @@ function parseAndSyncInventory(msg) {
         continue;
       }
     }
-    // One-word key
+    // One-word keys
+    if (parts[i] === 'Gold' && i + 1 < parts.length) {
+      playerGold = parseInt(parts[i + 1]) || 0;
+      i += 2;
+      continue;
+    }
     if (parts[i] === 'Level' && i + 1 < parts.length) {
       playerLevel = parseInt(parts[i + 1]) || 0;
       i += 2;
+      continue;
+    }
+    if (parts[i] === 'Username' && i + 1 < parts.length) {
+      i += 2; // skip username value
       continue;
     }
     i++;
@@ -826,6 +926,17 @@ function renderAll() {
   // Points badge
   var pts = getUnspentPoints();
   document.getElementById('pointsBadge').textContent = pts + (pts === 1 ? ' Point' : ' Points');
+
+  // Gold display & buy button
+  document.getElementById('goldDisplay').textContent = playerGold;
+  var buyBtn = document.getElementById('buyPointBtn');
+  if (playerGold >= BUY_POINT_COST && !actionPending) {
+    buyBtn.disabled = false;
+    buyBtn.onclick = buyTalentPoint;
+  } else {
+    buyBtn.disabled = true;
+    buyBtn.onclick = null;
+  }
 
   // Tab point counters
   document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 17';
