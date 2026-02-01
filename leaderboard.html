@@ -313,7 +313,6 @@ body {
   max-width: 380px;
   width: 90%;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
 }
 
 .modal-title {
@@ -845,7 +844,7 @@ function parseAndSyncInventory(msg) {
         i += 2;
         continue;
       }
-      if (parts[i] === 'Username') {
+      if (parts[i] === 'playerName') {
         playerName = parts[i+1] || '';
         i += 2;
         continue;

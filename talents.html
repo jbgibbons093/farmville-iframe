@@ -873,8 +873,8 @@ function parseAndSyncInventory(msg) {
       i += 2;
       continue;
     }
-    if (parts[i] === 'Username' && i + 1 < parts.length) {
-      i += 2; // skip username value
+    if (parts[i] === 'playerName' && i + 1 < parts.length) {
+      i += 2; // skip playerName value
       continue;
     }
     i++;
