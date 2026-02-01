@@ -726,11 +726,24 @@
     function harvestPlotFromTrigger(plotId) {
       const plot = gameState.plots[plotId - 1];
       if (!plot) return;
-      const cropType = plot.cropType || 'wheat';
-      const crop = CONFIG.crops[cropType];
-      const cropName = crop ? crop.name : 'Wheat';
+      // Always clean up Portals side (hide 3D crop, deactivate trigger)
       triggerTask(`Harvest_Plot_${plotId}`);
       triggerTask(`Plot_${plotId}_Trigger`, 'SetActiveToNotActive');
+      // Guard: if iframe lost track of crop type (e.g. after reload), skip crop award
+      if (!plot.cropType) {
+        console.log('[Hughberry] No cropType for plot', plotId, '- cleaning up without awarding crops');
+        plot.state = 'empty';
+        plot.plantedAt = null;
+        plot.readyAt = null;
+        dashboardDirty = true;
+        saveGameQuiet();
+        renderCrops();
+        return;
+      }
+      const cropType = plot.cropType;
+      const crop = CONFIG.crops[cropType];
+      if (!crop) return;
+      const cropName = crop.name;
       triggerTask(`Add_Crop_${cropName}_1`);
       const boostedHarvestXP = getHarvestXP(crop);
       awardXP(boostedHarvestXP);
@@ -777,9 +790,19 @@
       if (saved) {
         try {
           const p = JSON.parse(saved);
-          // Only load settings - NOT plots, animals, gold, xp, inventory
-          // Everything else comes from Portals or resets on refresh
+          // Load settings
           gameState.settings = { ...gameState.settings, ...p.settings };
+          // Restore plot crop data so crop types survive iframe reloads
+          if (p.plots && Array.isArray(p.plots)) {
+            p.plots.forEach(function(savedPlot, i) {
+              if (i < gameState.plots.length && savedPlot && savedPlot.cropType) {
+                gameState.plots[i].state = savedPlot.state || 'empty';
+                gameState.plots[i].cropType = savedPlot.cropType;
+                gameState.plots[i].plantedAt = savedPlot.plantedAt || null;
+                gameState.plots[i].readyAt = savedPlot.readyAt || null;
+              }
+            });
+          }
         } catch(e) { console.error('Load error:', e); }
       }
     }
