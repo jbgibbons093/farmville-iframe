@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hughberry Farms - Rebirth Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 10px;
+}
+
+.leaderboard-container {
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
+  border: 4px solid #8B4513;
+  border-radius: 20px;
+  box-shadow: 0 0 0 2px #5a3a1a, 0 20px 60px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #fff;
+}
+
+/* -- Header -- */
+.lb-header {
+  background: linear-gradient(180deg, #8B4513 0%, #5a2d0a 100%);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #a0522d;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon { font-size: 24px; }
+
+.header-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 20px;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+}
+
+.rebirth-badge {
+  background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #FFD700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  white-space: nowrap;
+}
+
+.close-btn {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.2);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.close-btn:hover {
+  background: rgba(192, 57, 43, 0.8);
+  border-color: #e74c3c;
+}
+
+/* -- Player Info Bar -- */
+.player-info {
+  background: rgba(0,0,0,0.3);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #5a3a1a;
+  flex-shrink: 0;
+}
+
+.player-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: #ddd;
+}
+
+.player-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.player-stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-value {
+  color: #FFD700;
+  font-weight: 700;
+}
+
+/* -- Leaderboard Table -- */
+.lb-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  min-height: 0;
+}
+
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lb-table thead th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8B7355;
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 2px solid #5a3a1a;
+  position: sticky;
+  top: 0;
+  background: #1a1208;
+}
+
+.lb-table thead th:last-child {
+  text-align: center;
+}
+
+.lb-table tbody tr {
+  border-bottom: 1px solid rgba(90, 58, 26, 0.4);
+  transition: background 0.15s;
+}
+
+.lb-table tbody tr:hover {
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.lb-table tbody td {
+  padding: 10px 8px;
+  font-size: 14px;
+}
+
+.lb-table tbody td:last-child {
+  text-align: center;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+/* Rank column */
+.rank-cell {
+  width: 50px;
+  font-weight: 700;
+  color: #8B7355;
+}
+
+.rank-1 { color: #FFD700; font-size: 16px; }
+.rank-2 { color: #C0C0C0; font-size: 15px; }
+.rank-3 { color: #CD7F32; font-size: 15px; }
+
+.rank-medal {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: 14px;
+}
+
+.medal-gold { background: linear-gradient(145deg, #FFD700, #DAA520); color: #1a1208; }
+.medal-silver { background: linear-gradient(145deg, #C0C0C0, #A8A8A8); color: #1a1208; }
+.medal-bronze { background: linear-gradient(145deg, #CD7F32, #A0522D); color: #fff; }
+
+/* Current player highlight */
+.lb-table tbody tr.current-player {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 4px;
+}
+
+.lb-table tbody tr.current-player td {
+  color: #FFD700;
+}
+
+.lb-table tbody tr.current-player td:first-child {
+  font-weight: 800;
+}
+
+/* Empty/Loading state */
+.lb-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #8B7355;
+  font-size: 14px;
+}
+
+.lb-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #8B7355;
+  font-size: 14px;
+}
+
+.lb-loading::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #5a3a1a;
+  border-top-color: #FFD700;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* -- Rebirth Button Area -- */
+.rebirth-section {
+  padding: 14px 20px;
+  border-top: 2px solid #5a3a1a;
+  background: rgba(0,0,0,0.2);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.rebirth-requirement {
+  font-size: 11px;
+  color: #8B7355;
+  margin-bottom: 8px;
+}
+
+.rebirth-btn {
+  background: linear-gradient(180deg, #c0392b 0%, #922b21 100%);
+  border: 2px solid #e74c3c;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 18px;
+  letter-spacing: 1px;
+  padding: 10px 32px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.rebirth-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.rebirth-btn:disabled {
+  background: linear-gradient(180deg, #4a4a4a 0%, #333 100%);
+  border-color: #555;
+  color: #888;
+  cursor: not-allowed;
+  text-shadow: none;
+}
+
+.rebirth-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* -- Confirmation Modal -- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-box {
+  background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
+  border: 3px solid #c0392b;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+
+.modal-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 22px;
+  color: #e74c3c;
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.modal-text {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.modal-warning {
+  color: #e74c3c;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  border-radius: 10px;
+  padding: 10px 24px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn-cancel {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.2);
+  color: #ccc;
+}
+
+.modal-btn-cancel:hover {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+.modal-btn-confirm {
+  background: linear-gradient(180deg, #c0392b 0%, #922b21 100%);
+  border: 2px solid #e74c3c;
+  color: #fff;
+}
+
+.modal-btn-confirm:hover {
+  background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+}
+
+/* -- Notifications -- */
+#notifications {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.notification {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  animation: notifIn 0.3s ease-out;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.notification.success {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  color: #fff;
+  border: 1px solid #2ecc71;
+}
+
+.notification.error {
+  background: linear-gradient(135deg, #c0392b, #922b21);
+  color: #fff;
+  border: 1px solid #e74c3c;
+}
+
+/* -- Error Banner -- */
+.db-error {
+  background: rgba(192, 57, 43, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 16px 0;
+  font-size: 12px;
+  color: #e74c3c;
+  text-align: center;
+  display: none;
+}
+
+.db-error.visible { display: block; }
+
+/* -- Animations -- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes notifIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* -- Scrollbar -- */
+.lb-scroll::-webkit-scrollbar { width: 6px; }
+.lb-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+.lb-scroll::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 3px; }
+
+/* -- Responsive -- */
+@media (max-width: 500px) {
+  .leaderboard-container { max-height: 95vh; border-radius: 14px; }
+  .lb-header { padding: 10px 14px; }
+  .header-title { font-size: 17px; }
+  .lb-table tbody td { padding: 8px 6px; font-size: 13px; }
+  .rebirth-btn { font-size: 16px; padding: 8px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="leaderboard-container">
+  <div class="lb-header">
+    <div class="header-left">
+      <span class="header-icon">&#9733;</span>
+      <span class="header-title">Rebirth Leaderboard</span>
+    </div>
+    <div class="rebirth-badge" id="rebirthBadge">0 Rebirths</div>
+    <button class="close-btn" onclick="closeIframe()" title="Close">&#10005;</button>
+  </div>
+
+  <div class="player-info">
+    <span class="player-name" id="playerNameDisplay">Loading...</span>
+    <div class="player-stats">
+      <span>Level: <span class="stat-value" id="playerLevel">0</span></span>
+      <span>Rank: <span class="stat-value" id="playerRank">--</span></span>
+    </div>
+  </div>
+
+  <div class="db-error" id="dbError">Could not connect to leaderboard server. Displaying local data only.</div>
+
+  <div class="lb-scroll">
+    <div class="lb-loading" id="lbLoading">Loading leaderboard</div>
+    <table class="lb-table" id="lbTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Player</th>
+          <th>Rebirths</th>
+        </tr>
+      </thead>
+      <tbody id="lbBody"></tbody>
+    </table>
+    <div class="lb-empty" id="lbEmpty" style="display: none;">No rebirths recorded yet. Be the first!</div>
+  </div>
+
+  <div class="rebirth-section">
+    <div class="rebirth-requirement" id="rebirthReq">Requires Level 50</div>
+    <button class="rebirth-btn" id="rebirthBtn" disabled onclick="showRebirthConfirm()">REBIRTH</button>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-title">Confirm Rebirth</div>
+    <div class="modal-text">
+      All your progress will be permanently reset:<br>
+      Gold, XP, Level, Inventory, Equipment, Recipes, and Talents.
+    </div>
+    <div class="modal-warning">This cannot be undone!</div>
+    <div class="modal-text">Your rebirth count will increase by 1.</div>
+    <div class="modal-buttons">
+      <button class="modal-btn modal-btn-cancel" onclick="hideRebirthConfirm()">Cancel</button>
+      <button class="modal-btn modal-btn-confirm" id="confirmBtn" onclick="executeRebirth()">REBIRTH</button>
+    </div>
+  </div>
+</div>
+
+<div id="notifications"></div>
+
+<script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+<script>
+// =============================================
+// SUPABASE CONFIG - Replace with your values
+// =============================================
+var SUPABASE_URL = 'https://oclpxlahdpqzjprxykgm.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_-kmued6rMf2o3-NQymY5cA_8e5Stodu';
+
+// ── Game State ──
+var playerName = '';
+var playerLevel = 0;
+var rebirthCount = 0;
+var leaderboardData = [];
+var rebirthPending = false;
+
+// ── Supabase REST API ──
+function supabaseHeaders() {
+  return {
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+    'Content-Type': 'application/json'
+  };
+}
+
+function fetchLeaderboard() {
+  document.getElementById('lbLoading').style.display = 'block';
+  document.getElementById('lbTable').style.display = 'none';
+  document.getElementById('lbEmpty').style.display = 'none';
+  document.getElementById('dbError').classList.remove('visible');
+
+  fetch(SUPABASE_URL + '/rest/v1/rebirth_leaderboard?select=player_name,rebirth_count&order=rebirth_count.desc&limit=50', {
+    method: 'GET',
+    headers: supabaseHeaders()
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  })
+  .then(function(data) {
+    leaderboardData = data || [];
+    renderLeaderboard();
+  })
+  .catch(function(err) {
+    console.error('[Leaderboard] Fetch error:', err);
+    document.getElementById('dbError').classList.add('visible');
+    document.getElementById('lbLoading').style.display = 'none';
+    document.getElementById('lbEmpty').style.display = 'block';
+  });
+}
+
+function recordRebirth(name) {
+  return fetch(SUPABASE_URL + '/rest/v1/rpc/record_rebirth', {
+    method: 'POST',
+    headers: supabaseHeaders(),
+    body: JSON.stringify({ p_player_name: name })
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  });
+}
+
+// ── Leaderboard Rendering ──
+function renderLeaderboard() {
+  var loading = document.getElementById('lbLoading');
+  var table = document.getElementById('lbTable');
+  var empty = document.getElementById('lbEmpty');
+  var body = document.getElementById('lbBody');
+
+  loading.style.display = 'none';
+
+  if (leaderboardData.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  var html = '';
+  var foundSelf = false;
+
+  for (var i = 0; i < leaderboardData.length; i++) {
+    var entry = leaderboardData[i];
+    var rank = i + 1;
+    var isSelf = playerName && entry.player_name.toLowerCase() === playerName.toLowerCase();
+    if (isSelf) {
+      foundSelf = true;
+      document.getElementById('playerRank').textContent = '#' + rank;
+    }
+
+    html += '<tr class="' + (isSelf ? 'current-player' : '') + '">';
+
+    // Rank cell
+    html += '<td class="rank-cell rank-' + rank + '">';
+    if (rank === 1) html += '<span class="rank-medal medal-gold">1</span>';
+    else if (rank === 2) html += '<span class="rank-medal medal-silver">2</span>';
+    else if (rank === 3) html += '<span class="rank-medal medal-bronze">3</span>';
+    else html += rank;
+    html += '</td>';
+
+    // Name
+    html += '<td>' + escapeHtml(entry.player_name);
+    if (isSelf) html += ' (You)';
+    html += '</td>';
+
+    // Rebirth count
+    html += '<td>' + entry.rebirth_count + '</td>';
+
+    html += '</tr>';
+  }
+
+  body.innerHTML = html;
+
+  if (!foundSelf) {
+    document.getElementById('playerRank').textContent = 'Unranked';
+  }
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ── Rebirth Flow ──
+function updateRebirthButton() {
+  var btn = document.getElementById('rebirthBtn');
+  var req = document.getElementById('rebirthReq');
+
+  if (rebirthPending) {
+    btn.disabled = true;
+    req.textContent = 'Rebirthing...';
+    return;
+  }
+
+  if (playerLevel >= 50) {
+    btn.disabled = false;
+    btn.onclick = showRebirthConfirm;
+    req.textContent = 'Level 50 reached - Ready to rebirth!';
+    req.style.color = '#2ecc71';
+  } else {
+    btn.disabled = true;
+    btn.onclick = null;
+    req.textContent = 'Requires Level 50 (currently ' + playerLevel + ')';
+    req.style.color = '#8B7355';
+  }
+}
+
+function showRebirthConfirm() {
+  if (rebirthPending) return;
+  if (playerLevel < 50) {
+    notify('You must reach Level 50 to rebirth', 'error');
+    return;
+  }
+  document.getElementById('confirmModal').classList.add('active');
+}
+
+function hideRebirthConfirm() {
+  document.getElementById('confirmModal').classList.remove('active');
+}
+
+function executeRebirth() {
+  if (rebirthPending) return;
+  rebirthPending = true;
+  hideRebirthConfirm();
+  updateRebirthButton();
+
+  var name = playerName || 'Unknown';
+
+  // 1. Record in Supabase
+  recordRebirth(name)
+  .then(function(result) {
+    console.log('[Leaderboard] Rebirth recorded in DB:', result);
+
+    // 2. Trigger Portals reset
+    triggerTask('Trigger_Rebirth');
+
+    // 3. Optimistic UI update
+    rebirthCount += 1;
+    document.getElementById('rebirthBadge').textContent = rebirthCount + (rebirthCount === 1 ? ' Rebirth' : ' Rebirths');
+
+    notify('Rebirth successful! All progress reset.', 'success');
+
+    // 4. Refresh leaderboard after a short delay
+    setTimeout(function() {
+      fetchLeaderboard();
+      rebirthPending = false;
+      updateRebirthButton();
+    }, 2000);
+  })
+  .catch(function(err) {
+    console.error('[Leaderboard] Rebirth DB error:', err);
+    // Still trigger Portals reset even if DB fails - player shouldn't be stuck
+    triggerTask('Trigger_Rebirth');
+    rebirthCount += 1;
+    document.getElementById('rebirthBadge').textContent = rebirthCount + (rebirthCount === 1 ? ' Rebirth' : ' Rebirths');
+    notify('Rebirth complete (leaderboard sync pending)', 'success');
+
+    setTimeout(function() {
+      rebirthPending = false;
+      updateRebirthButton();
+    }, 2000);
+  });
+}
+
+// ── Portals SDK ──
+function triggerTask(taskName, targetState) {
+  targetState = targetState || 'SetNotActiveToActive';
+  console.log('[Leaderboard] triggerTask:', taskName);
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+    PortalsSdk.sendMessageToUnity(JSON.stringify({
+      TaskName: taskName,
+      TaskTargetState: targetState
+    }));
+  }
+}
+
+function closeIframe() {
+  playSound('click');
+  console.log('[Leaderboard] Close requested');
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+    PortalsSdk.closeIframe();
+  }
+}
+
+// Keyboard - ESC to close
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    if (document.getElementById('confirmModal').classList.contains('active')) {
+      hideRebirthConfirm();
+    } else {
+      closeIframe();
+    }
+  }
+});
+
+// ── Message Handling ──
+var lastMessageId = '';
+var lastMessageTime = 0;
+
+function processMessage(msg, source) {
+  var now = Date.now();
+  var msgId = msg + '_' + Math.floor(now / 100);
+  if (msgId === lastMessageId && now - lastMessageTime < 200) {
+    return;
+  }
+  lastMessageId = msgId;
+  lastMessageTime = now;
+  handlePortalsMessage(msg);
+}
+
+function handlePortalsMessage(msg) {
+  if (typeof msg !== 'string') return;
+  if (msg.indexOf('Sync_Inventory') === 0) {
+    parseAndSyncInventory(msg);
+    updateUI();
+  }
+}
+
+function parseAndSyncInventory(msg) {
+  msg = msg.replace('Sync_Inventory_', '');
+  var parts = msg.split('_');
+  var i = 0;
+
+  // Two-word keys this iframe cares about
+  var twoWordKeys = {
+    'Rebirth_Count': 'rebirth_count',
+    // Include all T_* keys so parser doesn't desync
+    'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
+    'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
+    'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
+    'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
+    'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
+    'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
+    'T_KeenLearner': '_skip', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
+    'T_Artisan': '_skip', 'T_SeasonedWorker': '_skip', 'T_BonusPoint1': '_skip',
+    'T_Prodigy': '_skip', 'T_BonusPoint2': '_skip',
+    'Seeds_Wheat': '_skip', 'Seeds_Carrot': '_skip', 'Seeds_Corn': '_skip',
+    'Seeds_Potato': '_skip', 'Seeds_Tomato': '_skip', 'Seeds_Pumpkin': '_skip',
+    'Crop_Wheat': '_skip', 'Crop_Carrot': '_skip', 'Crop_Corn': '_skip',
+    'Crop_Potato': '_skip', 'Crop_Tomato': '_skip', 'Crop_Pumpkin': '_skip',
+    'Goat_Meat': '_skip',
+    'Meat_Pie': '_skip'
+  };
+
+  // Three-word keys (consume key + value = 4 tokens)
+  var threeWordKeys = {
+    'Unspent_Talent_Points': '_skip',
+    'Has_Milk_Pail': '_skip', 'Has_Egg_Basket': '_skip',
+    'Has_Shearing_Kit': '_skip', 'Has_Butcher_Knife': '_skip',
+    'Has_Truffle_Spade': '_skip',
+    'Has_Recipe_Flour': '_skip', 'Has_Recipe_Bread': '_skip',
+    'Has_Recipe_Cheese': '_skip', 'Has_Recipe_Stew': '_skip',
+    'Has_Recipe_Ragout': '_skip', 'Has_Recipe_Pie': '_skip',
+    'Has_Recipe_Blanket': '_skip', 'Has_Recipe_Butter': '_skip',
+    'Has_Recipe_Cake': '_skip', 'Has_Recipe_Mead': '_skip'
+  };
+
+  // Four-word keys (consume key + value = 5 tokens)
+  var fourWordKeys = {
+    'Has_Recipe_Meat_Pie': '_skip'
+  };
+
+  while (i < parts.length) {
+    // Try four-word key
+    if (i + 4 < parts.length) {
+      var fourWord = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+      if (fourWordKeys[fourWord] !== undefined) {
+        // skip value
+        i += 5;
+        continue;
+      }
+    }
+    // Try three-word key
+    if (i + 3 < parts.length) {
+      var threeWord = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+      if (threeWordKeys[threeWord] !== undefined) {
+        // skip value
+        i += 4;
+        continue;
+      }
+    }
+    // Try two-word key
+    if (i + 2 < parts.length) {
+      var twoWord = parts[i] + '_' + parts[i+1];
+      if (twoWordKeys[twoWord] !== undefined) {
+        if (twoWordKeys[twoWord] === 'rebirth_count') {
+          rebirthCount = Math.max(0, parseInt(parts[i+2]) || 0);
+        }
+        i += 3;
+        continue;
+      }
+    }
+    // One-word keys
+    if (i + 1 < parts.length) {
+      if (parts[i] === 'Level') {
+        playerLevel = Math.max(0, parseInt(parts[i+1]) || 0);
+        i += 2;
+        continue;
+      }
+      if (parts[i] === 'Username') {
+        playerName = parts[i+1] || '';
+        i += 2;
+        continue;
+      }
+      if (parts[i] === 'Has' && i + 2 < parts.length) {
+        // Already handled above in threeWordKeys, but catch-all
+        i++;
+        continue;
+      }
+      // Skip other known 1-word keys
+      var oneWordSkip = ['Gold','XP','Milk','Wool','Truffle','Egg','Honey',
+                         'Flour','Bread','Cheese','Stew','Ragout','Pie','Blanket',
+                         'Butter','Cake','Mead'];
+      var found = false;
+      for (var k = 0; k < oneWordSkip.length; k++) {
+        if (parts[i] === oneWordSkip[k]) {
+          i += 2;
+          found = true;
+          break;
+        }
+      }
+      if (found) continue;
+    }
+    i++;
+  }
+}
+
+// ── UI Updates ──
+function updateUI() {
+  document.getElementById('rebirthBadge').textContent = rebirthCount + (rebirthCount === 1 ? ' Rebirth' : ' Rebirths');
+  document.getElementById('playerLevel').textContent = playerLevel;
+  document.getElementById('playerNameDisplay').textContent = playerName || 'Unknown Player';
+  updateRebirthButton();
+  renderLeaderboard();
+}
+
+// ── SDK Setup ──
+function setupMessageListener() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+    PortalsSdk.setMessageListener(function(msg) {
+      processMessage(msg, 'SDK');
+    });
+    console.log('[Leaderboard] SDK listener registered');
+  } else {
+    setTimeout(setupMessageListener, 200);
+  }
+}
+
+window.addEventListener('message', function(event) {
+  if (event.data && typeof event.data === 'string') {
+    processMessage(event.data, 'postMessage-string');
+  }
+  else if (event.data && event.data.portalsMessage) {
+    processMessage(event.data.portalsMessage, 'postMessage-portals');
+  }
+  else if (event.data && event.data.message && typeof event.data.message === 'string') {
+    processMessage(event.data.message, 'postMessage-message');
+  }
+});
+
+setupMessageListener();
+
+// Request sync + fetch leaderboard on load
+setTimeout(function() {
+  triggerTask('Sync_Inventory');
+  fetchLeaderboard();
+}, 500);
+
+// ── Visibility/Focus Handlers ──
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    triggerTask('Sync_Inventory');
+    fetchLeaderboard();
+  }
+});
+window.addEventListener('focus', function() {
+  triggerTask('Sync_Inventory');
+  fetchLeaderboard();
+});
+
+// ── Sound Effects ──
+var _mp3Sounds = {};
+(function() {
+  var files = { click: 'click.mp3', purchase: 'purchase.mp3' };
+  for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = 0.3; _mp3Sounds[k] = a; }
+})();
+var _audioCtx = null;
+function _getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+function playSound(type) {
+  try {
+    if (_mp3Sounds[type]) { _mp3Sounds[type].currentTime = 0; _mp3Sounds[type].play().catch(function(){}); return; }
+    var ctx = _getAudioCtx(); var g = ctx.createGain(); g.connect(ctx.destination); var t = ctx.currentTime;
+    if (type === 'success') {
+      var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+      o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.1);
+      g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.2);
+      o.start(t); o.stop(t + 0.2);
+    } else if (type === 'error') {
+      var o = ctx.createOscillator(); o.type = 'square'; o.connect(g);
+      o.frequency.setValueAtTime(180, t);
+      g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.15);
+      o.start(t); o.stop(t + 0.15);
+    }
+  } catch (e) {}
+}
+
+function notify(msg, type) {
+  type = type || 'success';
+  playSound(type);
+  var container = document.getElementById('notifications');
+  // Cap at 3 notifications
+  while (container.children.length >= 3) {
+    container.removeChild(container.firstChild);
+  }
+  var notif = document.createElement('div');
+  notif.className = 'notification ' + (type === 'error' ? 'error' : 'success');
+  notif.textContent = msg;
+  container.appendChild(notif);
+  setTimeout(function() { notif.remove(); }, 3000);
+}
+</script>
+</body>
+</html>
