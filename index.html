@@ -1568,7 +1568,7 @@
     // === Sound Effects (MP3 + Web Audio API fallback) ===
     var _mp3Sounds = {};
     (function() {
-      var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', cow: 'cow.mp3', chicken: 'chicken.mp3', sheep: 'sheep.mp3', goat: 'goat.mp3', pig: 'pig.mp3', bee: 'bee.mp3' };
+      var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', cow: 'cow.mp3', chicken: 'chicken.mp3', sheep: 'sheep.mp3', goat: 'goat.mp3', pig: 'pig.mp3', bee: 'bee.mp3', cropready: 'cropready.mp3' };
       for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = 0.3; _mp3Sounds[k] = a; }
     })();
     var _audioCtx = null;
@@ -1620,7 +1620,7 @@
         if (p.state === 'growing' && Date.now() >= p.readyAt) {
           p.state = 'ready';
           triggerTask(`Ready_Plot_${i + 1}`);
-          notify(`Plot ${i + 1} is ready!`, 'success');
+          notify(`Plot ${i + 1} is ready!`, 'success', 'cropready');
           needsRender = true;
         }
       });
