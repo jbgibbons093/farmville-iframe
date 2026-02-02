@@ -225,26 +225,20 @@ body {
   transition: all 0.2s;
   text-shadow: none;
   white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
 }
 
-.buy-btn:hover:not(:disabled) {
+.buy-btn:hover {
   background: linear-gradient(180deg, #FFD700 0%, #DAA520 100%);
   transform: scale(1.05);
   box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
 }
 
-.buy-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.buy-btn:active:not(:disabled) {
+.buy-btn:active {
   transform: scale(0.98);
 }
-
-/* Helio container (hidden, used by popup) */
-.helio-mount { display: none; }
 
 /* Footer */
 .footer {
@@ -338,7 +332,7 @@ body {
     <div class="content">
       <div class="store-intro">
         Purchase <strong>Gold</strong> with <strong>USDC</strong> from your Solana wallet.
-        Gold is credited instantly to your farm!
+        Click <strong>Buy</strong> to open the payment page, then return here to claim your gold.
       </div>
 
       <div class="package-grid">
@@ -353,7 +347,7 @@ body {
           </div>
           <div class="package-action">
             <div class="package-price">$2 USDC</div>
-            <button class="buy-btn" id="btn-starter" onclick="buyGold('starter')" disabled>Loading...</button>
+            <a class="buy-btn" href="https://moonpay.hel.io/pay/69800704d065e051f1604d2d" target="_blank" rel="noopener" onclick="onBuyClick('starter')">Buy</a>
           </div>
         </div>
 
@@ -369,7 +363,7 @@ body {
           </div>
           <div class="package-action">
             <div class="package-price">$8 USDC</div>
-            <button class="buy-btn" id="btn-bundle" onclick="buyGold('bundle')" disabled>Loading...</button>
+            <a class="buy-btn" href="https://moonpay.hel.io/pay/69800706012d9a959ca0b8e0" target="_blank" rel="noopener" onclick="onBuyClick('bundle')">Buy</a>
           </div>
         </div>
 
@@ -385,7 +379,7 @@ body {
           </div>
           <div class="package-action">
             <div class="package-price">$20 USDC</div>
-            <button class="buy-btn" id="btn-tycoon" onclick="buyGold('tycoon')" disabled>Loading...</button>
+            <a class="buy-btn" href="https://moonpay.hel.io/pay/6980043419be2fcb1dbe049e" target="_blank" rel="noopener" onclick="onBuyClick('tycoon')">Buy</a>
           </div>
         </div>
       </div>
@@ -394,120 +388,46 @@ body {
     <div class="footer">
       <div class="footer-hint">
         Press <strong>ESC</strong> to close
-        <span class="powered">&bull; Powered by Helio</span>
+        <span class="powered">&bull; Powered by MoonPay Commerce</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Helio mount point (used by popup mode) -->
-<div id="helio-starter" class="helio-mount"></div>
-<div id="helio-bundle" class="helio-mount"></div>
-<div id="helio-tycoon" class="helio-mount"></div>
-
 <div id="notification" style="display:none"></div>
 
 <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
 <script>
-// Load Helio SDK dynamically so we can detect when it's ready
-var helioReady = false;
-(function() {
-  var s = document.createElement('script');
-  s.type = 'module';
-  s.src = 'https://embed.hel.io/assets/index-v1.js';
-  s.onload = function() {
-    // Module loaded, but helioCheckout may not be on window yet - poll for it
-    var checks = 0;
-    var poll = setInterval(function() {
-      checks++;
-      if (typeof window.helioCheckout === 'function') {
-        clearInterval(poll);
-        helioReady = true;
-        setButtonStates(false);
-        console.log('[GoldStore] Helio SDK ready');
-      } else if (checks > 100) {
-        clearInterval(poll);
-        console.error('[GoldStore] Helio SDK failed to initialize');
-      }
-    }, 200);
-  };
-  document.head.appendChild(s);
-})();
-</script>
-<script>
 // ============================================
 // HUGHBERRY FARMS - GOLD STORE
 // ============================================
+// Uses direct links to Helio hosted checkout pages.
+// After payment, the webhook records to Supabase.
+// Gold is credited client-side when the player
+// returns and the iframe regains focus.
 
-// ── Helio Pay Link IDs ──
+// ── Package Config ──
 var PACKAGES = {
-  starter: {
-    paylinkId: '69800704d065e051f1604d2d',
-    goldAmount: 1000,
-    taskName: 'Credit_Gold_1000',
-    label: 'Starter Pack'
-  },
-  bundle: {
-    paylinkId: '69800706012d9a959ca0b8e0',
-    goldAmount: 5000,
-    taskName: 'Credit_Gold_5000',
-    label: "Farmer's Bundle"
-  },
-  tycoon: {
-    paylinkId: '6980043419be2fcb1dbe049e',
-    goldAmount: 15000,
-    taskName: 'Credit_Gold_15000',
-    label: 'Tycoon Pack'
-  }
+  starter: { goldAmount: 1000, taskName: 'Credit_Gold_1000', label: 'Starter Pack' },
+  bundle:  { goldAmount: 5000, taskName: 'Credit_Gold_5000', label: "Farmer's Bundle" },
+  tycoon:  { goldAmount: 15000, taskName: 'Credit_Gold_15000', label: 'Tycoon Pack' }
 };
 
 // ── Game State ──
 var gold = 0;
 var playerName = '';
-var actionPending = false;
-
-// ── Sound Effects ──
-var _mp3Sounds = {};
-(function() {
-  var files = { click: 'click.mp3', purchase: 'purchase.mp3' };
-  for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = 0.3; _mp3Sounds[k] = a; }
-})();
-var _audioCtx = null;
-function _getAudioCtx() {
-  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (_audioCtx.state === 'suspended') _audioCtx.resume();
-  return _audioCtx;
-}
-function playSound(type) {
-  try {
-    if (_mp3Sounds[type]) { _mp3Sounds[type].currentTime = 0; _mp3Sounds[type].play().catch(function(){}); return; }
-    var ctx = _getAudioCtx(); var g = ctx.createGain(); g.connect(ctx.destination); var t = ctx.currentTime;
-    if (type === 'success') {
-      var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
-      o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.1);
-      g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.2);
-      o.start(t); o.stop(t + 0.2);
-    } else if (type === 'error') {
-      var o2 = ctx.createOscillator(); o2.type = 'square'; o2.connect(g);
-      o2.frequency.setValueAtTime(180, t);
-      g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.15);
-      o2.start(t); o2.stop(t + 0.15);
-    }
-  } catch (e) {}
-}
+var pendingPackage = null; // track which package was clicked
 
 // ── Notification ──
 var notifTimeout = null;
 function notify(msg, type) {
   type = type || 'info';
-  if (type === 'purchase' || type === 'success') playSound('purchase');
-  else if (type === 'error') playSound('error');
   var el = document.getElementById('notification');
   if (notifTimeout) clearTimeout(notifTimeout);
   el.className = 'notif-' + (type === 'purchase' ? 'success' : type);
   el.textContent = msg;
   el.style.display = 'block';
-  notifTimeout = setTimeout(function() { el.style.display = 'none'; }, 3000);
+  notifTimeout = setTimeout(function() { el.style.display = 'none'; }, 4000);
 }
 
 // ── Portals SDK ──
@@ -523,96 +443,63 @@ function triggerTask(taskName, targetState) {
 }
 
 function closeIframe() {
-  playSound('click');
   console.log('[GoldStore] Close requested');
   if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
     PortalsSdk.closeIframe();
   }
 }
 
-// ── Buy Gold ──
-function buyGold(packageKey) {
-  if (actionPending) { notify('Transaction in progress...', 'info'); return; }
-
+// ── Buy Click Handler ──
+// Called when user clicks a Buy link. The <a> tag opens the pay page.
+// We record which package they clicked so we can check for it later.
+function onBuyClick(packageKey) {
   var pkg = PACKAGES[packageKey];
   if (!pkg) return;
-
-  // Check if Helio is loaded
-  if (!helioReady || typeof window.helioCheckout !== 'function') {
-    notify('Payment system still loading, please wait...', 'info');
-    return;
-  }
-
-  actionPending = true;
-  setButtonStates(true);
-
-  var mountEl = document.getElementById('helio-' + packageKey);
-
-  console.log('[GoldStore] Opening Helio checkout for:', pkg.label);
-
-  try {
-    window.helioCheckout(mountEl, {
-      paylinkId: pkg.paylinkId,
-      display: 'modal',
-      theme: { themeMode: 'dark' },
-      primaryColor: '#DAA520',
-      additionalJSON: JSON.stringify({
-        playerName: playerName || 'Unknown',
-        goldAmount: pkg.goldAmount,
-        packageKey: packageKey
-      }),
-      onSuccess: function(event) {
-        console.log('[GoldStore] Payment SUCCESS:', event);
-        triggerTask(pkg.taskName);
-        gold += pkg.goldAmount;
-        document.getElementById('gold-display').textContent = gold.toLocaleString();
-        notify('+' + pkg.goldAmount.toLocaleString() + ' Gold purchased!', 'purchase');
-        setTimeout(function() {
-          triggerTask('Sync_Inventory');
-        }, 1000);
-        actionPending = false;
-        setButtonStates(false);
-      },
-      onError: function(event) {
-        console.error('[GoldStore] Payment ERROR:', event);
-        notify('Payment failed. Please try again.', 'error');
-        actionPending = false;
-        setButtonStates(false);
-      },
-      onCancel: function() {
-        console.log('[GoldStore] Payment CANCELLED');
-        notify('Payment cancelled.', 'info');
-        actionPending = false;
-        setButtonStates(false);
-      },
-      onStartPayment: function() {
-        console.log('[GoldStore] Payment STARTED');
-        notify('Processing payment...', 'info');
-      }
-    });
-  } catch (err) {
-    console.error('[GoldStore] helioCheckout error:', err);
-    notify('Payment system error. Please try again.', 'error');
-    actionPending = false;
-    setButtonStates(false);
-  }
-
-  // Safety timeout: if no callback fires within 30s, reset buttons
-  setTimeout(function() {
-    if (actionPending) {
-      console.warn('[GoldStore] Checkout timeout - resetting');
-      actionPending = false;
-      setButtonStates(false);
-    }
-  }, 30000);
+  pendingPackage = packageKey;
+  console.log('[GoldStore] Buy clicked:', pkg.label);
+  notify('Payment page opening... Complete payment, then return here.', 'info');
 }
 
-function setButtonStates(disabled) {
-  var btns = document.querySelectorAll('.buy-btn');
-  for (var i = 0; i < btns.length; i++) {
-    btns[i].disabled = disabled;
-    if (!disabled) btns[i].textContent = 'Buy';
-  }
+// ── Check Supabase for completed purchases ──
+var SUPABASE_URL = 'https://sjevauzyswgdkjwfkhog.supabase.co';
+var SUPABASE_ANON_KEY = '';
+
+function checkForPurchases() {
+  if (!playerName || !pendingPackage) return;
+  var pkg = PACKAGES[pendingPackage];
+  if (!pkg) return;
+
+  // Query gold_purchases for this player's recent purchases
+  var url = SUPABASE_URL + '/rest/v1/gold_purchases?player_name=eq.' +
+    encodeURIComponent(playerName) +
+    '&package_key=eq.' + encodeURIComponent(pendingPackage) +
+    '&status=eq.completed' +
+    '&order=created_at.desc&limit=1';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+  xhr.setRequestHeader('Authorization', 'Bearer ' + SUPABASE_ANON_KEY);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        if (data && data.length > 0) {
+          // Purchase found! Credit gold
+          console.log('[GoldStore] Purchase confirmed:', data[0]);
+          triggerTask(pkg.taskName);
+          gold += pkg.goldAmount;
+          document.getElementById('gold-display').textContent = gold.toLocaleString();
+          notify('+' + pkg.goldAmount.toLocaleString() + ' Gold credited!', 'purchase');
+          setTimeout(function() { triggerTask('Sync_Inventory'); }, 1000);
+          pendingPackage = null;
+        }
+      } catch (e) {
+        console.error('[GoldStore] Parse error:', e);
+      }
+    }
+  };
+  xhr.send();
 }
 
 // ── Keyboard ──
@@ -620,7 +507,7 @@ document.addEventListener('keydown', function(e) {
   var key = e.key.toLowerCase();
   if (e.key === 'Escape' || key === 'v') {
     e.preventDefault();
-    if (!actionPending) closeIframe();
+    closeIframe();
   }
 });
 
@@ -766,12 +653,20 @@ setTimeout(function() {
   triggerTask('Sync_Inventory');
 }, 500);
 
-// Visibility/Focus handlers
+// When iframe regains focus (player returns from pay page), check for purchases
 document.addEventListener('visibilitychange', function() {
-  if (!document.hidden) { triggerTask('Sync_Inventory'); }
+  if (!document.hidden) {
+    triggerTask('Sync_Inventory');
+    if (pendingPackage) {
+      setTimeout(checkForPurchases, 2000);
+    }
+  }
 });
 window.addEventListener('focus', function() {
   triggerTask('Sync_Inventory');
+  if (pendingPackage) {
+    setTimeout(checkForPurchases, 2000);
+  }
 });
 
 console.log('[GoldStore] Gold Store loaded');
