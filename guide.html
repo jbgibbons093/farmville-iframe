@@ -845,7 +845,7 @@
 
     // Keyboard controls - ESC to close
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' || e.key === 'l' || e.key === 'L') {
         e.preventDefault();
         closeGuide();
       }
