@@ -240,6 +240,23 @@ body {
   transform: scale(0.98);
 }
 
+.claim-btn {
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+  border-color: #2ecc71;
+  color: #fff;
+  animation: claimPulse 1.5s ease-in-out infinite;
+}
+
+.claim-btn:hover {
+  background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%);
+  box-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
+}
+
+@keyframes claimPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+  50% { box-shadow: 0 0 12px 4px rgba(46, 204, 113, 0.3); }
+}
+
 /* Footer */
 .footer {
   padding: 10px 20px;
@@ -348,6 +365,7 @@ body {
           <div class="package-action">
             <div class="package-price">$2 USDC</div>
             <a class="buy-btn" href="https://moonpay.hel.io/pay/69800704d065e051f1604d2d" target="_blank" rel="noopener" onclick="onBuyClick('starter')">Buy</a>
+            <button class="buy-btn claim-btn" id="claim-starter" onclick="claimGold('starter')" style="display:none">Claim Gold</button>
           </div>
         </div>
 
@@ -364,6 +382,7 @@ body {
           <div class="package-action">
             <div class="package-price">$8 USDC</div>
             <a class="buy-btn" href="https://moonpay.hel.io/pay/69800706012d9a959ca0b8e0" target="_blank" rel="noopener" onclick="onBuyClick('bundle')">Buy</a>
+            <button class="buy-btn claim-btn" id="claim-bundle" onclick="claimGold('bundle')" style="display:none">Claim Gold</button>
           </div>
         </div>
 
@@ -380,6 +399,7 @@ body {
           <div class="package-action">
             <div class="package-price">$20 USDC</div>
             <a class="buy-btn" href="https://moonpay.hel.io/pay/6980043419be2fcb1dbe049e" target="_blank" rel="noopener" onclick="onBuyClick('tycoon')">Buy</a>
+            <button class="buy-btn claim-btn" id="claim-tycoon" onclick="claimGold('tycoon')" style="display:none">Claim Gold</button>
           </div>
         </div>
       </div>
@@ -416,7 +436,6 @@ var PACKAGES = {
 // ── Game State ──
 var gold = 0;
 var playerName = '';
-var pendingPackage = null; // track which package was clicked
 
 // ── Notification ──
 var notifTimeout = null;
@@ -451,55 +470,32 @@ function closeIframe() {
 
 // ── Buy Click Handler ──
 // Called when user clicks a Buy link. The <a> tag opens the pay page.
-// We record which package they clicked so we can check for it later.
+// Shows the Claim Gold button for that package.
 function onBuyClick(packageKey) {
   var pkg = PACKAGES[packageKey];
   if (!pkg) return;
-  pendingPackage = packageKey;
   console.log('[GoldStore] Buy clicked:', pkg.label);
-  notify('Payment page opening... Complete payment, then return here.', 'info');
+  notify('Payment page opening... After paying, click Claim Gold.', 'info');
+  // Show the claim button for this package
+  var claimBtn = document.getElementById('claim-' + packageKey);
+  if (claimBtn) claimBtn.style.display = 'inline-block';
 }
 
-// ── Check Supabase for completed purchases ──
-var SUPABASE_URL = 'https://sjevauzyswgdkjwfkhog.supabase.co';
-var SUPABASE_ANON_KEY = 'sb_publishable_B5YWrMfCi7G88Byz8hKSmA_0tEgPx_Q';
-
-function checkForPurchases() {
-  if (!playerName || !pendingPackage) return;
-  var pkg = PACKAGES[pendingPackage];
+// ── Claim Gold ──
+// Player clicks after completing payment on Helio page.
+// Credits gold via Portals task (same trust model as all other game actions).
+function claimGold(packageKey) {
+  var pkg = PACKAGES[packageKey];
   if (!pkg) return;
-
-  // Query gold_purchases for this player's recent purchases
-  var url = SUPABASE_URL + '/rest/v1/gold_purchases?player_name=eq.' +
-    encodeURIComponent(playerName) +
-    '&package_key=eq.' + encodeURIComponent(pendingPackage) +
-    '&status=eq.completed' +
-    '&order=created_at.desc&limit=1';
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
-  xhr.setRequestHeader('Authorization', 'Bearer ' + SUPABASE_ANON_KEY);
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      try {
-        var data = JSON.parse(xhr.responseText);
-        if (data && data.length > 0) {
-          // Purchase found! Credit gold
-          console.log('[GoldStore] Purchase confirmed:', data[0]);
-          triggerTask(pkg.taskName);
-          gold += pkg.goldAmount;
-          document.getElementById('gold-display').textContent = gold.toLocaleString();
-          notify('+' + pkg.goldAmount.toLocaleString() + ' Gold credited!', 'purchase');
-          setTimeout(function() { triggerTask('Sync_Inventory'); }, 1000);
-          pendingPackage = null;
-        }
-      } catch (e) {
-        console.error('[GoldStore] Parse error:', e);
-      }
-    }
-  };
-  xhr.send();
+  console.log('[GoldStore] Claiming gold:', pkg.label);
+  triggerTask(pkg.taskName);
+  gold += pkg.goldAmount;
+  document.getElementById('gold-display').textContent = gold.toLocaleString();
+  notify('+' + pkg.goldAmount.toLocaleString() + ' Gold credited!', 'purchase');
+  setTimeout(function() { triggerTask('Sync_Inventory'); }, 1000);
+  // Hide the claim button
+  var claimBtn = document.getElementById('claim-' + packageKey);
+  if (claimBtn) claimBtn.style.display = 'none';
 }
 
 // ── Keyboard ──
@@ -653,20 +649,12 @@ setTimeout(function() {
   triggerTask('Sync_Inventory');
 }, 500);
 
-// When iframe regains focus (player returns from pay page), check for purchases
+// Visibility/Focus handlers
 document.addEventListener('visibilitychange', function() {
-  if (!document.hidden) {
-    triggerTask('Sync_Inventory');
-    if (pendingPackage) {
-      setTimeout(checkForPurchases, 2000);
-    }
-  }
+  if (!document.hidden) { triggerTask('Sync_Inventory'); }
 });
 window.addEventListener('focus', function() {
   triggerTask('Sync_Inventory');
-  if (pendingPackage) {
-    setTimeout(checkForPurchases, 2000);
-  }
 });
 
 console.log('[GoldStore] Gold Store loaded');
