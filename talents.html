@@ -843,11 +843,28 @@ function parseAndSyncInventory(msg) {
   };
 
   while (i < parts.length) {
+    // Try four-word key (Has_Recipe_Meat_Pie)
+    if (i + 4 < parts.length) {
+      var fourWord = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+      if (fourWord === 'Has_Recipe_Meat_Pie') {
+        i += 5;
+        continue;
+      }
+    }
     // Try three-word key (Unspent + Talent + Points + value)
     if (i + 3 < parts.length) {
       var threeWord = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2];
       if (threeWord === 'Unspent_Talent_Points') {
         unspentTalentPoints = parseInt(parts[i + 3]) || 0;
+        i += 4;
+        continue;
+      }
+      var threeWordSkip = ['Has_Milk_Pail','Has_Shearing_Kit','Has_Butcher_Knife',
+        'Has_Truffle_Spade','Has_Starter_Seeds',
+        'Has_Recipe_Flour','Has_Recipe_Bread','Has_Recipe_Cheese','Has_Recipe_Stew',
+        'Has_Recipe_Ragout','Has_Recipe_Pie','Has_Recipe_Blanket','Has_Recipe_Butter',
+        'Has_Recipe_Cake','Has_Recipe_Mead'];
+      if (threeWordSkip.indexOf(threeWord) !== -1) {
         i += 4;
         continue;
       }
