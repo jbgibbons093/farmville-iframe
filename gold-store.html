@@ -550,48 +550,61 @@ function buyGold(packageKey) {
 
   console.log('[GoldStore] Opening Helio checkout for:', pkg.label);
 
-  window.helioCheckout(mountEl, {
-    paylinkId: pkg.paylinkId,
-    display: 'button',
-    theme: { themeMode: 'dark' },
-    primaryColor: '#DAA520',
-    additionalJSON: JSON.stringify({
-      playerName: playerName || 'Unknown',
-      goldAmount: pkg.goldAmount,
-      packageKey: packageKey
-    }),
-    onSuccess: function(event) {
-      console.log('[GoldStore] Payment SUCCESS:', event);
-      // Credit gold in Portals
-      triggerTask(pkg.taskName);
-      // Optimistic UI update
-      gold += pkg.goldAmount;
-      document.getElementById('gold-display').textContent = gold.toLocaleString();
-      notify('+' + pkg.goldAmount.toLocaleString() + ' Gold purchased!', 'purchase');
-      // Request sync to confirm
-      setTimeout(function() {
-        triggerTask('Sync_Inventory');
-      }, 1000);
+  try {
+    window.helioCheckout(mountEl, {
+      paylinkId: pkg.paylinkId,
+      display: 'modal',
+      theme: { themeMode: 'dark' },
+      primaryColor: '#DAA520',
+      additionalJSON: JSON.stringify({
+        playerName: playerName || 'Unknown',
+        goldAmount: pkg.goldAmount,
+        packageKey: packageKey
+      }),
+      onSuccess: function(event) {
+        console.log('[GoldStore] Payment SUCCESS:', event);
+        triggerTask(pkg.taskName);
+        gold += pkg.goldAmount;
+        document.getElementById('gold-display').textContent = gold.toLocaleString();
+        notify('+' + pkg.goldAmount.toLocaleString() + ' Gold purchased!', 'purchase');
+        setTimeout(function() {
+          triggerTask('Sync_Inventory');
+        }, 1000);
+        actionPending = false;
+        setButtonStates(false);
+      },
+      onError: function(event) {
+        console.error('[GoldStore] Payment ERROR:', event);
+        notify('Payment failed. Please try again.', 'error');
+        actionPending = false;
+        setButtonStates(false);
+      },
+      onCancel: function() {
+        console.log('[GoldStore] Payment CANCELLED');
+        notify('Payment cancelled.', 'info');
+        actionPending = false;
+        setButtonStates(false);
+      },
+      onStartPayment: function() {
+        console.log('[GoldStore] Payment STARTED');
+        notify('Processing payment...', 'info');
+      }
+    });
+  } catch (err) {
+    console.error('[GoldStore] helioCheckout error:', err);
+    notify('Payment system error. Please try again.', 'error');
+    actionPending = false;
+    setButtonStates(false);
+  }
+
+  // Safety timeout: if no callback fires within 30s, reset buttons
+  setTimeout(function() {
+    if (actionPending) {
+      console.warn('[GoldStore] Checkout timeout - resetting');
       actionPending = false;
       setButtonStates(false);
-    },
-    onError: function(event) {
-      console.error('[GoldStore] Payment ERROR:', event);
-      notify('Payment failed. Please try again.', 'error');
-      actionPending = false;
-      setButtonStates(false);
-    },
-    onCancel: function() {
-      console.log('[GoldStore] Payment CANCELLED');
-      notify('Payment cancelled.', 'info');
-      actionPending = false;
-      setButtonStates(false);
-    },
-    onStartPayment: function() {
-      console.log('[GoldStore] Payment STARTED');
-      notify('Processing payment...', 'info');
     }
-  });
+  }, 30000);
 }
 
 function setButtonStates(disabled) {
