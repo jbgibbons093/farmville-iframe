@@ -580,7 +580,7 @@ function setButtonStates(disabled) {
 // ── Keyboard ──
 document.addEventListener('keydown', function(e) {
   var key = e.key.toLowerCase();
-  if (e.key === 'Escape' || key === 'b') {
+  if (e.key === 'Escape' || key === 'v') {
     e.preventDefault();
     if (!actionPending) closeIframe();
   }
