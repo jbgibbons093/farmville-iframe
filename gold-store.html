@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hughberry Farms - Gold Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: transparent;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  overflow: hidden;
+}
+
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
+  border: 4px solid #B8860B;
+  border-radius: 20px;
+  box-shadow: 0 0 0 2px #5a3a1a, 0 20px 60px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: linear-gradient(180deg, #B8860B 0%, #8B6914 100%);
+  border-bottom: 3px solid #DAA520;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 24px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-icon { font-size: 28px; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gold-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.3);
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,215,0,0.4);
+}
+
+.gold-icon { font-size: 18px; }
+
+.gold-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.close-btn {
+  background: rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.2);
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(192, 57, 43, 0.8);
+  border-color: #e74c3c;
+}
+
+/* Content */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.store-intro {
+  text-align: center;
+  font-size: 14px;
+  color: #aaa;
+  padding: 0 10px 8px;
+  border-bottom: 1px solid rgba(90, 58, 26, 0.4);
+}
+
+.store-intro strong { color: #DAA520; }
+
+/* Package Cards */
+.package-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.package-card {
+  background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%);
+  border: 2px solid #4a3a2a;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+
+.package-card:hover {
+  border-color: #DAA520;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(218, 165, 32, 0.2);
+}
+
+.package-card.starter { border-left: 4px solid #C0C0C0; }
+.package-card.bundle { border-left: 4px solid #FFD700; }
+.package-card.tycoon { border-left: 4px solid #FF6347; }
+
+.package-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.package-icon {
+  font-size: 36px;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+}
+
+.package-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.package-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.package-gold {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ddd;
+}
+
+.package-gold span {
+  color: #FFD700;
+  font-weight: 800;
+}
+
+.package-bonus {
+  font-size: 11px;
+  color: #2ecc71;
+  font-weight: 700;
+}
+
+.package-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.package-price {
+  font-size: 12px;
+  color: #aaa;
+  font-weight: 700;
+}
+
+.buy-btn {
+  background: linear-gradient(180deg, #DAA520 0%, #B8860B 100%);
+  border: 2px solid #FFD700;
+  border-radius: 10px;
+  color: #1a1208;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.buy-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #FFD700 0%, #DAA520 100%);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+}
+
+.buy-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.buy-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Helio container (hidden, used by popup) */
+.helio-mount { display: none; }
+
+/* Footer */
+.footer {
+  padding: 10px 20px;
+  border-top: 2px solid #5a3a1a;
+  background: rgba(0,0,0,0.2);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.footer-hint {
+  font-size: 11px;
+  color: #666;
+}
+
+.footer-hint .powered {
+  color: #888;
+}
+
+/* Notification */
+#notification {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  z-index: 300;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  animation: notifIn 0.3s ease-out;
+}
+
+.notif-success {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  color: #fff;
+  border: 1px solid #2ecc71;
+}
+
+.notif-error {
+  background: linear-gradient(135deg, #c0392b, #922b21);
+  color: #fff;
+  border: 1px solid #e74c3c;
+}
+
+.notif-info {
+  background: linear-gradient(135deg, #B8860B, #8B6914);
+  color: #fff;
+  border: 1px solid #DAA520;
+}
+
+@keyframes notifIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Scrollbar */
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+.content::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 500px) {
+  .container { border-radius: 14px; }
+  .header { padding: 10px 14px; }
+  .title { font-size: 20px; }
+  .package-card { padding: 14px 16px; flex-wrap: wrap; gap: 12px; }
+  .package-action { width: 100%; flex-direction: row; justify-content: space-between; }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay">
+  <div class="container">
+    <div class="header">
+      <div class="title">
+        <span class="title-icon">&#x1FA99;</span>
+        Gold Store
+      </div>
+      <div class="header-right">
+        <div class="gold-display">
+          <span class="gold-icon">&#x1FA99;</span>
+          <span class="gold-value" id="gold-display">0</span>
+        </div>
+        <button class="close-btn" onclick="closeIframe()" title="Close">&#10005;</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="store-intro">
+        Purchase <strong>Gold</strong> with <strong>USDC</strong> from your Solana wallet.
+        Gold is credited instantly to your farm!
+      </div>
+
+      <div class="package-grid">
+        <!-- Starter Pack -->
+        <div class="package-card starter">
+          <div class="package-info">
+            <span class="package-icon">&#x1FA99;</span>
+            <div class="package-details">
+              <div class="package-name">Starter Pack</div>
+              <div class="package-gold"><span>1,000</span> Gold</div>
+            </div>
+          </div>
+          <div class="package-action">
+            <div class="package-price">$2 USDC</div>
+            <button class="buy-btn" id="btn-starter" onclick="buyGold('starter')">Buy</button>
+          </div>
+        </div>
+
+        <!-- Farmer's Bundle -->
+        <div class="package-card bundle">
+          <div class="package-info">
+            <span class="package-icon">&#x1F4B0;</span>
+            <div class="package-details">
+              <div class="package-name">Farmer's Bundle</div>
+              <div class="package-gold"><span>5,000</span> Gold</div>
+              <div class="package-bonus">Best Value</div>
+            </div>
+          </div>
+          <div class="package-action">
+            <div class="package-price">$8 USDC</div>
+            <button class="buy-btn" id="btn-bundle" onclick="buyGold('bundle')">Buy</button>
+          </div>
+        </div>
+
+        <!-- Tycoon Pack -->
+        <div class="package-card tycoon">
+          <div class="package-info">
+            <span class="package-icon">&#x1F451;</span>
+            <div class="package-details">
+              <div class="package-name">Tycoon Pack</div>
+              <div class="package-gold"><span>15,000</span> Gold</div>
+              <div class="package-bonus">Most Gold</div>
+            </div>
+          </div>
+          <div class="package-action">
+            <div class="package-price">$20 USDC</div>
+            <button class="buy-btn" id="btn-tycoon" onclick="buyGold('tycoon')">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-hint">
+        Press <strong>ESC</strong> to close
+        <span class="powered">&bull; Powered by Helio</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Helio mount point (used by popup mode) -->
+<div id="helio-starter" class="helio-mount"></div>
+<div id="helio-bundle" class="helio-mount"></div>
+<div id="helio-tycoon" class="helio-mount"></div>
+
+<div id="notification" style="display:none"></div>
+
+<script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+<script type="module" src="https://embed.hel.io/assets/index-v1.js"></script>
+<script>
+// ============================================
+// HUGHBERRY FARMS - GOLD STORE
+// ============================================
+
+// ── Helio Pay Link IDs ──
+// TODO: Replace these with your actual Helio pay link IDs from the dashboard
+var PACKAGES = {
+  starter: {
+    paylinkId: 'REPLACE_WITH_STARTER_PAYLINK_ID',
+    goldAmount: 1000,
+    taskName: 'Credit_Gold_1000',
+    label: 'Starter Pack'
+  },
+  bundle: {
+    paylinkId: 'REPLACE_WITH_BUNDLE_PAYLINK_ID',
+    goldAmount: 5000,
+    taskName: 'Credit_Gold_5000',
+    label: "Farmer's Bundle"
+  },
+  tycoon: {
+    paylinkId: 'REPLACE_WITH_TYCOON_PAYLINK_ID',
+    goldAmount: 15000,
+    taskName: 'Credit_Gold_15000',
+    label: 'Tycoon Pack'
+  }
+};
+
+// ── Game State ──
+var gold = 0;
+var playerName = '';
+var actionPending = false;
+
+// ── Sound Effects ──
+var _mp3Sounds = {};
+(function() {
+  var files = { click: 'click.mp3', purchase: 'purchase.mp3' };
+  for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = 0.3; _mp3Sounds[k] = a; }
+})();
+var _audioCtx = null;
+function _getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+function playSound(type) {
+  try {
+    if (_mp3Sounds[type]) { _mp3Sounds[type].currentTime = 0; _mp3Sounds[type].play().catch(function(){}); return; }
+    var ctx = _getAudioCtx(); var g = ctx.createGain(); g.connect(ctx.destination); var t = ctx.currentTime;
+    if (type === 'success') {
+      var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+      o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.1);
+      g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.2);
+      o.start(t); o.stop(t + 0.2);
+    } else if (type === 'error') {
+      var o2 = ctx.createOscillator(); o2.type = 'square'; o2.connect(g);
+      o2.frequency.setValueAtTime(180, t);
+      g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.15);
+      o2.start(t); o2.stop(t + 0.15);
+    }
+  } catch (e) {}
+}
+
+// ── Notification ──
+var notifTimeout = null;
+function notify(msg, type) {
+  type = type || 'info';
+  if (type === 'purchase' || type === 'success') playSound('purchase');
+  else if (type === 'error') playSound('error');
+  var el = document.getElementById('notification');
+  if (notifTimeout) clearTimeout(notifTimeout);
+  el.className = 'notif-' + (type === 'purchase' ? 'success' : type);
+  el.textContent = msg;
+  el.style.display = 'block';
+  notifTimeout = setTimeout(function() { el.style.display = 'none'; }, 3000);
+}
+
+// ── Portals SDK ──
+function triggerTask(taskName, targetState) {
+  targetState = targetState || 'SetNotActiveToActive';
+  console.log('[GoldStore] triggerTask:', taskName);
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+    PortalsSdk.sendMessageToUnity(JSON.stringify({
+      TaskName: taskName,
+      TaskTargetState: targetState
+    }));
+  }
+}
+
+function closeIframe() {
+  playSound('click');
+  console.log('[GoldStore] Close requested');
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+    PortalsSdk.closeIframe();
+  }
+}
+
+// ── Buy Gold ──
+function buyGold(packageKey) {
+  if (actionPending) { notify('Transaction in progress...', 'info'); return; }
+
+  var pkg = PACKAGES[packageKey];
+  if (!pkg) return;
+
+  // Check if Helio is loaded
+  if (typeof window.helioCheckout === 'undefined') {
+    notify('Payment system loading, please wait...', 'error');
+    console.error('[GoldStore] Helio SDK not loaded');
+    return;
+  }
+
+  actionPending = true;
+  setButtonStates(true);
+
+  var mountEl = document.getElementById('helio-' + packageKey);
+
+  console.log('[GoldStore] Opening Helio checkout for:', pkg.label);
+
+  window.helioCheckout(mountEl, {
+    paylinkId: pkg.paylinkId,
+    display: 'button',
+    theme: { themeMode: 'dark' },
+    primaryColor: '#DAA520',
+    additionalJSON: JSON.stringify({
+      playerName: playerName || 'Unknown',
+      goldAmount: pkg.goldAmount,
+      packageKey: packageKey
+    }),
+    onSuccess: function(event) {
+      console.log('[GoldStore] Payment SUCCESS:', event);
+      // Credit gold in Portals
+      triggerTask(pkg.taskName);
+      // Optimistic UI update
+      gold += pkg.goldAmount;
+      document.getElementById('gold-display').textContent = gold.toLocaleString();
+      notify('+' + pkg.goldAmount.toLocaleString() + ' Gold purchased!', 'purchase');
+      // Request sync to confirm
+      setTimeout(function() {
+        triggerTask('Sync_Inventory');
+      }, 1000);
+      actionPending = false;
+      setButtonStates(false);
+    },
+    onError: function(event) {
+      console.error('[GoldStore] Payment ERROR:', event);
+      notify('Payment failed. Please try again.', 'error');
+      actionPending = false;
+      setButtonStates(false);
+    },
+    onCancel: function() {
+      console.log('[GoldStore] Payment CANCELLED');
+      notify('Payment cancelled.', 'info');
+      actionPending = false;
+      setButtonStates(false);
+    },
+    onStartPayment: function() {
+      console.log('[GoldStore] Payment STARTED');
+      notify('Processing payment...', 'info');
+    }
+  });
+}
+
+function setButtonStates(disabled) {
+  var btns = document.querySelectorAll('.buy-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].disabled = disabled;
+  }
+}
+
+// ── Keyboard ──
+document.addEventListener('keydown', function(e) {
+  var key = e.key.toLowerCase();
+  if (e.key === 'Escape' || key === 'b') {
+    e.preventDefault();
+    if (!actionPending) closeIframe();
+  }
+});
+
+// ── Sync_Inventory Parser ──
+var SYNC_MAP = {
+  // 4-word keys
+  'Has_Recipe_Meat_Pie': '_skip',
+  // 3-word keys
+  'Unspent_Talent_Points': '_skip',
+  'Has_Milk_Pail': '_skip', 'Has_Shearing_Kit': '_skip',
+  'Has_Butcher_Knife': '_skip', 'Has_Truffle_Spade': '_skip',
+  'Has_Starter_Seeds': '_skip',
+  'Has_Recipe_Flour': '_skip', 'Has_Recipe_Bread': '_skip',
+  'Has_Recipe_Cheese': '_skip', 'Has_Recipe_Stew': '_skip',
+  'Has_Recipe_Ragout': '_skip', 'Has_Recipe_Pie': '_skip',
+  'Has_Recipe_Blanket': '_skip', 'Has_Recipe_Butter': '_skip',
+  'Has_Recipe_Cake': '_skip', 'Has_Recipe_Mead': '_skip',
+  // 2-word keys
+  'Seeds_Wheat': '_skip', 'Seeds_Carrot': '_skip', 'Seeds_Corn': '_skip',
+  'Seeds_Potato': '_skip', 'Seeds_Tomato': '_skip', 'Seeds_Pumpkin': '_skip',
+  'Crop_Wheat': '_skip', 'Crop_Carrot': '_skip', 'Crop_Corn': '_skip',
+  'Crop_Potato': '_skip', 'Crop_Tomato': '_skip', 'Crop_Pumpkin': '_skip',
+  'Goat_Meat': '_skip', 'Meat_Pie': '_skip',
+  'Has_Basket': '_skip', 'Has_Beesuit': '_skip',
+  'Rebirth_Count': '_skip',
+  'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
+  'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
+  'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
+  'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
+  'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
+  'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
+  'T_KeenLearner': '_skip', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
+  'T_Artisan': '_skip', 'T_SeasonedWorker': '_skip', 'T_BonusPoint1': '_skip',
+  'T_Prodigy': '_skip', 'T_BonusPoint2': '_skip',
+  // 1-word keys we care about
+  'Gold': 'gold',
+  // 1-word keys to skip
+  'XP': '_skip', 'Level': '_skip',
+  'Milk': '_skip', 'Wool': '_skip', 'Truffle': '_skip', 'Egg': '_skip', 'Honey': '_skip',
+  'Flour': '_skip', 'Bread': '_skip', 'Cheese': '_skip', 'Stew': '_skip',
+  'Ragout': '_skip', 'Pie': '_skip', 'Blanket': '_skip', 'Butter': '_skip',
+  'Cake': '_skip', 'Mead': '_skip'
+};
+
+function parseSyncMessage(msg) {
+  var parts = msg.replace('Sync_Inventory_', '').split('_');
+  var i = 0;
+
+  while (i < parts.length) {
+    var matched = false;
+
+    // 4-word keys
+    if (!matched && i + 4 < parts.length) {
+      var k4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+      if (SYNC_MAP[k4] !== undefined) {
+        i += 5; matched = true;
+      }
+    }
+    // 3-word keys
+    if (!matched && i + 3 < parts.length) {
+      var k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+      if (SYNC_MAP[k3] !== undefined) {
+        i += 4; matched = true;
+      }
+    }
+    // 2-word keys
+    if (!matched && i + 2 < parts.length) {
+      var k2 = parts[i] + '_' + parts[i+1];
+      if (SYNC_MAP[k2] !== undefined) {
+        i += 3; matched = true;
+      }
+    }
+    // 1-word keys
+    if (!matched && i + 1 < parts.length) {
+      if (parts[i] === 'playerName') {
+        playerName = (parts[i+1] || '').replace(/"/g, '');
+        i += 2; matched = true;
+      } else if (SYNC_MAP[parts[i]] !== undefined) {
+        if (SYNC_MAP[parts[i]] === 'gold') {
+          gold = Math.max(0, parseInt(parts[i+1]) || 0);
+        }
+        i += 2; matched = true;
+      }
+    }
+
+    if (!matched) i++;
+  }
+}
+
+// ── Message Handling ──
+var lastMessageId = '';
+var lastMessageTime = 0;
+
+function processMessage(msg, source) {
+  var now = Date.now();
+  var msgId = msg + '_' + Math.floor(now / 100);
+  if (msgId === lastMessageId && now - lastMessageTime < 200) return;
+  lastMessageId = msgId;
+  lastMessageTime = now;
+  handlePortalsMessage(msg);
+}
+
+function handlePortalsMessage(msg) {
+  if (typeof msg !== 'string') return;
+  if (msg.indexOf('Sync_Inventory') === 0) {
+    parseSyncMessage(msg);
+    updateUI();
+  }
+}
+
+function updateUI() {
+  document.getElementById('gold-display').textContent = gold.toLocaleString();
+}
+
+// ── SDK Setup ──
+function setupMessageListener() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+    PortalsSdk.setMessageListener(function(msg) {
+      processMessage(msg, 'SDK');
+    });
+    console.log('[GoldStore] SDK listener registered');
+  } else {
+    setTimeout(setupMessageListener, 200);
+  }
+}
+
+window.addEventListener('message', function(event) {
+  if (event.data && typeof event.data === 'string') {
+    processMessage(event.data, 'postMessage-string');
+  }
+  else if (event.data && event.data.portalsMessage) {
+    processMessage(event.data.portalsMessage, 'postMessage-portals');
+  }
+  else if (event.data && event.data.message && typeof event.data.message === 'string') {
+    processMessage(event.data.message, 'postMessage-message');
+  }
+});
+
+setupMessageListener();
+
+// Request sync on load
+setTimeout(function() {
+  triggerTask('Sync_Inventory');
+}, 500);
+
+// Visibility/Focus handlers
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) { triggerTask('Sync_Inventory'); }
+});
+window.addEventListener('focus', function() {
+  triggerTask('Sync_Inventory');
+});
+
+console.log('[GoldStore] Gold Store loaded');
+</script>
+</body>
+</html>
