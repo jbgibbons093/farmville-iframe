@@ -845,7 +845,8 @@
 
     // Keyboard controls - ESC to close
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' || e.key === 'l' || e.key === 'L') {
+      var key = e.key.toLowerCase();
+      if (e.key === 'Escape' || key === 'l' || key === 'i' || key === 'y' || key === 'g') {
         e.preventDefault();
         closeGuide();
       }
