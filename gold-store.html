@@ -353,7 +353,7 @@ body {
           </div>
           <div class="package-action">
             <div class="package-price">$2 USDC</div>
-            <button class="buy-btn" id="btn-starter" onclick="buyGold('starter')">Buy</button>
+            <button class="buy-btn" id="btn-starter" onclick="buyGold('starter')" disabled>Loading...</button>
           </div>
         </div>
 
@@ -369,7 +369,7 @@ body {
           </div>
           <div class="package-action">
             <div class="package-price">$8 USDC</div>
-            <button class="buy-btn" id="btn-bundle" onclick="buyGold('bundle')">Buy</button>
+            <button class="buy-btn" id="btn-bundle" onclick="buyGold('bundle')" disabled>Loading...</button>
           </div>
         </div>
 
@@ -385,7 +385,7 @@ body {
           </div>
           <div class="package-action">
             <div class="package-price">$20 USDC</div>
-            <button class="buy-btn" id="btn-tycoon" onclick="buyGold('tycoon')">Buy</button>
+            <button class="buy-btn" id="btn-tycoon" onclick="buyGold('tycoon')" disabled>Loading...</button>
           </div>
         </div>
       </div>
@@ -408,7 +408,32 @@ body {
 <div id="notification" style="display:none"></div>
 
 <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
-<script type="module" src="https://embed.hel.io/assets/index-v1.js"></script>
+<script>
+// Load Helio SDK dynamically so we can detect when it's ready
+var helioReady = false;
+(function() {
+  var s = document.createElement('script');
+  s.type = 'module';
+  s.src = 'https://embed.hel.io/assets/index-v1.js';
+  s.onload = function() {
+    // Module loaded, but helioCheckout may not be on window yet - poll for it
+    var checks = 0;
+    var poll = setInterval(function() {
+      checks++;
+      if (typeof window.helioCheckout === 'function') {
+        clearInterval(poll);
+        helioReady = true;
+        setButtonStates(false);
+        console.log('[GoldStore] Helio SDK ready');
+      } else if (checks > 100) {
+        clearInterval(poll);
+        console.error('[GoldStore] Helio SDK failed to initialize');
+      }
+    }, 200);
+  };
+  document.head.appendChild(s);
+})();
+</script>
 <script>
 // ============================================
 // HUGHBERRY FARMS - GOLD STORE
@@ -513,9 +538,8 @@ function buyGold(packageKey) {
   if (!pkg) return;
 
   // Check if Helio is loaded
-  if (typeof window.helioCheckout === 'undefined') {
-    notify('Payment system loading, please wait...', 'error');
-    console.error('[GoldStore] Helio SDK not loaded');
+  if (!helioReady || typeof window.helioCheckout !== 'function') {
+    notify('Payment system still loading, please wait...', 'info');
     return;
   }
 
@@ -574,6 +598,7 @@ function setButtonStates(disabled) {
   var btns = document.querySelectorAll('.buy-btn');
   for (var i = 0; i < btns.length; i++) {
     btns[i].disabled = disabled;
+    if (!disabled) btns[i].textContent = 'Buy';
   }
 }
 
