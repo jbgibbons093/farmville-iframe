@@ -742,7 +742,19 @@
       }
       const cropType = plot.cropType;
       const crop = CONFIG.crops[cropType];
-      if (!crop) return;
+      if (!crop) {
+        // Invalid crop type - clean up the plot and notify player
+        console.log('[Hughberry] Invalid cropType for plot', plotId, ':', cropType, '- cleaning up');
+        notify('Crop data lost - plot cleared', 'error');
+        plot.state = 'empty';
+        plot.cropType = null;
+        plot.plantedAt = null;
+        plot.readyAt = null;
+        dashboardDirty = true;
+        saveGameQuiet();
+        renderCrops();
+        return;
+      }
       const cropName = crop.name;
       triggerTask(`Add_Crop_${cropName}_1`);
       const boostedHarvestXP = getHarvestXP(crop);
@@ -1293,7 +1305,12 @@
           html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(remaining)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${Math.min(100, progress)}%"></div></div></div>`;
         } else {
           const c = CONFIG.crops[plot.cropType];
-          html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`;
+          if (!c) {
+            // Invalid cropType - show as corrupt/empty
+            html += `<div class="plot-card empty"><span class="plot-number">#${num}</span><div class="plot-icon" style="color:#e74c3c">&#x26A0;</div><div class="plot-name" style="color:#e74c3c">Error</div><div class="plot-hint" style="color:#e74c3c">Press X to clear</div></div>`;
+          } else {
+            html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`;
+          }
         }
       });
       html += '</div>';
