@@ -893,12 +893,14 @@
     }
 
     function plantAllEmpty() {
-      console.log('[Hughberry] plantAllEmpty called, syncReceived:', syncReceived);
+      console.log('[Hughberry] plantAllEmpty called');
+      console.log('[Hughberry] syncReceived:', syncReceived, 'gameState.inventory:', JSON.stringify(gameState.inventory));
+
+      // Removed syncReceived block - just warn but continue
       if (!syncReceived) {
-        notify('Syncing with server... try again!', 'error');
-        triggerTask('Sync_Inventory');
-        return;
+        console.log('[Hughberry] Warning: sync not received yet, proceeding anyway');
       }
+
       const c = gameState.settings.priorityCrop;
       const seedKey = `seeds_${c}`;
       const availableSeeds = gameState.inventory[seedKey] || 0;
@@ -910,9 +912,10 @@
 
       // Find empty plots and plant up to availableSeeds
       const activePlots = getActivePlotCount();
+      console.log('[Hughberry] Finding empty plots, activePlots:', activePlots);
       const emptyPlots = gameState.plots.map((p, i) => ({ plot: p, idx: i })).filter(x => x.plot.state === 'empty' && x.idx < activePlots);
       const toPlant = Math.min(emptyPlots.length, availableSeeds);
-      console.log('[Hughberry] activePlots:', activePlots, 'emptyPlots:', emptyPlots.length, 'toPlant:', toPlant);
+      console.log('[Hughberry] emptyPlots:', emptyPlots.length, 'toPlant:', toPlant);
 
       if (toPlant < 1) { notify('No empty plots!', 'error'); console.log('[Hughberry] No empty plots, returning'); return; }
 
@@ -920,9 +923,11 @@
       const plantXP = getPlantingXP(crop);
       const cropName = crop.name;
 
+      console.log('[Hughberry] Starting plant loop for', toPlant, 'plots');
       // Update local state FIRST for immediate UI feedback
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
+        console.log('[Hughberry] Planting plot', idx + 1, 'with', c);
         gameState.inventory[seedKey]--;
         plot.state = 'growing';
         plot.cropType = c;
@@ -931,11 +936,14 @@
         planted++;
       }
 
+      console.log('[Hughberry] Planted', planted, 'crops, now rendering');
       // Render immediately with updated local state
       saveGameQuiet();
+      console.log('[Hughberry] Calling renderCrops');
       renderCrops();
+      console.log('[Hughberry] Calling renderDashboard');
       renderDashboard();
-      console.log('[Hughberry] Rendered', planted, 'crops immediately');
+      console.log('[Hughberry] Render complete');
 
       // Stagger Portals tasks 300ms apart to avoid task collisions
       for (let i = 0; i < toPlant; i++) {
