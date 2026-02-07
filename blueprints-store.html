@@ -29,6 +29,8 @@
     .item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .item-price { font-size: 20px; font-weight: 800; color: #FFD700; }
     .item-owned-tag { font-size: 14px; font-weight: 700; color: #27ae60; }
+    .tier-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+    .tier-benefit { font-size: 11px; color: #90EE90; margin-top: 4px; font-style: italic; }
     .buy-btn { background: linear-gradient(180deg, #c0392b 0%, #96281b 100%); border: 2px solid #e74c3c; color: #fff; padding: 10px 25px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .buy-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
     .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
@@ -51,7 +53,7 @@
         <div style="display: flex; gap: 10px; align-items: center;">
           <div class="gold-display">
             <span class="gold-icon">&#x2B50;</span>
-            <span class="gold-value">Lv.<span id="level-display">1</span></span>
+            <span class="gold-value">Lv.<span id="level-display">0</span></span>
           </div>
           <div class="gold-display">
             <span class="gold-icon">&#x1F4B0;</span>
@@ -84,6 +86,12 @@
       { id: 'truffle_spade', name: 'Truffle Spade', icon: '&#x1F9F9;', price: 450, unlockLevel: 25, desc: 'Required to work with pigs and collect truffles', taskName: 'Buy_Truffle_Spade' }
     ];
 
+    const TIER_BENEFITS = {
+      1: { name: 'Bronze', color: '#cd7f32', effect: 'Tool functions properly' },
+      2: { name: 'Silver', color: '#c0c0c0', effect: '-10% cooldown, +1 bonus product' },
+      3: { name: 'Gold', color: '#ffd700', effect: 'Additional 2x XP bonus' }
+    };
+
     const RECIPES = [
       { id: 'recipe_flour', name: 'Flour Recipe', icon: '&#x1F4DC;', price: 100, unlockLevel: 4, desc: 'Learn to grind wheat into flour', taskName: 'Buy_Recipe_Flour' },
       { id: 'recipe_butter', name: 'Butter Recipe', icon: '&#x1F4DC;', price: 150, unlockLevel: 8, desc: 'Learn to churn milk into butter', taskName: 'Buy_Recipe_Butter' },
@@ -98,7 +106,7 @@
       { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 28, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
     ];
 
-    let gameState = { gold: 0, level: 0, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
+    let gameState = { gold: 0, level: 0, equipment: { milk_pail: 0, basket: 0, beesuit: 0, shearing_kit: 0, butcher_knife: 0, truffle_spade: 0 }, recipes: {} };
     let actionPending = false;
 
     function triggerTask(taskName) {
@@ -159,15 +167,23 @@
     function buyEquipment(id) {
       if (actionPending) { notify('Please wait...'); return; }
 
-      const equip = EQUIPMENT.find(e => e.id === id);
+      var equip = EQUIPMENT.find(function(e) { return e.id === id; });
       if (!equip) return;
-      if (gameState.equipment[id]) { notify('Already owned!', 'error'); return; }
+
+      var currentTier = gameState.equipment[id] || 0;
+      if (currentTier >= 3) { notify('Max tier reached!', 'error'); return; }
       if (gameState.level < equip.unlockLevel) { notify('Level too low!', 'error'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!', 'error'); return; }
 
       actionPending = true;
+      // Optimistic tier increment
+      gameState.gold -= equip.price;
+      gameState.equipment[id] = currentTier + 1;
+      render();
       triggerTask(equip.taskName);
-      notify('Purchased ' + equip.name + '!', 'purchase');
+
+      var tierName = TIER_BENEFITS[currentTier + 1].name;
+      notify('Upgraded to ' + tierName + ' tier!', 'purchase');
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
       setTimeout(function() { actionPending = false; render(); }, 3000);
@@ -197,22 +213,37 @@
       // Render Equipment
       let equipHtml = '';
       EQUIPMENT.forEach(equip => {
-        const owned = gameState.equipment[equip.id];
+        const currentTier = gameState.equipment[equip.id] || 0;
         const locked = gameState.level < equip.unlockLevel;
-        const canBuy = !owned && !locked && !actionPending && gameState.gold >= equip.price;
+        const maxTier = currentTier >= 3;
+        const canBuy = !maxTier && !locked && !actionPending && gameState.gold >= equip.price;
 
-        equipHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
+        let buttonText = 'Purchase';
+        if (currentTier === 1) buttonText = 'Upgrade to Silver';
+        else if (currentTier === 2) buttonText = 'Upgrade to Gold';
+
+        let tierBadgeHtml = '';
+        let tierBenefitHtml = '';
+        if (currentTier > 0) {
+          const tierInfo = TIER_BENEFITS[currentTier];
+          tierBadgeHtml = '<div class="tier-badge" style="background: ' + tierInfo.color + '; color: #000;">' + tierInfo.name + ' Tier</div>';
+          tierBenefitHtml = '<div class="tier-benefit">' + tierInfo.effect + '</div>';
+        }
+
+        equipHtml += '<div class="item ' + (currentTier > 0 ? 'owned' : '') + '">' +
           '<span class="item-icon">' + equip.icon + '</span>' +
           '<div class="item-info">' +
             '<div class="item-name">' + equip.name + '</div>' +
             '<div class="item-desc">' + equip.desc + '</div>' +
+            tierBenefitHtml +
             (locked ? '<div class="item-locked">Requires Level ' + equip.unlockLevel + '</div>' : '') +
           '</div>' +
           '<div class="item-actions">' +
-            (owned ?
-              '<div class="item-owned-tag">OWNED</div>' :
+            tierBadgeHtml +
+            (maxTier ?
+              '<div class="item-owned-tag">MAX TIER</div>' :
               '<div class="item-price">' + equip.price + 'g</div>' +
-              '<button class="buy-btn" ' + (canBuy ? 'onclick="buyEquipment(\'' + equip.id + '\')"' : 'disabled') + '>Purchase</button>'
+              '<button class="buy-btn" ' + (canBuy ? 'onclick="buyEquipment(\'' + equip.id + '\')"' : 'disabled') + '>' + buttonText + '</button>'
             ) +
           '</div>' +
         '</div>';
@@ -311,13 +342,13 @@
         const data = parseSyncMessage(msg);
         gameState.gold = data.gold || 0;
         gameState.level = data.level || 0;
-        // Equipment
-        gameState.equipment.milk_pail = (data.has_milk_pail || 0) > 0;
-        gameState.equipment.basket = (data.has_basket || 0) > 0;
-        gameState.equipment.beesuit = (data.has_beesuit || 0) > 0;
-        gameState.equipment.shearing_kit = (data.has_shearing_kit || 0) > 0;
-        gameState.equipment.butcher_knife = (data.has_butcher_knife || 0) > 0;
-        gameState.equipment.truffle_spade = (data.has_truffle_spade || 0) > 0;
+        // Equipment (tier values 0-3)
+        gameState.equipment.milk_pail = data.has_milk_pail || 0;
+        gameState.equipment.basket = data.has_basket || 0;
+        gameState.equipment.beesuit = data.has_beesuit || 0;
+        gameState.equipment.shearing_kit = data.has_shearing_kit || 0;
+        gameState.equipment.butcher_knife = data.has_butcher_knife || 0;
+        gameState.equipment.truffle_spade = data.has_truffle_spade || 0;
         // Recipes
         gameState.recipes.recipe_flour = (data.has_recipe_flour || 0) > 0;
         gameState.recipes.recipe_bread = (data.has_recipe_bread || 0) > 0;

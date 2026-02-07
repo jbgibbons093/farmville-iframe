@@ -323,7 +323,7 @@
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0, mead: 0
       },
       uncollected: { milk: 0, eggs: 0, wool: 0, meat: 0, truffle: 0, honey: 0 },
-      equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false },
+      equipment: { milk_pail: 0, basket: 0, beesuit: 0, shearing_kit: 0, butcher_knife: 0, truffle_spade: 0 },
       recipes: {
         recipe_flour: false, recipe_bread: false, recipe_cheese: false, recipe_stew: false,
         recipe_ragout: false, recipe_pie: false, recipe_meat_pie: false, recipe_blanket: false,
@@ -415,7 +415,13 @@
 
     function getAnimalCollectXP(station) {
       const t = gameState.talents;
-      return station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+      const baseXP = station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+
+      // Tier 3: double XP bonus
+      const equipmentTier = station.equipment ? (gameState.equipment[station.equipment] || 0) : 0;
+      const xpMultiplier = equipmentTier >= 3 ? 2 : 1;
+
+      return baseXP * xpMultiplier;
     }
 
     function getCropGrowTime(crop) {
@@ -424,10 +430,16 @@
       return Math.max(Math.ceil(crop.growTime * (1 - reduction)), 3);
     }
 
-    function getAnimalCooldown(config) {
+    function getAnimalCooldown(config, equipmentKey) {
       const t = gameState.talents;
-      const reduction = Math.min(0.9, t.quickHands * 0.10);
-      return Math.max(Math.ceil(config.cooldown * (1 - reduction)), 9);
+      const talentReduction = t.quickHands * 0.10;
+
+      // Tier 2+: additional 10% cooldown reduction
+      const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
+      const tierReduction = equipmentTier >= 2 ? 0.10 : 0;
+
+      const totalReduction = Math.min(0.9, talentReduction + tierReduction);
+      return Math.max(Math.ceil(config.cooldown * (1 - totalReduction)), 9);
     }
 
     function getActivePlotCount() {
@@ -443,7 +455,15 @@
     }
 
     function getHarvestBonusCrops() { return gameState.talents.bountifulHarvest; }
-    function getCollectionBonusProducts() { return gameState.talents.animalMastery; }
+    function getCollectionBonusProducts(equipmentKey) {
+      const talentBonus = gameState.talents.animalMastery;
+
+      // Tier 2+: +1 bonus product per collection
+      const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
+      const tierBonus = equipmentTier >= 2 ? 1 : 0;
+
+      return talentBonus + tierBonus;
+    }
 
     // Claim free starter seeds (one-time only)
     function claimStarterSeeds() {
@@ -558,7 +578,7 @@
           if (varMapping[fourWordKey]) {
             const value = Math.max(0, parseInt(parts[i + 4]) || 0);
             const mapping = varMapping[fourWordKey];
-            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
@@ -573,7 +593,7 @@
           if (varMapping[threeWordKey]) {
             const value = Math.max(0, parseInt(parts[i + 3]) || 0);
             const mapping = varMapping[threeWordKey];
-            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
@@ -589,7 +609,7 @@
             const value = Math.max(0, parseInt(parts[i + 2]) || 0);
             const mapping = varMapping[twoWordKey];
             if (mapping.isUncollected) gameState.uncollected[mapping.target] = value;
-            else if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            else if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
@@ -607,7 +627,7 @@
           if (varMapping[oneWordKey]) {
             const value = Math.max(0, parseInt(parts[i + 1]) || 0);
             const mapping = varMapping[oneWordKey];
-            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
@@ -936,7 +956,7 @@
       const animalXP = getAnimalStartXP(config);
       awardXP(animalXP);
 
-      const cooldown = getAnimalCooldown(config);
+      const cooldown = getAnimalCooldown(config, reqEquip?.id);
       animal.state = 'producing';
       animal.readyAt = Date.now() + (cooldown * 1000);
       animal.notified = false;
@@ -1071,7 +1091,7 @@
 
       // Auto-restart animals if setting is enabled
       if (gameState.settings.autoRestartAnimals) {
-        const cooldown = getAnimalCooldown(CONFIG.animals[station.animalType]);
+        const cooldown = getAnimalCooldown(CONFIG.animals[station.animalType], station.equipment);
         readyAnimals.forEach(animal => {
           animal.state = 'producing';
           animal.readyAt = Date.now() + (cooldown * 1000);
@@ -1091,7 +1111,7 @@
       // Each task self-resets, so we stagger 350ms to give Portals time to process each one
       const addDelay = 350;
       const xpPerUnit = getAnimalCollectXP(station);
-      const bonusPerAnimal = getCollectionBonusProducts();
+      const bonusPerAnimal = getCollectionBonusProducts(station.equipment);
       const totalProducts = readyCount + (readyCount * bonusPerAnimal);
       const xpGained = readyCount * xpPerUnit;
 
@@ -1364,7 +1384,7 @@
       let started = 0;
       animals.forEach((animal, i) => {
         if (i < activeSlots && animal.state === 'idle') {
-          const cooldown = getAnimalCooldown(config);
+          const cooldown = getAnimalCooldown(config, reqEquip?.id);
           animal.state = 'producing';
           animal.readyAt = Date.now() + (cooldown * 1000);
           animal.notified = false;
