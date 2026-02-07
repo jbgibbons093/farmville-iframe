@@ -573,7 +573,8 @@
         if (i + 4 < parts.length) {
           const fourWordKey = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2] + '_' + parts[i + 3];
           if (varMapping[fourWordKey]) {
-            const value = Math.max(0, parseInt(parts[i + 4]) || 0);
+            const parsed = parseInt(parts[i + 4]);
+            const value = Math.max(0, isNaN(parsed) ? 0 : parsed);
             const mapping = varMapping[fourWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -588,7 +589,8 @@
         if (!matched && i + 3 < parts.length) {
           const threeWordKey = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2];
           if (varMapping[threeWordKey]) {
-            const value = Math.max(0, parseInt(parts[i + 3]) || 0);
+            const parsed = parseInt(parts[i + 3]);
+            const value = Math.max(0, isNaN(parsed) ? 0 : parsed);
             const mapping = varMapping[threeWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -603,7 +605,8 @@
         if (!matched && i + 2 < parts.length) {
           const twoWordKey = parts[i] + '_' + parts[i + 1];
           if (varMapping[twoWordKey]) {
-            const value = Math.max(0, parseInt(parts[i + 2]) || 0);
+            const parsed = parseInt(parts[i + 2]);
+            const value = Math.max(0, isNaN(parsed) ? 0 : parsed);
             const mapping = varMapping[twoWordKey];
             if (mapping.isUncollected) gameState.uncollected[mapping.target] = value;
             else if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
@@ -619,7 +622,8 @@
         if (!matched && i + 1 < parts.length) {
           const oneWordKey = parts[i];
           if (varMapping[oneWordKey]) {
-            const value = Math.max(0, parseInt(parts[i + 1]) || 0);
+            const parsed = parseInt(parts[i + 1]);
+            const value = Math.max(0, isNaN(parsed) ? 0 : parsed);
             const mapping = varMapping[oneWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -706,7 +710,7 @@
         loadFromStorage();
         updateAllUI();
       }
-      else if (msg.startsWith('Sync_Inventory')) {
+      else if (msg.indexOf('Sync_Inventory') === 0) {
         parseAndSyncInventory(msg);
         checkLevelUp(); // Detect level-ups and trigger Add_Level_1 to Portals
         updateAllUI();
@@ -1260,6 +1264,7 @@
     }
 
     function renderCrops() {
+      console.log('[Hughberry] renderCrops called - plot states:', gameState.plots.map(p => p.state).join(','));
       const unlockedCrops = Object.entries(CONFIG.crops).filter(([k, v]) => gameState.level >= v.unlockLevel);
       let html = `<div class="crops-header"><div class="section-title">&#x1F33E; Crop Management</div><div class="crops-controls"><div class="control-group"><span class="control-label">Auto-Replant</span><div class="toggle-switch ${gameState.settings.autoReplant ? 'on' : ''}" onclick="toggleAutoReplant()"></div></div><div class="control-group"><span class="control-label">Priority</span><select id="priority-select" onchange="setPriority(this.value)">${unlockedCrops.map(([k, v]) => `<option value="${k}" ${gameState.settings.priorityCrop === k ? 'selected' : ''}>${v.name}</option>`).join('')}</select></div><button class="action-btn" onclick="plantAllEmpty()">&#x1F331; Plant All</button></div></div><div class="crops-grid">`;
 
