@@ -814,7 +814,11 @@
     }
 
     function saveGameQuiet() {
-      localStorage.setItem('hughberry_state', JSON.stringify(gameState));
+      try {
+        localStorage.setItem('hughberry_state', JSON.stringify(gameState));
+      } catch (e) {
+        // Sandboxed iframe - localStorage not available, ignore
+      }
     }
 
     function refreshSync() {
@@ -823,9 +827,9 @@
     }
 
     function loadFromStorage() {
-      const saved = localStorage.getItem('hughberry_state');
-      if (saved) {
-        try {
+      try {
+        const saved = localStorage.getItem('hughberry_state');
+        if (saved) {
           const p = JSON.parse(saved);
           // Load settings
           gameState.settings = { ...gameState.settings, ...p.settings };
@@ -855,7 +859,9 @@
               }
             });
           }
-        } catch(e) { console.error('Load error:', e); }
+        }
+      } catch(e) {
+        // Sandboxed iframe - localStorage not available, or parse error
       }
     }
 
