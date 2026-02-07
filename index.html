@@ -415,9 +415,9 @@
       const t = gameState.talents;
       const baseXP = station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
 
-      // Tier 3: double XP bonus
+      // Tier 4 (Platinum): double XP bonus
       const equipmentTier = station.equipment ? (gameState.equipment[station.equipment] || 0) : 0;
-      const xpMultiplier = equipmentTier >= 3 ? 2 : 1;
+      const xpMultiplier = equipmentTier >= 4 ? 2 : 1;
 
       return baseXP * xpMultiplier;
     }
@@ -432,9 +432,9 @@
       const t = gameState.talents;
       const talentReduction = t.quickHands * 0.10;
 
-      // Tier 2+: additional 10% cooldown reduction
+      // Tier 3+ (Gold): additional 10% cooldown reduction
       const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
-      const tierReduction = equipmentTier >= 2 ? 0.10 : 0;
+      const tierReduction = equipmentTier >= 3 ? 0.10 : 0;
 
       const totalReduction = Math.min(0.9, talentReduction + tierReduction);
       return Math.max(Math.ceil(config.cooldown * (1 - totalReduction)), 9);
@@ -456,7 +456,7 @@
     function getCollectionBonusProducts(equipmentKey) {
       const talentBonus = gameState.talents.animalMastery;
 
-      // Tier 2+: +1 bonus product per collection
+      // Tier 2+ (Silver): +1 bonus product per collection
       const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
       const tierBonus = equipmentTier >= 2 ? 1 : 0;
 

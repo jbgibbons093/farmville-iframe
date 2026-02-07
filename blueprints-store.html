@@ -87,9 +87,10 @@
     ];
 
     const TIER_BENEFITS = {
-      1: { name: 'Bronze', color: '#cd7f32', effect: 'Tool functions properly' },
-      2: { name: 'Silver', color: '#c0c0c0', effect: '-10% cooldown, +1 bonus product' },
-      3: { name: 'Gold', color: '#ffd700', effect: 'Additional 2x XP bonus' }
+      1: { name: 'Bronze', color: '#cd7f32', effect: 'Equipment unlocked' },
+      2: { name: 'Silver', color: '#c0c0c0', effect: '+1 bonus product per collection' },
+      3: { name: 'Gold', color: '#ffd700', effect: '-10% cooldown reduction' },
+      4: { name: 'Platinum', color: '#e5e4e2', effect: '2x XP multiplier' }
     };
 
     const RECIPES = [
@@ -171,7 +172,7 @@
       if (!equip) return;
 
       var currentTier = gameState.equipment[id] || 0;
-      if (currentTier >= 3) { notify('Max tier reached!', 'error'); return; }
+      if (currentTier >= 4) { notify('Max tier reached!', 'error'); return; }
       if (gameState.level < equip.unlockLevel) { notify('Level too low!', 'error'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!', 'error'); return; }
 
@@ -215,12 +216,13 @@
       EQUIPMENT.forEach(equip => {
         const currentTier = gameState.equipment[equip.id] || 0;
         const locked = gameState.level < equip.unlockLevel;
-        const maxTier = currentTier >= 3;
+        const maxTier = currentTier >= 4;
         const canBuy = !maxTier && !locked && !actionPending && gameState.gold >= equip.price;
 
         let buttonText = 'Purchase';
         if (currentTier === 1) buttonText = 'Upgrade to Silver';
         else if (currentTier === 2) buttonText = 'Upgrade to Gold';
+        else if (currentTier === 3) buttonText = 'Upgrade to Platinum';
 
         let tierBadgeHtml = '';
         let tierBenefitHtml = '';
