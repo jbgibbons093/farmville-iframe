@@ -1124,34 +1124,29 @@
     // XP and Level come from Portals via Sync_Inventory
     // But iframe must detect level-ups and trigger Add_Level_1 task
 
+    var levelUpPending = false;
     function checkLevelUp() {
+      if (levelUpPending) {
+        console.log('[Hughberry] checkLevelUp skipped - level up already pending');
+        return;
+      }
       const t = CONFIG.levelThresholds;
-      let levelsGained = 0;
+      console.log('[Hughberry] checkLevelUp: level=' + gameState.level + ', xp=' + gameState.xp + ', threshold=' + t[gameState.level]);
 
-      while (gameState.level < t.length) {
-        const xpNeeded = t[gameState.level];
-        if (gameState.xp < xpNeeded) break;
-
-        // Compute remaining XP after this level-up
-        gameState.xp -= xpNeeded;
-        const newLevel = gameState.level + 1;
-        console.log('[Hughberry] Level up! Excess XP:', gameState.xp, 'after needing', xpNeeded, '-> Level', newLevel);
-        levelsGained++;
-
-        // Trigger level-up tasks staggered to avoid Portals collision
-        (function(delay) {
-          setTimeout(function() {
-            triggerTask('Add_Level_1');
-          }, delay);
-        })((levelsGained - 1) * 400);
-
-        gameState.level = newLevel;
+      if (gameState.level >= t.length) {
+        console.log('[Hughberry] Max level reached');
+        return;
       }
 
-      if (levelsGained > 0) {
-        // Reset XP in Portals to the remaining amount after all level-ups
-        triggerTask('Reset_XP');
-        notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success', 'levelup');
+      const xpNeeded = t[gameState.level];
+      if (gameState.xp >= xpNeeded) {
+        levelUpPending = true;
+        console.log('[Hughberry] LEVEL UP! XP ' + gameState.xp + ' >= ' + xpNeeded);
+        triggerTask('Add_Level_1');
+        notify('LEVEL UP! Now Lv.' + (gameState.level + 1) + '!', 'success', 'levelup');
+
+        // Reset pending flag after a delay to allow Portals to process
+        setTimeout(function() { levelUpPending = false; }, 2000);
       }
     }
 
