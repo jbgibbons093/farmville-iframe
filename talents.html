@@ -646,7 +646,6 @@ var playerLevel = 0;
 var playerGold = 0;
 var unspentTalentPoints = 0;
 var activeTree = 'farming';
-var actionPending = false;
 var buyPending = false;
 
 // Initialize all talent ranks to 0
@@ -684,7 +683,6 @@ function isTierUnlocked(treeName, gate) {
 }
 
 function canInvest(treeName, talent, tierGate) {
-  if (actionPending) return false;
   if (getUnspentPoints() <= 0) return false;
   if (!isTierUnlocked(treeName, tierGate)) return false;
   var current = talentState[talent.key] || 0;
@@ -716,7 +714,6 @@ function investPoint(treeName, talentKey) {
     return;
   }
 
-  actionPending = true;
   triggerTask('Invest_' + talentKey);
 
   // Optimistic update for responsive UI
@@ -727,9 +724,6 @@ function investPoint(treeName, talentKey) {
   }
   notify(talent.name + ' ' + talentState[talentKey] + '/' + talent.maxRank, 'talent');
   renderAll();
-
-  // Release pending after sync window
-  setTimeout(function() { actionPending = false; }, 1500);
 }
 
 // ── Buy Talent Point ──
@@ -802,7 +796,6 @@ function handlePortalsMessage(msg) {
   if (typeof msg !== 'string') return;
   if (msg.indexOf('Sync_Inventory') === 0) {
     parseAndSyncInventory(msg);
-    actionPending = false;
     buyPending = false;
     renderAll();
   }
@@ -1004,7 +997,7 @@ function renderTree() {
       var talent = tierData.talents[j];
       var currentRank = talentState[talent.key] || 0;
       var isMaxed = currentRank >= talent.maxRank;
-      var isAvailable = !isMaxed && tierUnlocked && unspent > 0 && !actionPending;
+      var isAvailable = !isMaxed && tierUnlocked && unspent > 0;
       var isLocked = !tierUnlocked;
 
       var cardClass = 'talent-card';

@@ -107,7 +107,6 @@
     ];
 
     let gameState = { gold: 0, level: 0, equipment: { milk_pail: 0, basket: 0, beesuit: 0, shearing_kit: 0, butcher_knife: 0, truffle_spade: 0 }, recipes: {} };
-    let actionPending = false;
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -167,8 +166,6 @@
     }
 
     function buyEquipment(id) {
-      if (actionPending) { notify('Please wait...'); return; }
-
       var equip = EQUIPMENT.find(function(e) { return e.id === id; });
       if (!equip) return;
 
@@ -177,39 +174,26 @@
       if (gameState.level < equip.unlockLevel) { notify('Level too low!', 'error'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!', 'error'); return; }
 
-      actionPending = true;
-      // Optimistic tier increment
       gameState.gold -= equip.price;
       gameState.equipment[id] = currentTier + 1;
-      render();
       triggerTask(equip.taskName);
-
       var tierName = TIER_BENEFITS[currentTier + 1].name;
       notify('Upgraded to ' + tierName + ' tier!', 'purchase');
-
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; render(); }, 3000);
+      render();
     }
 
     function buyRecipe(id) {
-      if (actionPending) { notify('Please wait...'); return; }
-
       var recipe = RECIPES.find(function(r) { return r.id === id; });
       if (!recipe) return;
       if (gameState.recipes[id]) { notify('Already owned!', 'error'); return; }
       if (gameState.level < recipe.unlockLevel) { notify('Level too low!', 'error'); return; }
       if (gameState.gold < recipe.price) { notify('Not enough gold!', 'error'); return; }
 
-      actionPending = true;
-      // Optimistic deduction
       gameState.gold -= recipe.price;
       gameState.recipes[id] = true;
-      render();
       triggerTask(recipe.taskName);
       notify('Purchased ' + recipe.name + '!', 'purchase');
-
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; render(); }, 3000);
+      render();
     }
 
     function render() {
@@ -222,7 +206,7 @@
         const currentTier = gameState.equipment[equip.id] || 0;
         const locked = gameState.level < equip.unlockLevel;
         const maxTier = currentTier >= 3;
-        const canBuy = !maxTier && !locked && !actionPending && gameState.gold >= equip.price;
+        const canBuy = !maxTier && !locked && gameState.gold >= equip.price;
 
         let buttonText = 'Purchase';
         if (currentTier === 1) buttonText = 'Upgrade to Silver';
@@ -261,7 +245,7 @@
       RECIPES.forEach(recipe => {
         const owned = gameState.recipes[recipe.id];
         const locked = gameState.level < recipe.unlockLevel;
-        const canBuy = !owned && !locked && !actionPending && gameState.gold >= recipe.price;
+        const canBuy = !owned && !locked && gameState.gold >= recipe.price;
 
         recipeHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
           '<span class="item-icon">' + recipe.icon + '</span>' +
@@ -399,7 +383,6 @@
         gameState.recipes.recipe_butter = (data.has_recipe_butter || 0) > 0;
         gameState.recipes.recipe_cake = (data.has_recipe_cake || 0) > 0;
         gameState.recipes.recipe_mead = (data.has_recipe_mead || 0) > 0;
-        actionPending = false;
         render();
       }
     }

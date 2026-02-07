@@ -90,7 +90,6 @@
     };
 
     let gameState = { inventory: {}, recipes: {}, talents: { keenLearner: 0, artisan: 0, seasonedWorker: 0, prodigy: 0 } };
-    let actionPending = false;
     let notifyTimeout = null;
 
     function triggerTask(taskName) {
@@ -180,8 +179,7 @@
     }
 
     function craftItem(recipeId) {
-      if (actionPending) { notify('Please wait...'); return; }
-
+      
       console.log('[Hughberry Crafting] craftItem called with:', recipeId);
       const recipe = RECIPES.find(r => r.id === recipeId);
       if (!recipe) {
@@ -205,8 +203,6 @@
         }
       }
 
-      actionPending = true;
-
       // Trigger craft task
       console.log('[Hughberry Crafting] Triggering:', recipe.taskName);
       triggerTask(recipe.taskName);
@@ -226,16 +222,13 @@
       }, 250);
 
       notify('Crafted ' + recipe.name + '! +' + craftXP + ' XP', 'craft');
-
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; render(); }, 3000);
     }
 
     function render() {
       let html = '';
       RECIPES.forEach(recipe => {
         const hasRecipe = gameState.recipes['recipe_' + recipe.id];
-        let canCraft = hasRecipe && !actionPending;
+        let canCraft = hasRecipe;
         let ingredientsHtml = '';
 
         for (const [ing, qty] of Object.entries(recipe.ingredients)) {
@@ -415,7 +408,6 @@
         gameState.talents.artisan = data.t_artisan !== undefined ? data.t_artisan : 0;
         gameState.talents.seasonedWorker = data.t_seasonedworker !== undefined ? data.t_seasonedworker : 0;
         gameState.talents.prodigy = data.t_prodigy !== undefined ? data.t_prodigy : 0;
-        actionPending = false;
         render();
       }
     }

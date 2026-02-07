@@ -79,7 +79,6 @@
     };
 
     let gameState = { gold: 0, level: 0, seeds: {} };
-    let actionPending = false;
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -139,23 +138,16 @@
     }
 
     function buySeeds(type, qty) {
-      if (actionPending) { notify('Please wait...'); return; }
-
       const seed = SEEDS[type];
       const cost = seed.cost * qty;
       if (gameState.gold < cost) { notify('Not enough gold!', 'error'); return; }
       if (gameState.level < seed.unlockLevel) { notify('Level too low!', 'error'); return; }
 
-      actionPending = true;
-      // Optimistic deduction to prevent double-buy
       gameState.gold -= cost;
       gameState.seeds[type] = (gameState.seeds[type] || 0) + qty;
       triggerTask('Buy_Seeds_' + seed.name + '_' + qty);
       notify('Bought ' + qty + ' ' + seed.name + ' seeds!', 'purchase');
       render();
-
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; render(); }, 3000);
     }
 
     function render() {
@@ -165,8 +157,8 @@
       Object.entries(SEEDS).forEach(([key, seed]) => {
         const owned = gameState.seeds[key] || 0;
         const locked = gameState.level < seed.unlockLevel;
-        const canBuy1 = !locked && !actionPending && gameState.gold >= seed.cost;
-        const canBuy5 = !locked && !actionPending && gameState.gold >= seed.cost * 5;
+        const canBuy1 = !locked && gameState.gold >= seed.cost;
+        const canBuy5 = !locked && gameState.gold >= seed.cost * 5;
 
         html += '<div class="item">' +
           '<span class="item-icon">' + seed.icon + '</span>' +
@@ -272,7 +264,6 @@
         if (data.seeds_potato !== undefined) gameState.seeds.potato = data.seeds_potato;
         if (data.seeds_tomato !== undefined) gameState.seeds.tomato = data.seeds_tomato;
         if (data.seeds_pumpkin !== undefined) gameState.seeds.pumpkin = data.seeds_pumpkin;
-        actionPending = false;
         render();
       }
     }

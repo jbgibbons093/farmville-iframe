@@ -357,10 +357,7 @@
     }
     initAnimals();
 
-    let actionPending = false;
     let dashboardDirty = true;
-    let staggeringSeedKey = null;
-    let staggerEndTime = 0;
     let levelUpPending = false;
     let pendingLevelTarget = 0;
 
@@ -612,9 +609,6 @@
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else if (mapping.isTalent) gameState.talents[mapping.target] = value;
-            else if (staggeringSeedKey === mapping.target && Date.now() < staggerEndTime) {
-              console.log('[Hughberry] Skipping sync overwrite for', mapping.target, 'during stagger');
-            }
             else gameState.inventory[mapping.target] = value;
             i += 3; matched = true;
           }
@@ -762,11 +756,7 @@
       }
       else if (msg.indexOf('Sync_Inventory') === 0) {
         parseAndSyncInventory(msg);
-        // Always reset actionPending on sync - prevents getting stuck
-        actionPending = false;
-        staggeringSeedKey = null;
-        staggerEndTime = 0;
-        checkLevelUp(); // Detect level-ups and trigger Add_Level_1 to Portals
+        checkLevelUp();
         updateAllUI();
       }
       else if (cmd === 'interact' && parts[1] === 'plot') {
@@ -909,49 +899,41 @@
       }
     }
 
-    function plantCrop(plotId, cropType, skipLock) {
-      if (!skipLock && actionPending) { notify('Please wait...', 'error'); return false; }
-
+    function plantCrop(plotId, cropType) {
       const plot = gameState.plots[plotId - 1];
       const crop = CONFIG.crops[cropType];
       const seedKey = `seeds_${cropType}`;
 
-      if (plot.state !== 'empty') { notify('Plot not empty!', 'error'); return false; }
+      if (plot.state !== 'empty') { return false; }
       if (gameState.inventory[seedKey] < 1) { notify(`No ${crop.name} seeds!`, 'error'); return false; }
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return false; }
 
-      if (!skipLock) actionPending = true;
-
-      // Optimistic seed deduction to prevent rapid planting from exceeding available seeds
+      // Deduct seed and update plot immediately
       gameState.inventory[seedKey]--;
-
-      triggerTask(`Plant_Plot_${plotId}`);
-      setTimeout(function() { triggerTask(`Sub_Seeds_${crop.name}_1`); }, 150);
-      const plantXP = getPlantingXP(crop);
-      awardXP(plantXP);
-
       plot.state = 'growing';
       plot.cropType = cropType;
       plot.plantedAt = Date.now();
       plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
 
+      // Send to Portals
+      triggerTask(`Plant_Plot_${plotId}`);
+      triggerTask(`Sub_Seeds_${crop.name}_1`);
+
+      const plantXP = getPlantingXP(crop);
+      awardXP(plantXP);
+
       notify(`Planted ${crop.name}! +${plantXP} XP`, 'success');
       saveGameQuiet();
-
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      if (!skipLock) setTimeout(function() { actionPending = false; }, 3000);
       return true;
     }
 
     function plantAllEmpty() {
-      if (actionPending) { notify('Please wait...', 'error'); return; }
-
       const c = gameState.settings.priorityCrop;
       const seedKey = `seeds_${c}`;
       const availableSeeds = gameState.inventory[seedKey] || 0;
       const crop = CONFIG.crops[c];
 
-      if (availableSeeds < 1) { notify('No seeds!', 'error'); return; }
+      if (availableSeeds < 1) { notify('No ' + crop.name + ' seeds!', 'error'); return; }
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return; }
 
       // Find empty plots and plant up to availableSeeds
@@ -961,50 +943,31 @@
 
       if (toPlant < 1) { notify('No empty plots!', 'error'); return; }
 
-      actionPending = true;
-      staggeringSeedKey = seedKey;
-      staggerEndTime = Date.now() + (toPlant * 350) + 1500;
-
       let planted = 0;
       const plantXP = getPlantingXP(crop);
+
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
 
-        // Stagger task triggers by 350ms per plot to avoid Portals race conditions
-        // Sub_Seeds fires 150ms after Plant_Plot to avoid same-instant "Iframe Message" collision
-        (function(plotIdx, delay) {
-          setTimeout(function() {
-            triggerTask(`Plant_Plot_${plotIdx + 1}`);
-          }, delay);
-          setTimeout(function() {
-            triggerTask(`Sub_Seeds_${crop.name}_1`);
-          }, delay + 150);
-        })(idx, i * 350);
-
-        // Optimistic local seed deduction for rapid planting
+        // Update local state immediately
         gameState.inventory[seedKey]--;
-
         plot.state = 'growing';
         plot.cropType = c;
         plot.plantedAt = Date.now();
         plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
+
+        // Send to Portals
+        triggerTask(`Plant_Plot_${idx + 1}`);
+        triggerTask(`Sub_Seeds_${crop.name}_1`);
         planted++;
       }
 
-      // Award total XP once to avoid same-task collision in Portals
       const totalPlantXP = planted * plantXP;
       awardXP(totalPlantXP);
 
       notify(`Planted ${planted} crops! +${totalPlantXP} XP`, 'success');
       saveGameQuiet();
       renderCrops();
-
-      // Safety timeout: reset actionPending and stagger guard after all tasks have sent
-      setTimeout(function() {
-        actionPending = false;
-        staggeringSeedKey = null;
-        staggerEndTime = 0;
-      }, toPlant * 350 + 3000);
     }
 
     // Equipment requirements for starting animal activities

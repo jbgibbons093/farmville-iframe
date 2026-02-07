@@ -113,7 +113,6 @@
     };
 
     let gameState = { gold: 0, inventory: {} };
-    let actionPending = false;
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -173,29 +172,23 @@
     }
 
     function sellItem(key, qty, taskPrefix, price) {
-      if (actionPending) { notify('Please wait...'); return; }
-
+      
       const owned = Math.max(0, parseInt(gameState.inventory[key]) || 0);
       if (owned < qty) { notify('Not enough to sell!', 'error'); return; }
 
-      actionPending = true;
-      // Optimistic deduction to prevent double-sell before Sync_Inventory arrives
       gameState.inventory[key] = owned - qty;
       gameState.gold += price * qty;
-      render();
       triggerTask(taskPrefix + '_' + qty);
       notify('Sold for ' + (price * qty) + 'g!', 'purchase');
-
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; render(); }, 3000);
+      render();
     }
 
     function renderGrid(items, containerId) {
       let html = '<div class="grid">';
       items.forEach(item => {
         const owned = Math.max(0, parseInt(gameState.inventory[item.key]) || 0);
-        const canSell1 = owned >= 1 && !actionPending;
-        const canSell5 = owned >= 5 && !actionPending;
+        const canSell1 = owned >= 1;
+        const canSell5 = owned >= 5;
 
         let buttonsHtml;
         if (item.singleOnly) {
@@ -363,7 +356,6 @@
         gameState.inventory.butter = data.butter !== undefined ? data.butter : 0;
         gameState.inventory.cake = data.cake !== undefined ? data.cake : 0;
         gameState.inventory.mead = data.mead !== undefined ? data.mead : 0;
-        actionPending = false;
         render();
       }
     }
