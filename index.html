@@ -706,6 +706,14 @@
       console.log('[Hughberry] Requested Sync_Inventory');
     }, 100);
 
+    // Fallback: if no sync received after 2 seconds, allow actions anyway
+    setTimeout(function() {
+      if (!syncReceived) {
+        console.log('[Hughberry] No sync received after 2s, enabling actions anyway');
+        syncReceived = true;
+      }
+    }, 2000);
+
     function handlePortalsMessage(msg) {
       console.log('[Hughberry] Received:', msg);
       if (typeof msg !== 'string') return;
@@ -718,6 +726,7 @@
           const lv = parseInt(parts[2]); gameState.level = isNaN(lv) ? 0 : lv;
           const xv = parseInt(parts[3]); gameState.xp = isNaN(xv) ? 0 : xv;
         }
+        syncReceived = true; // init message counts as sync
         loadFromStorage();
         updateAllUI();
       }
@@ -1862,7 +1871,19 @@
       }
     });
 
-    window.onload = init;
+    // Run init when DOM is ready, or immediately if already ready
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(init, 0);
+    } else {
+      window.addEventListener('DOMContentLoaded', init);
+    }
+    window.onload = function() {
+      // Double-check init ran and re-render
+      if (!syncReceived) {
+        console.log('[Hughberry] window.onload - ensuring UI is rendered');
+        updateAllUI();
+      }
+    };
   </script>
 </body>
 </html>
