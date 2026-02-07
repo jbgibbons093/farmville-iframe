@@ -29,8 +29,6 @@
     .item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .item-price { font-size: 20px; font-weight: 800; color: #FFD700; }
     .item-owned-tag { font-size: 14px; font-weight: 700; color: #27ae60; }
-    .tier-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
-    .tier-benefit { font-size: 11px; color: #90EE90; margin-top: 4px; font-style: italic; }
     .buy-btn { background: linear-gradient(180deg, #c0392b 0%, #96281b 100%); border: 2px solid #e74c3c; color: #fff; padding: 10px 25px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .buy-btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
     .buy-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
@@ -53,7 +51,7 @@
         <div style="display: flex; gap: 10px; align-items: center;">
           <div class="gold-display">
             <span class="gold-icon">&#x2B50;</span>
-            <span class="gold-value">Lv.<span id="level-display">0</span></span>
+            <span class="gold-value">Lv.<span id="level-display">1</span></span>
           </div>
           <div class="gold-display">
             <span class="gold-icon">&#x1F4B0;</span>
@@ -86,12 +84,6 @@
       { id: 'truffle_spade', name: 'Truffle Spade', icon: '&#x1F9F9;', price: 450, unlockLevel: 25, desc: 'Required to work with pigs and collect truffles', taskName: 'Buy_Truffle_Spade' }
     ];
 
-    const TIER_BENEFITS = {
-      1: { name: 'Bronze', color: '#cd7f32', effect: 'Tool functions properly' },
-      2: { name: 'Silver', color: '#c0c0c0', effect: '-10% cooldown, +1 bonus product' },
-      3: { name: 'Gold', color: '#ffd700', effect: 'Additional XP bonus' }
-    };
-
     const RECIPES = [
       { id: 'recipe_flour', name: 'Flour Recipe', icon: '&#x1F4DC;', price: 100, unlockLevel: 4, desc: 'Learn to grind wheat into flour', taskName: 'Buy_Recipe_Flour' },
       { id: 'recipe_butter', name: 'Butter Recipe', icon: '&#x1F4DC;', price: 150, unlockLevel: 8, desc: 'Learn to churn milk into butter', taskName: 'Buy_Recipe_Butter' },
@@ -106,7 +98,8 @@
       { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 28, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
     ];
 
-    let gameState = { gold: 0, level: 0, equipment: { milk_pail: 0, basket: 0, beesuit: 0, shearing_kit: 0, butcher_knife: 0, truffle_spade: 0 }, recipes: {} };
+    let gameState = { gold: 0, level: 0, equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false }, recipes: {} };
+    let actionPending = false;
 
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
@@ -155,45 +148,46 @@
       } catch (e) { /* audio not supported */ }
     }
 
-    var notifyTimeout = null;
     function notify(msg, soundType) {
       if (soundType) playSound(soundType);
-      var el = document.getElementById('notification');
+      const el = document.getElementById('notification');
       el.textContent = msg;
       el.style.display = 'block';
-      if (notifyTimeout) clearTimeout(notifyTimeout);
-      notifyTimeout = setTimeout(function() { el.style.display = 'none'; }, 2000);
+      setTimeout(() => el.style.display = 'none', 2000);
     }
 
     function buyEquipment(id) {
-      var equip = EQUIPMENT.find(function(e) { return e.id === id; });
-      if (!equip) return;
+      if (actionPending) { notify('Please wait...'); return; }
 
-      var currentTier = gameState.equipment[id] || 0;
-      if (currentTier >= 3) { notify('Max tier reached!', 'error'); return; }
+      const equip = EQUIPMENT.find(e => e.id === id);
+      if (!equip) return;
+      if (gameState.equipment[id]) { notify('Already owned!', 'error'); return; }
       if (gameState.level < equip.unlockLevel) { notify('Level too low!', 'error'); return; }
       if (gameState.gold < equip.price) { notify('Not enough gold!', 'error'); return; }
 
-      gameState.gold -= equip.price;
-      gameState.equipment[id] = currentTier + 1;
+      actionPending = true;
       triggerTask(equip.taskName);
-      var tierName = TIER_BENEFITS[currentTier + 1].name;
-      notify('Upgraded to ' + tierName + ' tier!', 'purchase');
-      render();
+      notify('Purchased ' + equip.name + '!', 'purchase');
+
+      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
+      setTimeout(function() { actionPending = false; render(); }, 3000);
     }
 
     function buyRecipe(id) {
-      var recipe = RECIPES.find(function(r) { return r.id === id; });
+      if (actionPending) { notify('Please wait...'); return; }
+
+      const recipe = RECIPES.find(r => r.id === id);
       if (!recipe) return;
       if (gameState.recipes[id]) { notify('Already owned!', 'error'); return; }
       if (gameState.level < recipe.unlockLevel) { notify('Level too low!', 'error'); return; }
       if (gameState.gold < recipe.price) { notify('Not enough gold!', 'error'); return; }
 
-      gameState.gold -= recipe.price;
-      gameState.recipes[id] = true;
+      actionPending = true;
       triggerTask(recipe.taskName);
       notify('Purchased ' + recipe.name + '!', 'purchase');
-      render();
+
+      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
+      setTimeout(function() { actionPending = false; render(); }, 3000);
     }
 
     function render() {
@@ -203,37 +197,22 @@
       // Render Equipment
       let equipHtml = '';
       EQUIPMENT.forEach(equip => {
-        const currentTier = gameState.equipment[equip.id] || 0;
+        const owned = gameState.equipment[equip.id];
         const locked = gameState.level < equip.unlockLevel;
-        const maxTier = currentTier >= 3;
-        const canBuy = !maxTier && !locked && gameState.gold >= equip.price;
+        const canBuy = !owned && !locked && !actionPending && gameState.gold >= equip.price;
 
-        let buttonText = 'Purchase';
-        if (currentTier === 1) buttonText = 'Upgrade to Silver';
-        else if (currentTier === 2) buttonText = 'Upgrade to Gold';
-
-        let tierBadgeHtml = '';
-        let tierBenefitHtml = '';
-        if (currentTier > 0) {
-          const tierInfo = TIER_BENEFITS[currentTier];
-          tierBadgeHtml = '<div class="tier-badge" style="background: ' + tierInfo.color + '; color: #000;">' + tierInfo.name + ' Tier</div>';
-          tierBenefitHtml = '<div class="tier-benefit">' + tierInfo.effect + '</div>';
-        }
-
-        equipHtml += '<div class="item ' + (currentTier > 0 ? 'owned' : '') + '">' +
+        equipHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
           '<span class="item-icon">' + equip.icon + '</span>' +
           '<div class="item-info">' +
             '<div class="item-name">' + equip.name + '</div>' +
             '<div class="item-desc">' + equip.desc + '</div>' +
-            tierBenefitHtml +
             (locked ? '<div class="item-locked">Requires Level ' + equip.unlockLevel + '</div>' : '') +
           '</div>' +
           '<div class="item-actions">' +
-            tierBadgeHtml +
-            (maxTier ?
-              '<div class="item-owned-tag">MAX TIER</div>' :
+            (owned ?
+              '<div class="item-owned-tag">OWNED</div>' :
               '<div class="item-price">' + equip.price + 'g</div>' +
-              '<button class="buy-btn" ' + (canBuy ? 'onclick="buyEquipment(\'' + equip.id + '\')"' : 'disabled') + '>' + buttonText + '</button>'
+              '<button class="buy-btn" ' + (canBuy ? 'onclick="buyEquipment(\'' + equip.id + '\')"' : 'disabled') + '>Purchase</button>'
             ) +
           '</div>' +
         '</div>';
@@ -245,7 +224,7 @@
       RECIPES.forEach(recipe => {
         const owned = gameState.recipes[recipe.id];
         const locked = gameState.level < recipe.unlockLevel;
-        const canBuy = !owned && !locked && gameState.gold >= recipe.price;
+        const canBuy = !owned && !locked && !actionPending && gameState.gold >= recipe.price;
 
         recipeHtml += '<div class="item ' + (owned ? 'owned' : '') + '">' +
           '<span class="item-icon">' + recipe.icon + '</span>' +
@@ -266,111 +245,79 @@
       document.getElementById('recipes-grid').innerHTML = recipeHtml;
     }
 
-    // === Sync_Inventory Parser ===
-    // 4-word keys
-    var fourWordKeys = { 'Has_Recipe_Meat_Pie': 'has_recipe_meat_pie' };
-    // 3-word keys
-    var threeWordKeys = {
-      'Unspent_Talent_Points': '_skip',
+    // === Standard Sync_Inventory Parser (same in all iframes) ===
+    const SYNC_MAP = {
       'Has_Milk_Pail': 'has_milk_pail', 'Has_Shearing_Kit': 'has_shearing_kit',
       'Has_Butcher_Knife': 'has_butcher_knife', 'Has_Truffle_Spade': 'has_truffle_spade',
-      'Has_Starter_Seeds': '_skip',
+      'Has_Starter_Seeds': 'has_starter_seeds',
+      'Seeds_Wheat': 'seeds_wheat', 'Seeds_Carrot': 'seeds_carrot', 'Seeds_Corn': 'seeds_corn',
+      'Seeds_Potato': 'seeds_potato', 'Seeds_Tomato': 'seeds_tomato', 'Seeds_Pumpkin': 'seeds_pumpkin',
+      'Crop_Wheat': 'crop_wheat', 'Crop_Carrot': 'crop_carrot', 'Crop_Corn': 'crop_corn',
+      'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
+      'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
+      'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
+      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
+      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
+      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
+      'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
+      'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
+      'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
+      'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
+      'Cake': 'cake', 'Mead': 'mead',
       'Has_Recipe_Flour': 'has_recipe_flour', 'Has_Recipe_Bread': 'has_recipe_bread',
       'Has_Recipe_Cheese': 'has_recipe_cheese', 'Has_Recipe_Stew': 'has_recipe_stew',
       'Has_Recipe_Ragout': 'has_recipe_ragout', 'Has_Recipe_Pie': 'has_recipe_pie',
-      'Has_Recipe_Blanket': 'has_recipe_blanket', 'Has_Recipe_Butter': 'has_recipe_butter',
-      'Has_Recipe_Cake': 'has_recipe_cake', 'Has_Recipe_Mead': 'has_recipe_mead'
-    };
-    // 2-word keys
-    var twoWordKeys = {
-      'Seeds_Wheat': '_skip', 'Seeds_Carrot': '_skip', 'Seeds_Corn': '_skip',
-      'Seeds_Potato': '_skip', 'Seeds_Tomato': '_skip', 'Seeds_Pumpkin': '_skip',
-      'Crop_Wheat': '_skip', 'Crop_Carrot': '_skip', 'Crop_Corn': '_skip',
-      'Crop_Potato': '_skip', 'Crop_Tomato': '_skip', 'Crop_Pumpkin': '_skip',
-      'Goat_Meat': '_skip', 'Meat_Pie': '_skip',
-      'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
-      'Rebirth_Count': '_skip',
-      'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
-      'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
-      'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
-      'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
-      'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
-      'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
-      'T_KeenLearner': '_skip', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
-      'T_Artisan': '_skip', 'T_SeasonedWorker': '_skip', 'T_BonusPoint1': '_skip',
-      'T_Prodigy': '_skip', 'T_BonusPoint2': '_skip'
-    };
-    // 1-word keys
-    var oneWordKeys = {
-      'Gold': 'gold', 'XP': '_skip', 'Level': 'level',
-      'Milk': '_skip', 'Wool': '_skip', 'Truffle': '_skip', 'Egg': '_skip', 'Honey': '_skip',
-      'Flour': '_skip', 'Bread': '_skip', 'Cheese': '_skip', 'Stew': '_skip',
-      'Ragout': '_skip', 'Pie': '_skip', 'Blanket': '_skip', 'Butter': '_skip',
-      'Cake': '_skip', 'Mead': '_skip'
+      'Has_Recipe_Meat_Pie': 'has_recipe_meat_pie', 'Has_Recipe_Blanket': 'has_recipe_blanket',
+      'Has_Recipe_Butter': 'has_recipe_butter', 'Has_Recipe_Cake': 'has_recipe_cake',
+      'Has_Recipe_Mead': 'has_recipe_mead',
+      'Rebirth_Count': 'rebirth_count',
+      'playerName': '_skip'
     };
 
     function parseSyncMessage(msg) {
-      var parts = msg.replace('Sync_Inventory_', '').split('_');
-      var data = {};
-      var i = 0;
+      const parts = msg.replace('Sync_Inventory_', '').split('_');
+      const data = {};
+      let i = 0;
       while (i < parts.length) {
-        var matched = false;
-        // 4-word keys
+        let matched = false;
+        // Try 4-word key first (e.g. Has_Recipe_Meat_Pie)
         if (!matched && i + 4 < parts.length) {
-          var k4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
-          if (fourWordKeys[k4] !== undefined) {
-            var mv4 = fourWordKeys[k4];
-            if (mv4 !== '_skip') { data[mv4] = Math.max(0, parseInt(parts[i+4]) || 0); }
-            i += 5; matched = true;
-          }
+          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+4]) || 0; i += 5; matched = true; }
         }
-        // 3-word keys
+        // Try 3-word key (e.g. Has_Recipe_Flour, Has_Milk_Pail)
         if (!matched && i + 3 < parts.length) {
-          var k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
-          if (threeWordKeys[k3] !== undefined) {
-            var mv3 = threeWordKeys[k3];
-            if (mv3 !== '_skip') { data[mv3] = Math.max(0, parseInt(parts[i+3]) || 0); }
-            i += 4; matched = true;
-          }
+          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
         }
-        // 2-word keys
+        // Try 2-word key (e.g. Seeds_Wheat, Crop_Carrot)
         if (!matched && i + 2 < parts.length) {
-          var k2 = parts[i] + '_' + parts[i+1];
-          if (twoWordKeys[k2] !== undefined) {
-            var mv2 = twoWordKeys[k2];
-            if (mv2 !== '_skip') { data[mv2] = Math.max(0, parseInt(parts[i+2]) || 0); }
-            i += 3; matched = true;
-          }
+          const k = parts[i] + '_' + parts[i+1];
+          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
         }
-        // 1-word keys
-        if (!matched && i + 1 < parts.length) {
-          if (parts[i] === 'playerName') {
-            i += 2; matched = true;
-          } else if (oneWordKeys[parts[i]] !== undefined) {
-            var mv1 = oneWordKeys[parts[i]];
-            if (mv1 !== '_skip') { data[mv1] = Math.max(0, parseInt(parts[i+1]) || 0); }
-            i += 2; matched = true;
-          }
+        // Try 1-word key (e.g. Gold, XP, Level)
+        if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
+          data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
         }
         if (!matched) i++;
       }
       return data;
     }
-    // === End Parser ===
+    // === End Standard Parser ===
 
     function handlePortalsMessage(msg) {
       console.log('[Hughberry Blueprints] Received:', msg);
-      if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
-        var data = parseSyncMessage(msg);
-        gameState.gold = data.gold !== undefined ? data.gold : 0;
-        gameState.level = data.level !== undefined ? data.level : 0;
-        // Equipment (tier values 0-3)
-        gameState.equipment.milk_pail = data.has_milk_pail || 0;
-        gameState.equipment.basket = data.has_basket || 0;
-        gameState.equipment.beesuit = data.has_beesuit || 0;
-        gameState.equipment.shearing_kit = data.has_shearing_kit || 0;
-        gameState.equipment.butcher_knife = data.has_butcher_knife || 0;
-        gameState.equipment.truffle_spade = data.has_truffle_spade || 0;
+      if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
+        const data = parseSyncMessage(msg);
+        gameState.gold = data.gold || 0;
+        gameState.level = data.level || 0;
+        // Equipment
+        gameState.equipment.milk_pail = (data.has_milk_pail || 0) > 0;
+        gameState.equipment.basket = (data.has_basket || 0) > 0;
+        gameState.equipment.beesuit = (data.has_beesuit || 0) > 0;
+        gameState.equipment.shearing_kit = (data.has_shearing_kit || 0) > 0;
+        gameState.equipment.butcher_knife = (data.has_butcher_knife || 0) > 0;
+        gameState.equipment.truffle_spade = (data.has_truffle_spade || 0) > 0;
         // Recipes
         gameState.recipes.recipe_flour = (data.has_recipe_flour || 0) > 0;
         gameState.recipes.recipe_bread = (data.has_recipe_bread || 0) > 0;
@@ -383,6 +330,7 @@
         gameState.recipes.recipe_butter = (data.has_recipe_butter || 0) > 0;
         gameState.recipes.recipe_cake = (data.has_recipe_cake || 0) > 0;
         gameState.recipes.recipe_mead = (data.has_recipe_mead || 0) > 0;
+        actionPending = false;
         render();
       }
     }
@@ -412,14 +360,6 @@
       if (event.data && typeof event.data === 'string') processMessage(event.data, 'postMessage-string');
       else if (event.data && event.data.portalsMessage) processMessage(event.data.portalsMessage, 'postMessage-portals');
       else if (event.data && event.data.message && typeof event.data.message === 'string') processMessage(event.data.message, 'postMessage-message');
-    });
-
-    // Visibility/Focus handlers
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) { triggerTask('Sync_Inventory'); }
-    });
-    window.addEventListener('focus', function() {
-      triggerTask('Sync_Inventory');
     });
 
     // Initialize

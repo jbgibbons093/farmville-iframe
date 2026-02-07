@@ -382,7 +382,6 @@ body {
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
-  pointer-events: none;
 }
 
 .lock-icon {
@@ -502,7 +501,7 @@ body {
     <button class="tree-tab" data-tree="animal" onclick="switchTree('animal')">
       <span class="tab-icon">&#128004;</span>
       <span class="tab-label">Animals</span>
-      <span class="tab-points" id="tabPointsAnimal">0 / 38</span>
+      <span class="tab-points" id="tabPointsAnimal">0 / 35</span>
     </button>
     <button class="tree-tab" data-tree="economy" onclick="switchTree('economy')">
       <span class="tab-icon">&#128218;</span>
@@ -564,7 +563,7 @@ var TALENT_TREES = {
   },
   animal: {
     name: 'Animal Husbandry',
-    maxPoints: 38,
+    maxPoints: 35,
     tiers: [
       {
         tier: 1, gate: 0,
@@ -646,6 +645,7 @@ var playerLevel = 0;
 var playerGold = 0;
 var unspentTalentPoints = 0;
 var activeTree = 'farming';
+var actionPending = false;
 var buyPending = false;
 
 // Initialize all talent ranks to 0
@@ -683,6 +683,7 @@ function isTierUnlocked(treeName, gate) {
 }
 
 function canInvest(treeName, talent, tierGate) {
+  if (actionPending) return false;
   if (getUnspentPoints() <= 0) return false;
   if (!isTierUnlocked(treeName, tierGate)) return false;
   var current = talentState[talent.key] || 0;
@@ -714,6 +715,7 @@ function investPoint(treeName, talentKey) {
     return;
   }
 
+  actionPending = true;
   triggerTask('Invest_' + talentKey);
 
   // Optimistic update for responsive UI
@@ -724,6 +726,9 @@ function investPoint(treeName, talentKey) {
   }
   notify(talent.name + ' ' + talentState[talentKey] + '/' + talent.maxRank, 'talent');
   renderAll();
+
+  // Release pending after sync window
+  setTimeout(function() { actionPending = false; }, 1500);
 }
 
 // ── Buy Talent Point ──
@@ -796,6 +801,7 @@ function handlePortalsMessage(msg) {
   if (typeof msg !== 'string') return;
   if (msg.indexOf('Sync_Inventory') === 0) {
     parseAndSyncInventory(msg);
+    actionPending = false;
     buyPending = false;
     renderAll();
   }
@@ -954,7 +960,7 @@ function renderAll() {
 
   // Tab point counters
   document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 17';
-  document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 38';
+  document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 35';
   document.getElementById('tabPointsEconomy').textContent = getPointsInTree('economy') + ' / 20';
 
   renderTree();
@@ -997,7 +1003,7 @@ function renderTree() {
       var talent = tierData.talents[j];
       var currentRank = talentState[talent.key] || 0;
       var isMaxed = currentRank >= talent.maxRank;
-      var isAvailable = !isMaxed && tierUnlocked && unspent > 0;
+      var isAvailable = !isMaxed && tierUnlocked && unspent > 0 && !actionPending;
       var isLocked = !tierUnlocked;
 
       var cardClass = 'talent-card';
@@ -1075,14 +1081,11 @@ function playSound(type) {
 function notify(msg, type) {
   type = type || 'success';
   playSound(type);
-  var container = document.getElementById('notifications');
-  // Cap notifications at 5
-  while (container.children.length >= 5) { container.removeChild(container.firstChild); }
   var notif = document.createElement('div');
   notif.className = 'notification ' + (type === 'success' || type === 'error' ? type : 'success');
   notif.textContent = msg;
-  container.appendChild(notif);
-  setTimeout(function() { if (notif.parentNode) notif.remove(); }, 3000);
+  document.getElementById('notifications').appendChild(notif);
+  setTimeout(function() { notif.remove(); }, 3000);
 }
 
 // Initial render

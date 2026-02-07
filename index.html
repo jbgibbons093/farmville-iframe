@@ -322,6 +322,7 @@
         milk: 0, wool: 0, goat_meat: 0, truffle: 0, egg: 0, honey: 0,
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0, mead: 0
       },
+      uncollected: { milk: 0, eggs: 0, wool: 0, meat: 0, truffle: 0, honey: 0 },
       equipment: { milk_pail: false, basket: false, beesuit: false, shearing_kit: false, butcher_knife: false, truffle_spade: false },
       recipes: {
         recipe_flour: false, recipe_bread: false, recipe_cheese: false, recipe_stew: false,
@@ -357,13 +358,10 @@
     }
     initAnimals();
 
+    let actionPending = false;
     let dashboardDirty = true;
-    let levelUpPending = false;
-    let pendingLevelTarget = 0;
-
-    // Track previous crop inventory to detect external harvests
-    let previousCropInventory = { wheat: 0, carrot: 0, corn: 0, potato: 0, tomato: 0, pumpkin: 0 };
-    let firstSyncComplete = false;
+    let staggeringSeedKey = null;
+    let staggerEndTime = 0;
 
     function triggerTask(taskName, targetState) {
       if (!targetState) targetState = 'SetNotActiveToActive';
@@ -417,13 +415,7 @@
 
     function getAnimalCollectXP(station) {
       const t = gameState.talents;
-      const baseXP = station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
-
-      // Tier 3: double XP bonus
-      const equipmentTier = station.equipment ? (gameState.equipment[station.equipment] || 0) : 0;
-      const xpMultiplier = equipmentTier >= 3 ? 2 : 1;
-
-      return baseXP * xpMultiplier;
+      return station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
     }
 
     function getCropGrowTime(crop) {
@@ -432,16 +424,10 @@
       return Math.max(Math.ceil(crop.growTime * (1 - reduction)), 3);
     }
 
-    function getAnimalCooldown(config, equipmentKey) {
+    function getAnimalCooldown(config) {
       const t = gameState.talents;
-      const talentReduction = t.quickHands * 0.10;
-
-      // Tier 2+: additional 10% cooldown reduction
-      const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
-      const tierReduction = equipmentTier >= 2 ? 0.10 : 0;
-
-      const totalReduction = Math.min(0.9, talentReduction + tierReduction);
-      return Math.max(Math.ceil(config.cooldown * (1 - totalReduction)), 9);
+      const reduction = Math.min(0.9, t.quickHands * 0.10);
+      return Math.max(Math.ceil(config.cooldown * (1 - reduction)), 9);
     }
 
     function getActivePlotCount() {
@@ -457,15 +443,7 @@
     }
 
     function getHarvestBonusCrops() { return gameState.talents.bountifulHarvest; }
-    function getCollectionBonusProducts(equipmentKey) {
-      const talentBonus = gameState.talents.animalMastery;
-
-      // Tier 2+: +1 bonus product per collection
-      const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
-      const tierBonus = equipmentTier >= 2 ? 1 : 0;
-
-      return talentBonus + tierBonus;
-    }
+    function getCollectionBonusProducts() { return gameState.talents.animalMastery; }
 
     // Claim free starter seeds (one-time only)
     function claimStarterSeeds() {
@@ -560,6 +538,12 @@
         'T_BonusPoint1': { target: 'bonusPoint1', isTalent: true },
         'T_Prodigy': { target: 'prodigy', isTalent: true },
         'T_BonusPoint2': { target: 'bonusPoint2', isTalent: true },
+        'Milk_Uncollected': { target: 'milk', isUncollected: true },
+        'Eggs_Uncollected': { target: 'eggs', isUncollected: true },
+        'Wool_Uncollected': { target: 'wool', isUncollected: true },
+        'Meat_Uncollected': { target: 'meat', isUncollected: true },
+        'Truffle_Uncollected': { target: 'truffle', isUncollected: true },
+        'Honey_Uncollected': { target: 'honey', isUncollected: true },
         'Rebirth_Count': { target: 'rebirthCount', isRoot: true },
         'playerName': { target: '_skip', isSkip: true }
       };
@@ -572,7 +556,7 @@
         if (i + 4 < parts.length) {
           const fourWordKey = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2] + '_' + parts[i + 3];
           if (varMapping[fourWordKey]) {
-            const pv4 = parseInt(parts[i + 4]); const value = Math.max(0, isNaN(pv4) ? 0 : pv4);
+            const value = Math.max(0, parseInt(parts[i + 4]) || 0);
             const mapping = varMapping[fourWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -587,7 +571,7 @@
         if (!matched && i + 3 < parts.length) {
           const threeWordKey = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2];
           if (varMapping[threeWordKey]) {
-            const pv3 = parseInt(parts[i + 3]); const value = Math.max(0, isNaN(pv3) ? 0 : pv3);
+            const value = Math.max(0, parseInt(parts[i + 3]) || 0);
             const mapping = varMapping[threeWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -598,17 +582,21 @@
             i += 4; matched = true;
           }
         }
-        // Check two-word keys (Seeds_Wheat, Crop_Corn, Has_Basket, T_PlotRow2, etc.)
+        // Check two-word keys (Seeds_Wheat, Crop_Corn, Has_Basket, Milk_Uncollected, etc.)
         if (!matched && i + 2 < parts.length) {
           const twoWordKey = parts[i] + '_' + parts[i + 1];
           if (varMapping[twoWordKey]) {
-            const pv2 = parseInt(parts[i + 2]); const value = Math.max(0, isNaN(pv2) ? 0 : pv2);
+            const value = Math.max(0, parseInt(parts[i + 2]) || 0);
             const mapping = varMapping[twoWordKey];
-            if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
+            if (mapping.isUncollected) gameState.uncollected[mapping.target] = value;
+            else if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else if (mapping.isTalent) gameState.talents[mapping.target] = value;
+            else if (staggeringSeedKey === mapping.target && Date.now() < staggerEndTime) {
+              console.log('[Hughberry] Skipping sync overwrite for', mapping.target, 'during stagger');
+            }
             else gameState.inventory[mapping.target] = value;
             i += 3; matched = true;
           }
@@ -617,7 +605,7 @@
         if (!matched && i + 1 < parts.length) {
           const oneWordKey = parts[i];
           if (varMapping[oneWordKey]) {
-            const pv1 = parseInt(parts[i + 1]); const value = Math.max(0, isNaN(pv1) ? 0 : pv1);
+            const value = Math.max(0, parseInt(parts[i + 1]) || 0);
             const mapping = varMapping[oneWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value > 0;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
@@ -632,57 +620,7 @@
       console.log('[Hughberry] Talents after sync:', JSON.stringify(gameState.talents));
       console.log('[Hughberry] Unspent Talent Points:', gameState.unspentTalentPoints);
       dashboardDirty = true;
-
-      // Detect external harvests - if crop count increased and we have ready plots, reset them
-      detectExternalHarvests();
-
       saveGameQuiet();
-    }
-
-    // Detect when crops were harvested in Portals but iframe wasn't notified
-    function detectExternalHarvests() {
-      const cropTypes = ['wheat', 'carrot', 'corn', 'potato', 'tomato', 'pumpkin'];
-
-      // Skip detection on first sync - just initialize the tracking values
-      if (!firstSyncComplete) {
-        cropTypes.forEach(cropType => {
-          previousCropInventory[cropType] = gameState.inventory[cropType] || 0;
-        });
-        firstSyncComplete = true;
-        console.log('[Hughberry] First sync complete, initialized crop tracking:', JSON.stringify(previousCropInventory));
-        return;
-      }
-
-      cropTypes.forEach(cropType => {
-        const currentCount = gameState.inventory[cropType] || 0;
-        const previousCount = previousCropInventory[cropType] || 0;
-
-        // If crop inventory increased, some ready plots might have been harvested
-        if (currentCount > previousCount) {
-          const cropsGained = currentCount - previousCount;
-          console.log('[Hughberry] Detected crop increase:', cropType, 'from', previousCount, 'to', currentCount, '(+' + cropsGained + ')');
-
-          // Find and reset any ready plots of this type
-          let resetCount = 0;
-          gameState.plots.forEach((plot, i) => {
-            if (plot.state === 'ready' && plot.cropType === cropType && resetCount < cropsGained) {
-              console.log('[Hughberry] Resetting ready plot', i + 1, 'for', cropType, '(external harvest detected)');
-              plot.state = 'empty';
-              plot.cropType = null;
-              plot.plantedAt = null;
-              plot.readyAt = null;
-              resetCount++;
-            }
-          });
-
-          if (resetCount > 0) {
-            notify(`Harvested ${resetCount} ${cropType}!`, 'success', 'harvest');
-          }
-        }
-
-        // Update previous inventory for next comparison
-        previousCropInventory[cropType] = currentCount;
-      });
     }
 
     // Setup message listener with retry for SDK initialization
@@ -754,9 +692,10 @@
         loadFromStorage();
         updateAllUI();
       }
-      else if (msg.indexOf('Sync_Inventory') === 0) {
+      else if (msg.startsWith('Sync_Inventory')) {
         parseAndSyncInventory(msg);
-        checkLevelUp();
+        if (Date.now() >= staggerEndTime) actionPending = false;
+        checkLevelUp(); // Detect level-ups and trigger Add_Level_1 to Portals
         updateAllUI();
       }
       else if (cmd === 'interact' && parts[1] === 'plot') {
@@ -803,19 +742,7 @@
       }
       const cropType = plot.cropType;
       const crop = CONFIG.crops[cropType];
-      if (!crop) {
-        // Invalid crop type - clean up the plot and notify player
-        console.log('[Hughberry] Invalid cropType for plot', plotId, ':', cropType, '- cleaning up');
-        notify('Crop data lost - plot cleared', 'error');
-        plot.state = 'empty';
-        plot.cropType = null;
-        plot.plantedAt = null;
-        plot.readyAt = null;
-        dashboardDirty = true;
-        saveGameQuiet();
-        renderCrops();
-        return;
-      }
+      if (!crop) return;
       const cropName = crop.name;
       triggerTask(`Add_Crop_${cropName}_1`);
       const boostedHarvestXP = getHarvestXP(crop);
@@ -839,11 +766,7 @@
       if (gameState.settings.autoReplant) {
         const p = gameState.settings.priorityCrop;
         if (gameState.inventory[`seeds_${p}`] > 0 && gameState.level >= CONFIG.crops[p].unlockLevel) {
-          setTimeout(function() {
-            if (plantCrop(plotId, p)) {
-              renderCrops(); // Update UI after auto-replant
-            }
-          }, 300);
+          setTimeout(() => plantCrop(plotId, p), 300);
         }
       }
 
@@ -880,65 +803,54 @@
               }
             });
           }
-          // Restore animal states so timers survive iframe reloads
-          if (p.animals) {
-            const animalTypes = ['cows', 'chickens', 'sheep', 'goats', 'pigs', 'beehives'];
-            animalTypes.forEach(function(type) {
-              if (p.animals[type] && Array.isArray(p.animals[type])) {
-                p.animals[type].forEach(function(savedAnimal, i) {
-                  if (i < gameState.animals[type].length && savedAnimal) {
-                    gameState.animals[type][i].state = savedAnimal.state || 'idle';
-                    gameState.animals[type][i].readyAt = savedAnimal.readyAt || null;
-                    gameState.animals[type][i].notified = savedAnimal.notified || false;
-                  }
-                });
-              }
-            });
-          }
         } catch(e) { console.error('Load error:', e); }
       }
     }
 
-    function plantCrop(plotId, cropType) {
+    function plantCrop(plotId, cropType, skipLock) {
+      if (!skipLock && actionPending) { notify('Please wait...', 'error'); return false; }
+
       const plot = gameState.plots[plotId - 1];
       const crop = CONFIG.crops[cropType];
       const seedKey = `seeds_${cropType}`;
 
-      if (plot.state !== 'empty') { return false; }
+      if (plot.state !== 'empty') { notify('Plot not empty!', 'error'); return false; }
       if (gameState.inventory[seedKey] < 1) { notify(`No ${crop.name} seeds!`, 'error'); return false; }
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return false; }
 
-      // Deduct seed and update plot immediately
+      if (!skipLock) actionPending = true;
+
+      // Optimistic seed deduction to prevent rapid planting from exceeding available seeds
       gameState.inventory[seedKey]--;
+
+      triggerTask(`Plant_Plot_${plotId}`);
+      setTimeout(function() { triggerTask(`Sub_Seeds_${crop.name}_1`); }, 150);
+      const plantXP = getPlantingXP(crop);
+      awardXP(plantXP);
+
       plot.state = 'growing';
       plot.cropType = cropType;
       plot.plantedAt = Date.now();
       plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
 
-      // Send to Portals
-      triggerTask(`Plant_Plot_${plotId}`);
-      triggerTask(`Sub_Seeds_${crop.name}_1`);
-
-      const plantXP = getPlantingXP(crop);
-      awardXP(plantXP);
-
       notify(`Planted ${crop.name}! +${plantXP} XP`, 'success');
       saveGameQuiet();
+
+      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
+      if (!skipLock) setTimeout(function() { actionPending = false; }, 3000);
       return true;
     }
 
     function plantAllEmpty() {
-      console.log('[Hughberry] plantAllEmpty called');
+      if (actionPending) { notify('Please wait...', 'error'); return; }
+
       const c = gameState.settings.priorityCrop;
-      console.log('[Hughberry] Priority crop:', c, 'Settings:', JSON.stringify(gameState.settings));
       const seedKey = `seeds_${c}`;
       const availableSeeds = gameState.inventory[seedKey] || 0;
-      console.log('[Hughberry] Seeds:', seedKey, '=', availableSeeds);
       const crop = CONFIG.crops[c];
-      console.log('[Hughberry] Crop config:', crop);
 
-      if (availableSeeds < 1) { notify('No ' + crop.name + ' seeds!', 'error'); console.log('[Hughberry] No seeds - returning'); return; }
-      if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); console.log('[Hughberry] Level too low - returning'); return; }
+      if (availableSeeds < 1) { notify('No seeds!', 'error'); return; }
+      if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return; }
 
       // Find empty plots and plant up to availableSeeds
       const activePlots = getActivePlotCount();
@@ -947,33 +859,50 @@
 
       if (toPlant < 1) { notify('No empty plots!', 'error'); return; }
 
+      actionPending = true;
+      staggeringSeedKey = seedKey;
+      staggerEndTime = Date.now() + (toPlant * 350) + 1500;
+
       let planted = 0;
       const plantXP = getPlantingXP(crop);
-
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
 
-        // Update local state immediately
+        // Stagger task triggers by 350ms per plot to avoid Portals race conditions
+        // Sub_Seeds fires 150ms after Plant_Plot to avoid same-instant "Iframe Message" collision
+        (function(plotIdx, delay) {
+          setTimeout(function() {
+            triggerTask(`Plant_Plot_${plotIdx + 1}`);
+          }, delay);
+          setTimeout(function() {
+            triggerTask(`Sub_Seeds_${crop.name}_1`);
+          }, delay + 150);
+        })(idx, i * 350);
+
+        // Optimistic local seed deduction for rapid planting
         gameState.inventory[seedKey]--;
+
         plot.state = 'growing';
         plot.cropType = c;
         plot.plantedAt = Date.now();
         plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
-
-        // Send to Portals
-        triggerTask(`Plant_Plot_${idx + 1}`);
-        triggerTask(`Sub_Seeds_${crop.name}_1`);
         planted++;
       }
 
+      // Award total XP once to avoid same-task collision in Portals
       const totalPlantXP = planted * plantXP;
       awardXP(totalPlantXP);
 
-      console.log('[Hughberry] Planted', planted, 'crops, calling renderCrops');
       notify(`Planted ${planted} crops! +${totalPlantXP} XP`, 'success');
       saveGameQuiet();
       renderCrops();
-      console.log('[Hughberry] renderCrops completed');
+
+      // Safety timeout: reset actionPending and stagger guard after all tasks have sent
+      setTimeout(function() {
+        actionPending = false;
+        staggeringSeedKey = null;
+        staggerEndTime = 0;
+      }, toPlant * 350 + 3000);
     }
 
     // Equipment requirements for starting animal activities
@@ -1007,7 +936,7 @@
       const animalXP = getAnimalStartXP(config);
       awardXP(animalXP);
 
-      const cooldown = getAnimalCooldown(config, reqEquip?.id);
+      const cooldown = getAnimalCooldown(config);
       animal.state = 'producing';
       animal.readyAt = Date.now() + (cooldown * 1000);
       animal.notified = false;
@@ -1142,7 +1071,7 @@
 
       // Auto-restart animals if setting is enabled
       if (gameState.settings.autoRestartAnimals) {
-        const cooldown = getAnimalCooldown(CONFIG.animals[station.animalType], station.equipment);
+        const cooldown = getAnimalCooldown(CONFIG.animals[station.animalType]);
         readyAnimals.forEach(animal => {
           animal.state = 'producing';
           animal.readyAt = Date.now() + (cooldown * 1000);
@@ -1162,7 +1091,7 @@
       // Each task self-resets, so we stagger 350ms to give Portals time to process each one
       const addDelay = 350;
       const xpPerUnit = getAnimalCollectXP(station);
-      const bonusPerAnimal = getCollectionBonusProducts(station.equipment);
+      const bonusPerAnimal = getCollectionBonusProducts();
       const totalProducts = readyCount + (readyCount * bonusPerAnimal);
       const xpGained = readyCount * xpPerUnit;
 
@@ -1205,64 +1134,32 @@
 
     function checkLevelUp() {
       const t = CONFIG.levelThresholds;
+      let levelsGained = 0;
 
-      // If level-up is already pending and we haven't reached target yet, skip
-      if (levelUpPending && gameState.level < pendingLevelTarget) {
-        console.log('[Hughberry] Level-up pending, waiting for Portals sync. Target:', pendingLevelTarget, 'Current:', gameState.level);
-        return;
+      while (gameState.level < t.length) {
+        const xpNeeded = t[gameState.level];
+        if (gameState.xp < xpNeeded) break;
+
+        // Compute remaining XP after this level-up
+        gameState.xp -= xpNeeded;
+        const newLevel = gameState.level + 1;
+        console.log('[Hughberry] Level up! Excess XP:', gameState.xp, 'after needing', xpNeeded, '-> Level', newLevel);
+        levelsGained++;
+
+        // Trigger level-up tasks staggered to avoid Portals collision
+        (function(delay) {
+          setTimeout(function() {
+            triggerTask('Add_Level_1');
+          }, delay);
+        })((levelsGained - 1) * 400);
+
+        gameState.level = newLevel;
       }
 
-      // Clear pending flag if we've reached or exceeded the target
-      if (levelUpPending && gameState.level >= pendingLevelTarget) {
-        console.log('[Hughberry] Level-up complete! Reached level', gameState.level);
-        levelUpPending = false;
-        pendingLevelTarget = 0;
-      }
-
-      // Calculate how many levels the player should gain
-      let tempXP = gameState.xp;
-      let tempLevel = gameState.level;
-      let levelsToGain = 0;
-
-      while (tempLevel < t.length) {
-        const xpNeeded = t[tempLevel];
-        if (tempXP < xpNeeded) break;
-        tempXP -= xpNeeded;
-        tempLevel++;
-        levelsToGain++;
-      }
-
-      if (levelsToGain > 0) {
-        console.log('[Hughberry] Detected', levelsToGain, 'level-ups needed. XP:', gameState.xp, 'Current Level:', gameState.level, 'Target:', tempLevel);
-
-        // Set pending flag to prevent re-triggering
-        levelUpPending = true;
-        pendingLevelTarget = tempLevel;
-
-        // Trigger level-up tasks staggered to Portals
-        for (let i = 0; i < levelsToGain; i++) {
-          (function(delay) {
-            setTimeout(function() {
-              triggerTask('Add_Level_1');
-              console.log('[Hughberry] Triggered Add_Level_1 (' + (i + 1) + '/' + levelsToGain + ')');
-            }, delay);
-          })(i * 400);
-        }
-
-        // Update local state optimistically for immediate UI feedback
-        gameState.level = tempLevel;
-        gameState.xp = tempXP;
-
-        notify(`LEVEL UP! Now Lv.${tempLevel}!`, 'success', 'levelup');
-
-        // Clear pending after tasks are sent + buffer for Portals processing
-        setTimeout(function() {
-          if (levelUpPending) {
-            console.log('[Hughberry] Clearing level-up pending flag (timeout)');
-            levelUpPending = false;
-            pendingLevelTarget = 0;
-          }
-        }, (levelsToGain * 400) + 2000);
+      if (levelsGained > 0) {
+        // Reset XP in Portals to the remaining amount after all level-ups
+        triggerTask('Reset_XP');
+        notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success', 'levelup');
       }
     }
 
@@ -1396,12 +1293,7 @@
           html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(remaining)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${Math.min(100, progress)}%"></div></div></div>`;
         } else {
           const c = CONFIG.crops[plot.cropType];
-          if (!c) {
-            // Invalid cropType - show as corrupt/empty
-            html += `<div class="plot-card empty"><span class="plot-number">#${num}</span><div class="plot-icon" style="color:#e74c3c">&#x26A0;</div><div class="plot-name" style="color:#e74c3c">Error</div><div class="plot-hint" style="color:#e74c3c">Press X to clear</div></div>`;
-          } else {
-            html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`;
-          }
+          html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`;
         }
       });
       html += '</div>';
@@ -1472,7 +1364,7 @@
       let started = 0;
       animals.forEach((animal, i) => {
         if (i < activeSlots && animal.state === 'idle') {
-          const cooldown = getAnimalCooldown(config, reqEquip?.id);
+          const cooldown = getAnimalCooldown(config);
           animal.state = 'producing';
           animal.readyAt = Date.now() + (cooldown * 1000);
           animal.notified = false;
@@ -1669,23 +1561,17 @@
 
         <div class="section-title">Crafting XP</div>
         <div class="xp-history">
-          ${[
-            { icon: '&#x1F35E;', name: 'Flour', baseXP: 10 },
-            { icon: '&#x1F9C8;', name: 'Butter', baseXP: 15 },
-            { icon: '&#x1F9C0;', name: 'Cheese', baseXP: 15 },
-            { icon: '&#x1F956;', name: 'Bread', baseXP: 15 },
-            { icon: '&#x1F9E3;', name: 'Blanket', baseXP: 20 },
-            { icon: '&#x1F372;', name: 'Stew', baseXP: 25 },
-            { icon: '&#x1F37A;', name: 'Mead', baseXP: 25 },
-            { icon: '&#x1F967;', name: 'Pie', baseXP: 30 },
-            { icon: '&#x1F356;', name: 'Ragout', baseXP: 30 },
-            { icon: '&#x1F969;', name: 'Meat Pie', baseXP: 35 },
-            { icon: '&#x1F370;', name: 'Cake', baseXP: 40 }
-          ].map(r => {
-            const t = gameState.talents;
-            const xp = r.baseXP + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3;
-            return '<div class="xp-entry"><span class="xp-entry-activity">' + r.icon + ' Craft ' + r.name + '</span><span class="xp-entry-amount">+' + xp + ' XP</span></div>';
-          }).join('')}
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F35E; Craft Flour</span><span class="xp-entry-amount">+10 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9C8; Craft Butter</span><span class="xp-entry-amount">+15 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9C0; Craft Cheese</span><span class="xp-entry-amount">+15 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F956; Craft Bread</span><span class="xp-entry-amount">+15 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9E3; Craft Blanket</span><span class="xp-entry-amount">+20 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F372; Craft Stew</span><span class="xp-entry-amount">+25 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F37A; Craft Mead</span><span class="xp-entry-amount">+25 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F967; Craft Pie</span><span class="xp-entry-amount">+30 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F356; Craft Ragout</span><span class="xp-entry-amount">+30 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F969; Craft Meat Pie</span><span class="xp-entry-amount">+35 XP</span></div>
+          <div class="xp-entry"><span class="xp-entry-activity">&#x1F370; Craft Cake</span><span class="xp-entry-amount">+40 XP</span></div>
         </div>`;
       document.getElementById('tab-xp').innerHTML = html;
     }
@@ -1896,20 +1782,18 @@
     // Handle visibility changes - restart timer loop when iframe becomes visible
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
-        console.log('[Hughberry] Iframe visible - restarting game loop and requesting sync');
+        console.log('[Hughberry] Iframe visible - restarting game loop');
         startGameLoop(); // Restart fresh interval
         gameLoop(); // Immediately run to catch up
-        triggerTask('Sync_Inventory'); // Request fresh data from Portals
         updateAllUI();
       }
     });
 
     // Also handle focus events as backup
     window.addEventListener('focus', function() {
-      console.log('[Hughberry] Iframe focused - refreshing UI and requesting sync');
+      console.log('[Hughberry] Iframe focused - refreshing UI');
       startGameLoop(); // Restart fresh interval
       gameLoop();
-      triggerTask('Sync_Inventory'); // Request fresh data from Portals
       updateAllUI();
     });
 

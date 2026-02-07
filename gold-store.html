@@ -583,7 +583,7 @@ function parseSyncMessage(msg) {
         i += 2; matched = true;
       } else if (SYNC_MAP[parts[i]] !== undefined) {
         if (SYNC_MAP[parts[i]] === 'gold') {
-          var pv = parseInt(parts[i+1]); gold = Math.max(0, isNaN(pv) ? 0 : pv);
+          gold = Math.max(0, parseInt(parts[i+1]) || 0);
         }
         i += 2; matched = true;
       }
