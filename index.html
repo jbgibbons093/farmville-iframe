@@ -849,7 +849,11 @@
       if (gameState.settings.autoReplant) {
         const p = gameState.settings.priorityCrop;
         if (gameState.inventory[`seeds_${p}`] > 0 && gameState.level >= CONFIG.crops[p].unlockLevel) {
-          setTimeout(() => plantCrop(plotId, p), 300);
+          setTimeout(function() {
+            if (plantCrop(plotId, p)) {
+              renderCrops(); // Update UI after auto-replant
+            }
+          }, 300);
         }
       }
 
@@ -883,6 +887,21 @@
                 gameState.plots[i].cropType = savedPlot.cropType;
                 gameState.plots[i].plantedAt = savedPlot.plantedAt || null;
                 gameState.plots[i].readyAt = savedPlot.readyAt || null;
+              }
+            });
+          }
+          // Restore animal states so timers survive iframe reloads
+          if (p.animals) {
+            const animalTypes = ['cows', 'chickens', 'sheep', 'goats', 'pigs', 'beehives'];
+            animalTypes.forEach(function(type) {
+              if (p.animals[type] && Array.isArray(p.animals[type])) {
+                p.animals[type].forEach(function(savedAnimal, i) {
+                  if (i < gameState.animals[type].length && savedAnimal) {
+                    gameState.animals[type][i].state = savedAnimal.state || 'idle';
+                    gameState.animals[type][i].readyAt = savedAnimal.readyAt || null;
+                    gameState.animals[type][i].notified = savedAnimal.notified || false;
+                  }
+                });
               }
             });
           }
