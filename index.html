@@ -849,20 +849,23 @@
     }
 
     function plantAllEmpty() {
+      console.log('[Hughberry] plantAllEmpty called');
       const c = gameState.settings.priorityCrop;
       const seedKey = `seeds_${c}`;
       const availableSeeds = gameState.inventory[seedKey] || 0;
       const crop = CONFIG.crops[c];
+      console.log('[Hughberry] priorityCrop:', c, 'seedKey:', seedKey, 'availableSeeds:', availableSeeds);
 
-      if (availableSeeds < 1) { notify('No ' + crop.name + ' seeds!', 'error'); return; }
-      if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return; }
+      if (availableSeeds < 1) { notify('No ' + crop.name + ' seeds!', 'error'); console.log('[Hughberry] No seeds, returning'); return; }
+      if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); console.log('[Hughberry] Level too low, returning'); return; }
 
       // Find empty plots and plant up to availableSeeds
       const activePlots = getActivePlotCount();
       const emptyPlots = gameState.plots.map((p, i) => ({ plot: p, idx: i })).filter(x => x.plot.state === 'empty' && x.idx < activePlots);
       const toPlant = Math.min(emptyPlots.length, availableSeeds);
+      console.log('[Hughberry] activePlots:', activePlots, 'emptyPlots:', emptyPlots.length, 'toPlant:', toPlant);
 
-      if (toPlant < 1) { notify('No empty plots!', 'error'); return; }
+      if (toPlant < 1) { notify('No empty plots!', 'error'); console.log('[Hughberry] No empty plots, returning'); return; }
 
       let planted = 0;
       const plantXP = getPlantingXP(crop);
@@ -888,8 +891,10 @@
       awardXP(totalPlantXP);
 
       notify(`Planted ${planted} crops! +${totalPlantXP} XP`, 'success');
+      console.log('[Hughberry] Planted', planted, 'crops, calling saveGameQuiet and renderCrops');
       saveGameQuiet();
       renderCrops();
+      console.log('[Hughberry] renderCrops completed');
     }
 
     // Equipment requirements for starting animal activities
