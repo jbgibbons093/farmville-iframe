@@ -322,7 +322,6 @@
         milk: 0, wool: 0, goat_meat: 0, truffle: 0, egg: 0, honey: 0,
         flour: 0, bread: 0, cheese: 0, stew: 0, ragout: 0, pie: 0, meat_pie: 0, blanket: 0, butter: 0, cake: 0, mead: 0
       },
-      uncollected: { milk: 0, eggs: 0, wool: 0, meat: 0, truffle: 0, honey: 0 },
       equipment: { milk_pail: 0, basket: 0, beesuit: 0, shearing_kit: 0, butcher_knife: 0, truffle_spade: 0 },
       recipes: {
         recipe_flour: false, recipe_bread: false, recipe_cheese: false, recipe_stew: false,
@@ -555,12 +554,6 @@
         'T_BonusPoint1': { target: 'bonusPoint1', isTalent: true },
         'T_Prodigy': { target: 'prodigy', isTalent: true },
         'T_BonusPoint2': { target: 'bonusPoint2', isTalent: true },
-        'Milk_Uncollected': { target: 'milk', isUncollected: true },
-        'Eggs_Uncollected': { target: 'eggs', isUncollected: true },
-        'Wool_Uncollected': { target: 'wool', isUncollected: true },
-        'Meat_Uncollected': { target: 'meat', isUncollected: true },
-        'Truffle_Uncollected': { target: 'truffle', isUncollected: true },
-        'Honey_Uncollected': { target: 'honey', isUncollected: true },
         'Rebirth_Count': { target: 'rebirthCount', isRoot: true },
         'playerName': { target: '_skip', isSkip: true }
       };
@@ -608,8 +601,7 @@
             const parsed = parseInt(parts[i + 2]);
             const value = Math.max(0, isNaN(parsed) ? 0 : parsed);
             const mapping = varMapping[twoWordKey];
-            if (mapping.isUncollected) gameState.uncollected[mapping.target] = value;
-            else if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
+            if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
@@ -820,6 +812,21 @@
               }
             });
           }
+          // Restore animal timer states so they survive iframe reloads
+          if (p.animals) {
+            var animalTypes = ['cows', 'chickens', 'sheep', 'goats', 'pigs', 'beehives'];
+            animalTypes.forEach(function(type) {
+              if (p.animals[type] && gameState.animals[type]) {
+                p.animals[type].forEach(function(savedAnimal, i) {
+                  if (i < gameState.animals[type].length && savedAnimal) {
+                    gameState.animals[type][i].state = savedAnimal.state || 'idle';
+                    gameState.animals[type][i].readyAt = savedAnimal.readyAt || null;
+                    gameState.animals[type][i].notified = savedAnimal.notified || false;
+                  }
+                });
+              }
+            });
+          }
         } catch(e) { console.error('Load error:', e); }
       }
     }
@@ -873,32 +880,45 @@
 
       let planted = 0;
       const plantXP = getPlantingXP(crop);
+      const cropName = crop.name;
+
+      // Update local state FIRST for immediate UI feedback
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
-
-        // Optimistic local seed deduction
         gameState.inventory[seedKey]--;
-
         plot.state = 'growing';
         plot.cropType = c;
         plot.plantedAt = Date.now();
         plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
-
-        // Trigger tasks to Portals
-        triggerTask(`Plant_Plot_${idx + 1}`);
-        triggerTask(`Sub_Seeds_${crop.name}_1`);
         planted++;
       }
 
-      // Award total XP
-      const totalPlantXP = planted * plantXP;
-      awardXP(totalPlantXP);
-
-      notify(`Planted ${planted} crops! +${totalPlantXP} XP`, 'success');
-      console.log('[Hughberry] Planted', planted, 'crops, calling saveGameQuiet and renderCrops');
+      // Render immediately with updated local state
       saveGameQuiet();
       renderCrops();
-      console.log('[Hughberry] renderCrops completed');
+      renderDashboard();
+      console.log('[Hughberry] Rendered', planted, 'crops immediately');
+
+      // Stagger Portals tasks 300ms apart to avoid task collisions
+      for (let i = 0; i < toPlant; i++) {
+        const plotIdx = emptyPlots[i].idx;
+        (function(idx, delay) {
+          setTimeout(function() {
+            triggerTask('Plant_Plot_' + (idx + 1));
+            triggerTask('Sub_Seeds_' + cropName + '_1');
+            console.log('[Hughberry] Sent Plant_Plot_' + (idx + 1) + ' + Sub_Seeds (delay: ' + delay + 'ms)');
+          }, delay);
+        })(plotIdx, i * 300);
+      }
+
+      // Award total XP (staggered after all plant tasks)
+      const totalPlantXP = planted * plantXP;
+      setTimeout(function() {
+        awardXP(totalPlantXP);
+      }, toPlant * 300);
+
+      notify('Planted ' + planted + ' crops! +' + totalPlantXP + ' XP', 'success');
+      console.log('[Hughberry] plantAllEmpty completed, tasks staggered');
     }
 
     // Equipment requirements for starting animal activities
@@ -1774,19 +1794,19 @@
     // Handle visibility changes - restart timer loop when iframe becomes visible
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
-        console.log('[Hughberry] Iframe visible - restarting game loop');
-        startGameLoop(); // Restart fresh interval
-        gameLoop(); // Immediately run to catch up
-        updateAllUI();
+        console.log('[Hughberry] Iframe visible - restarting game loop and requesting sync');
+        startGameLoop();
+        gameLoop();
+        triggerTask('Sync_Inventory'); // Request fresh data from Portals
       }
     });
 
     // Also handle focus events as backup
     window.addEventListener('focus', function() {
-      console.log('[Hughberry] Iframe focused - refreshing UI');
-      startGameLoop(); // Restart fresh interval
+      console.log('[Hughberry] Iframe focused - requesting sync');
+      startGameLoop();
       gameLoop();
-      updateAllUI();
+      triggerTask('Sync_Inventory'); // Request fresh data from Portals
     });
 
     // Message from parent window can also trigger refresh
