@@ -338,7 +338,7 @@
 
     function handlePortalsMessage(msg) {
       console.log('[Hughberry Blueprints] Received:', msg);
-      if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
+      if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
         const data = parseSyncMessage(msg);
         gameState.gold = data.gold || 0;
         gameState.level = data.level || 0;

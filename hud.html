@@ -468,7 +468,7 @@
     function handlePortalsMessage(msg) {
       console.log('[HUD] Received message:', msg.substring(0, 100) + '...');
 
-      if (msg.startsWith('Sync_Inventory_') || (msg.includes('_Gold_') && msg.includes('_XP_') && msg.includes('_Level_'))) {
+      if (msg.indexOf('Sync_Inventory_') === 0 || (msg.indexOf('_Gold_') !== -1 && msg.indexOf('_XP_') !== -1 && msg.indexOf('_Level_') !== -1)) {
         const data = parseSyncMessage(msg);
         if (data.gold !== undefined) gold = data.gold;
         if (data.xp !== undefined) xp = data.xp;
@@ -477,7 +477,7 @@
         updateHUD();
         console.log('[HUD] Updated - Gold:', gold, 'XP:', xp, 'Level:', level);
       }
-      else if (msg.startsWith('init_') || msg.startsWith('hud_')) {
+      else if (msg.indexOf('init_') === 0 || msg.indexOf('hud_') === 0) {
         const parts = msg.split('_');
         if (parts.length >= 4) {
           gold = parseInt(parts[1]) || 0;
