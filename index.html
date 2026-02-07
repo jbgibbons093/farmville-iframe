@@ -208,8 +208,8 @@
       <div class="menu-header">
         <div class="game-title">HUGHBERRY FARMS</div>
         <div class="header-stats">
-          <div class="stat-box"><span class="stat-icon">&#x1F4B0;</span><div><div class="stat-value" id="header-gold">100</div><div class="stat-label">Gold</div></div></div>
-          <div class="stat-box"><span class="stat-icon">&#x2B50;</span><div><div class="stat-value">Lv.<span id="header-level">1</span></div><div class="xp-bar-bg"><div class="xp-bar-fill" id="header-xp-bar" style="width:0%"></div></div></div></div>
+          <div class="stat-box"><span class="stat-icon">&#x1F4B0;</span><div><div class="stat-value" id="header-gold">0</div><div class="stat-label">Gold</div></div></div>
+          <div class="stat-box"><span class="stat-icon">&#x2B50;</span><div><div class="stat-value">Lv.<span id="header-level">0</span></div><div class="xp-bar-bg"><div class="xp-bar-fill" id="header-xp-bar" style="width:0%"></div></div></div></div>
         </div>
         <button class="close-btn" onclick="closeMenu()" title="Close (Tab)">&#x2715;</button>
       </div>
@@ -300,6 +300,8 @@
         { level: 31, title: 'Hughberry Legend', desc: 'All content unlocked - you are a legend!', items: ['Hughberry Legend'] }
       ]
     };
+
+    let syncReceived = false; // Track if we've received at least one Sync_Inventory
 
     let gameState = {
       gold: 0, xp: 0, level: 0,
@@ -463,6 +465,11 @@
 
     // Claim free starter seeds (one-time only)
     function claimStarterSeeds() {
+      if (!syncReceived) {
+        notify('Syncing with server... try again!', 'error');
+        triggerTask('Sync_Inventory');
+        return;
+      }
       if (gameState.claimedStarterSeeds) {
         notify('Already claimed!', 'error');
         return;
@@ -614,21 +621,33 @@
         if (!matched && i + 1 < parts.length) {
           const oneWordKey = parts[i];
           if (varMapping[oneWordKey]) {
-            const parsed = parseInt(parts[i + 1]);
-            const value = Math.max(0, isNaN(parsed) ? 0 : parsed);
             const mapping = varMapping[oneWordKey];
-            if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
-            else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
-            else if (mapping.isFlag) gameState[mapping.target] = value > 0;
-            else if (mapping.isRoot) gameState[mapping.target] = value;
-            else gameState.inventory[mapping.target] = value;
-            i += 2; matched = true;
+            // Skip playerName - it's a quoted string that can contain underscores
+            if (mapping.isSkip) {
+              // Find the end of the quoted value by looking for closing quote
+              let skipCount = 1;
+              for (let j = i + 1; j < parts.length; j++) {
+                skipCount++;
+                if (parts[j].endsWith('"')) break;
+              }
+              i += skipCount; matched = true;
+            } else {
+              const parsed = parseInt(parts[i + 1]);
+              const value = Math.max(0, isNaN(parsed) ? 0 : parsed);
+              if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
+              else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
+              else if (mapping.isFlag) gameState[mapping.target] = value > 0;
+              else if (mapping.isRoot) gameState[mapping.target] = value;
+              else gameState.inventory[mapping.target] = value;
+              i += 2; matched = true;
+            }
           }
         }
         if (!matched) i++;
       }
       console.log('[Hughberry] Talents after sync:', JSON.stringify(gameState.talents));
       console.log('[Hughberry] Unspent Talent Points:', gameState.unspentTalentPoints);
+      syncReceived = true;
       dashboardDirty = true;
       saveGameQuiet();
     }
@@ -681,11 +700,11 @@
 
     setupMessageListener();
 
-    // Request inventory sync from Portals when iframe loads
+    // Request inventory sync from Portals when iframe loads - immediate request
     setTimeout(function() {
       triggerTask('Sync_Inventory');
       console.log('[Hughberry] Requested Sync_Inventory');
-    }, 500);
+    }, 100);
 
     function handlePortalsMessage(msg) {
       console.log('[Hughberry] Received:', msg);
@@ -695,8 +714,8 @@
 
       if (cmd === 'init') {
         if (parts.length >= 4) {
-          const gv = parseInt(parts[1]); gameState.gold = isNaN(gv) ? 100 : gv;
-          const lv = parseInt(parts[2]); gameState.level = isNaN(lv) ? 1 : lv;
+          const gv = parseInt(parts[1]); gameState.gold = isNaN(gv) ? 0 : gv;
+          const lv = parseInt(parts[2]); gameState.level = isNaN(lv) ? 0 : lv;
           const xv = parseInt(parts[3]); gameState.xp = isNaN(xv) ? 0 : xv;
         }
         loadFromStorage();
@@ -832,6 +851,11 @@
     }
 
     function plantCrop(plotId, cropType) {
+      if (!syncReceived) {
+        notify('Syncing with server... try again!', 'error');
+        triggerTask('Sync_Inventory');
+        return false;
+      }
       const plot = gameState.plots[plotId - 1];
       const crop = CONFIG.crops[cropType];
       const seedKey = `seeds_${cropType}`;
@@ -860,7 +884,12 @@
     }
 
     function plantAllEmpty() {
-      console.log('[Hughberry] plantAllEmpty called');
+      console.log('[Hughberry] plantAllEmpty called, syncReceived:', syncReceived);
+      if (!syncReceived) {
+        notify('Syncing with server... try again!', 'error');
+        triggerTask('Sync_Inventory');
+        return;
+      }
       const c = gameState.settings.priorityCrop;
       const seedKey = `seeds_${c}`;
       const availableSeeds = gameState.inventory[seedKey] || 0;
@@ -932,6 +961,11 @@
     };
 
     function startAnimalActivity(animalType, id) {
+      if (!syncReceived) {
+        notify('Syncing with server... try again!', 'error');
+        triggerTask('Sync_Inventory');
+        return;
+      }
       const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens, beehive: gameState.animals.beehives };
       const animal = animalArrays[animalType]?.[id - 1];
       const config = CONFIG.animals[animalType];
@@ -1041,6 +1075,11 @@
 
     function handleCollectionStation(stationType) {
       console.log('[Hughberry] handleCollectionStation:', stationType);
+      if (!syncReceived) {
+        notify('Syncing with server... try again!', 'error');
+        triggerTask('Sync_Inventory');
+        return;
+      }
       const station = COLLECTION_STATIONS[stationType];
       if (!station) {
         console.log('[Hughberry] Unknown station type:', stationType);
@@ -1364,6 +1403,11 @@
     }
 
     function startAllAnimals(type) {
+      if (!syncReceived) {
+        notify('Syncing with server... try again!', 'error');
+        triggerTask('Sync_Inventory');
+        return;
+      }
       const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens, beehive: gameState.animals.beehives };
       const animals = animalArrays[type];
       const config = CONFIG.animals[type];
