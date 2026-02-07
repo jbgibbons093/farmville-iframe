@@ -382,6 +382,7 @@ body {
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+  pointer-events: none;
 }
 
 .lock-icon {
@@ -501,7 +502,7 @@ body {
     <button class="tree-tab" data-tree="animal" onclick="switchTree('animal')">
       <span class="tab-icon">&#128004;</span>
       <span class="tab-label">Animals</span>
-      <span class="tab-points" id="tabPointsAnimal">0 / 35</span>
+      <span class="tab-points" id="tabPointsAnimal">0 / 38</span>
     </button>
     <button class="tree-tab" data-tree="economy" onclick="switchTree('economy')">
       <span class="tab-icon">&#128218;</span>
@@ -563,7 +564,7 @@ var TALENT_TREES = {
   },
   animal: {
     name: 'Animal Husbandry',
-    maxPoints: 35,
+    maxPoints: 38,
     tiers: [
       {
         tier: 1, gate: 0,
@@ -960,7 +961,7 @@ function renderAll() {
 
   // Tab point counters
   document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 17';
-  document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 35';
+  document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 38';
   document.getElementById('tabPointsEconomy').textContent = getPointsInTree('economy') + ' / 20';
 
   renderTree();
@@ -1081,11 +1082,14 @@ function playSound(type) {
 function notify(msg, type) {
   type = type || 'success';
   playSound(type);
+  var container = document.getElementById('notifications');
+  // Cap notifications at 5
+  while (container.children.length >= 5) { container.removeChild(container.firstChild); }
   var notif = document.createElement('div');
   notif.className = 'notification ' + (type === 'success' || type === 'error' ? type : 'success');
   notif.textContent = msg;
-  document.getElementById('notifications').appendChild(notif);
-  setTimeout(function() { notif.remove(); }, 3000);
+  container.appendChild(notif);
+  setTimeout(function() { if (notif.parentNode) notif.remove(); }, 3000);
 }
 
 // Initial render

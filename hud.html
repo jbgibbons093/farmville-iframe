@@ -402,9 +402,6 @@
       'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
       'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
       'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
-      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
-      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
-      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
       'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
       'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
       'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
@@ -468,23 +465,14 @@
     function handlePortalsMessage(msg) {
       console.log('[HUD] Received message:', msg.substring(0, 100) + '...');
 
-      if (msg.startsWith('Sync_Inventory_') || (msg.includes('_Gold_') && msg.includes('_XP_') && msg.includes('_Level_'))) {
-        const data = parseSyncMessage(msg);
+      if (msg.indexOf('Sync_Inventory') === 0 || (msg.indexOf('_Gold_') !== -1 && msg.indexOf('_XP_') !== -1 && msg.indexOf('_Level_') !== -1)) {
+        var data = parseSyncMessage(msg);
         if (data.gold !== undefined) gold = data.gold;
         if (data.xp !== undefined) xp = data.xp;
         if (data.level !== undefined) level = data.level;
         if (data.unspent_talent_points !== undefined) unspentTalentPoints = data.unspent_talent_points;
         updateHUD();
         console.log('[HUD] Updated - Gold:', gold, 'XP:', xp, 'Level:', level);
-      }
-      else if (msg.startsWith('init_') || msg.startsWith('hud_')) {
-        const parts = msg.split('_');
-        if (parts.length >= 4) {
-          gold = parseInt(parts[1]) || 0;
-          level = parseInt(parts[2]) || 0;
-          xp = parseInt(parts[3]) || 0;
-          updateHUD();
-        }
       }
     }
 

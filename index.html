@@ -361,6 +361,12 @@
     let dashboardDirty = true;
     let staggeringSeedKey = null;
     let staggerEndTime = 0;
+    let levelUpPending = false;
+    let pendingLevelTarget = 0;
+
+    // Track previous crop inventory to detect external harvests
+    let previousCropInventory = { wheat: 0, carrot: 0, corn: 0, potato: 0, tomato: 0, pumpkin: 0 };
+    let firstSyncComplete = false;
 
     function triggerTask(taskName, targetState) {
       if (!targetState) targetState = 'SetNotActiveToActive';
@@ -632,7 +638,57 @@
       console.log('[Hughberry] Talents after sync:', JSON.stringify(gameState.talents));
       console.log('[Hughberry] Unspent Talent Points:', gameState.unspentTalentPoints);
       dashboardDirty = true;
+
+      // Detect external harvests - if crop count increased and we have ready plots, reset them
+      detectExternalHarvests();
+
       saveGameQuiet();
+    }
+
+    // Detect when crops were harvested in Portals but iframe wasn't notified
+    function detectExternalHarvests() {
+      const cropTypes = ['wheat', 'carrot', 'corn', 'potato', 'tomato', 'pumpkin'];
+
+      // Skip detection on first sync - just initialize the tracking values
+      if (!firstSyncComplete) {
+        cropTypes.forEach(cropType => {
+          previousCropInventory[cropType] = gameState.inventory[cropType] || 0;
+        });
+        firstSyncComplete = true;
+        console.log('[Hughberry] First sync complete, initialized crop tracking:', JSON.stringify(previousCropInventory));
+        return;
+      }
+
+      cropTypes.forEach(cropType => {
+        const currentCount = gameState.inventory[cropType] || 0;
+        const previousCount = previousCropInventory[cropType] || 0;
+
+        // If crop inventory increased, some ready plots might have been harvested
+        if (currentCount > previousCount) {
+          const cropsGained = currentCount - previousCount;
+          console.log('[Hughberry] Detected crop increase:', cropType, 'from', previousCount, 'to', currentCount, '(+' + cropsGained + ')');
+
+          // Find and reset any ready plots of this type
+          let resetCount = 0;
+          gameState.plots.forEach((plot, i) => {
+            if (plot.state === 'ready' && plot.cropType === cropType && resetCount < cropsGained) {
+              console.log('[Hughberry] Resetting ready plot', i + 1, 'for', cropType, '(external harvest detected)');
+              plot.state = 'empty';
+              plot.cropType = null;
+              plot.plantedAt = null;
+              plot.readyAt = null;
+              resetCount++;
+            }
+          });
+
+          if (resetCount > 0) {
+            notify(`Harvested ${resetCount} ${cropType}!`, 'success', 'harvest');
+          }
+        }
+
+        // Update previous inventory for next comparison
+        previousCropInventory[cropType] = currentCount;
+      });
     }
 
     // Setup message listener with retry for SDK initialization
@@ -706,7 +762,10 @@
       }
       else if (msg.indexOf('Sync_Inventory') === 0) {
         parseAndSyncInventory(msg);
-        if (Date.now() >= staggerEndTime) actionPending = false;
+        // Always reset actionPending on sync - prevents getting stuck
+        actionPending = false;
+        staggeringSeedKey = null;
+        staggerEndTime = 0;
         checkLevelUp(); // Detect level-ups and trigger Add_Level_1 to Portals
         updateAllUI();
       }
@@ -1158,32 +1217,64 @@
 
     function checkLevelUp() {
       const t = CONFIG.levelThresholds;
-      let levelsGained = 0;
 
-      while (gameState.level < t.length) {
-        const xpNeeded = t[gameState.level];
-        if (gameState.xp < xpNeeded) break;
-
-        // Compute remaining XP after this level-up
-        gameState.xp -= xpNeeded;
-        const newLevel = gameState.level + 1;
-        console.log('[Hughberry] Level up! Excess XP:', gameState.xp, 'after needing', xpNeeded, '-> Level', newLevel);
-        levelsGained++;
-
-        // Trigger level-up tasks staggered to avoid Portals collision
-        (function(delay) {
-          setTimeout(function() {
-            triggerTask('Add_Level_1');
-          }, delay);
-        })((levelsGained - 1) * 400);
-
-        gameState.level = newLevel;
+      // If level-up is already pending and we haven't reached target yet, skip
+      if (levelUpPending && gameState.level < pendingLevelTarget) {
+        console.log('[Hughberry] Level-up pending, waiting for Portals sync. Target:', pendingLevelTarget, 'Current:', gameState.level);
+        return;
       }
 
-      if (levelsGained > 0) {
-        // Reset XP in Portals to the remaining amount after all level-ups
-        triggerTask('Reset_XP');
-        notify(`LEVEL UP! Now Lv.${gameState.level}!`, 'success', 'levelup');
+      // Clear pending flag if we've reached or exceeded the target
+      if (levelUpPending && gameState.level >= pendingLevelTarget) {
+        console.log('[Hughberry] Level-up complete! Reached level', gameState.level);
+        levelUpPending = false;
+        pendingLevelTarget = 0;
+      }
+
+      // Calculate how many levels the player should gain
+      let tempXP = gameState.xp;
+      let tempLevel = gameState.level;
+      let levelsToGain = 0;
+
+      while (tempLevel < t.length) {
+        const xpNeeded = t[tempLevel];
+        if (tempXP < xpNeeded) break;
+        tempXP -= xpNeeded;
+        tempLevel++;
+        levelsToGain++;
+      }
+
+      if (levelsToGain > 0) {
+        console.log('[Hughberry] Detected', levelsToGain, 'level-ups needed. XP:', gameState.xp, 'Current Level:', gameState.level, 'Target:', tempLevel);
+
+        // Set pending flag to prevent re-triggering
+        levelUpPending = true;
+        pendingLevelTarget = tempLevel;
+
+        // Trigger level-up tasks staggered to Portals
+        for (let i = 0; i < levelsToGain; i++) {
+          (function(delay) {
+            setTimeout(function() {
+              triggerTask('Add_Level_1');
+              console.log('[Hughberry] Triggered Add_Level_1 (' + (i + 1) + '/' + levelsToGain + ')');
+            }, delay);
+          })(i * 400);
+        }
+
+        // Update local state optimistically for immediate UI feedback
+        gameState.level = tempLevel;
+        gameState.xp = tempXP;
+
+        notify(`LEVEL UP! Now Lv.${tempLevel}!`, 'success', 'levelup');
+
+        // Clear pending after tasks are sent + buffer for Portals processing
+        setTimeout(function() {
+          if (levelUpPending) {
+            console.log('[Hughberry] Clearing level-up pending flag (timeout)');
+            levelUpPending = false;
+            pendingLevelTarget = 0;
+          }
+        }, (levelsToGain * 400) + 2000);
       }
     }
 
@@ -1817,18 +1908,20 @@
     // Handle visibility changes - restart timer loop when iframe becomes visible
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
-        console.log('[Hughberry] Iframe visible - restarting game loop');
+        console.log('[Hughberry] Iframe visible - restarting game loop and requesting sync');
         startGameLoop(); // Restart fresh interval
         gameLoop(); // Immediately run to catch up
+        triggerTask('Sync_Inventory'); // Request fresh data from Portals
         updateAllUI();
       }
     });
 
     // Also handle focus events as backup
     window.addEventListener('focus', function() {
-      console.log('[Hughberry] Iframe focused - refreshing UI');
+      console.log('[Hughberry] Iframe focused - refreshing UI and requesting sync');
       startGameLoop(); // Restart fresh interval
       gameLoop();
+      triggerTask('Sync_Inventory'); // Request fresh data from Portals
       updateAllUI();
     });
 

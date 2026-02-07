@@ -72,73 +72,102 @@
       }
     }
 
-    // === Standard Sync_Inventory Parser (same in all iframes) ===
-    const SYNC_MAP = {
-      'Has_Milk_Pail': 'has_milk_pail', 'Has_Shearing_Kit': 'has_shearing_kit',
-      'Has_Butcher_Knife': 'has_butcher_knife', 'Has_Truffle_Spade': 'has_truffle_spade',
-      'Has_Starter_Seeds': 'has_starter_seeds',
-      'Seeds_Wheat': 'seeds_wheat', 'Seeds_Carrot': 'seeds_carrot', 'Seeds_Corn': 'seeds_corn',
-      'Seeds_Potato': 'seeds_potato', 'Seeds_Tomato': 'seeds_tomato', 'Seeds_Pumpkin': 'seeds_pumpkin',
-      'Crop_Wheat': 'crop_wheat', 'Crop_Carrot': 'crop_carrot', 'Crop_Corn': 'crop_corn',
-      'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
-      'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
-      'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
-      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
-      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
-      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
-      'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
-      'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
-      'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
-      'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
-      'Cake': 'cake', 'Mead': 'mead',
-      'RecipeFlour': 'has_recipe_flour', 'RecipeBread': 'has_recipe_bread',
-      'RecipeCheese': 'has_recipe_cheese', 'RecipeStew': 'has_recipe_stew',
-      'RecipeRagout': 'has_recipe_ragout', 'RecipePie': 'has_recipe_pie',
-      'RecipeMeatPie': 'has_recipe_meat_pie', 'RecipeBlanket': 'has_recipe_blanket',
-      'RecipeButter': 'has_recipe_butter', 'RecipeCake': 'has_recipe_cake',
-      'RecipeMead': 'has_recipe_mead',
-      'playerName': '_skip',
-      'Rebirth_Count': '_skip'
+    // === Sync_Inventory Parser ===
+    // 4-word keys
+    var fourWordKeys = { 'Has_Recipe_Meat_Pie': '_skip' };
+    // 3-word keys
+    var threeWordKeys = {
+      'Unspent_Talent_Points': '_skip',
+      'Has_Milk_Pail': '_skip', 'Has_Shearing_Kit': '_skip',
+      'Has_Butcher_Knife': '_skip', 'Has_Truffle_Spade': '_skip',
+      'Has_Starter_Seeds': '_skip',
+      'Has_Recipe_Flour': '_skip', 'Has_Recipe_Bread': '_skip',
+      'Has_Recipe_Cheese': '_skip', 'Has_Recipe_Stew': '_skip',
+      'Has_Recipe_Ragout': '_skip', 'Has_Recipe_Pie': '_skip',
+      'Has_Recipe_Blanket': '_skip', 'Has_Recipe_Butter': '_skip',
+      'Has_Recipe_Cake': '_skip', 'Has_Recipe_Mead': '_skip'
+    };
+    // 2-word keys
+    var twoWordKeys = {
+      'Seeds_Wheat': '_skip', 'Seeds_Carrot': '_skip', 'Seeds_Corn': '_skip',
+      'Seeds_Potato': '_skip', 'Seeds_Tomato': '_skip', 'Seeds_Pumpkin': '_skip',
+      'Crop_Wheat': '_skip', 'Crop_Carrot': '_skip', 'Crop_Corn': '_skip',
+      'Crop_Potato': '_skip', 'Crop_Tomato': '_skip', 'Crop_Pumpkin': '_skip',
+      'Goat_Meat': '_skip', 'Meat_Pie': '_skip',
+      'Has_Basket': '_skip', 'Has_Beesuit': '_skip',
+      'Rebirth_Count': '_skip',
+      'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
+      'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
+      'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
+      'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
+      'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
+      'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
+      'T_KeenLearner': '_skip', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
+      'T_Artisan': '_skip', 'T_SeasonedWorker': '_skip', 'T_BonusPoint1': '_skip',
+      'T_Prodigy': '_skip', 'T_BonusPoint2': '_skip'
+    };
+    // 1-word keys
+    var oneWordKeys = {
+      'Gold': 'gold', 'XP': '_skip', 'Level': '_skip',
+      'Milk': '_skip', 'Wool': '_skip', 'Truffle': '_skip', 'Egg': '_skip', 'Honey': '_skip',
+      'Flour': '_skip', 'Bread': '_skip', 'Cheese': '_skip', 'Stew': '_skip',
+      'Ragout': '_skip', 'Pie': '_skip', 'Blanket': '_skip', 'Butter': '_skip',
+      'Cake': '_skip', 'Mead': '_skip'
     };
 
     function parseSyncMessage(msg) {
-      const parts = msg.replace('Sync_Inventory_', '').split('_');
-      const data = {};
-      let i = 0;
+      var parts = msg.replace('Sync_Inventory_', '').split('_');
+      var gold = 0;
+      var i = 0;
       while (i < parts.length) {
-        let matched = false;
+        var matched = false;
+        // 4-word keys
+        if (!matched && i + 4 < parts.length) {
+          var k4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (fourWordKeys[k4] !== undefined) { i += 5; matched = true; }
+        }
+        // 3-word keys
         if (!matched && i + 3 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
+          var k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+          if (threeWordKeys[k3] !== undefined) { i += 4; matched = true; }
         }
+        // 2-word keys
         if (!matched && i + 2 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
+          var k2 = parts[i] + '_' + parts[i+1];
+          if (twoWordKeys[k2] !== undefined) { i += 3; matched = true; }
         }
-        if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
-          data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
+        // 1-word keys
+        if (!matched && i + 1 < parts.length) {
+          if (parts[i] === 'playerName') {
+            i += 2; matched = true;
+          } else if (oneWordKeys[parts[i]] !== undefined) {
+            if (oneWordKeys[parts[i]] === 'gold') {
+              gold = Math.max(0, parseInt(parts[i+1]) || 0);
+            }
+            i += 2; matched = true;
+          }
         }
         if (!matched) i++;
       }
-      return data;
+      return { gold: gold };
     }
-    // === End Standard Parser ===
+    // === End Parser ===
 
     function handlePortalsMessage(msg) {
       console.log('[Hughberry Decorations] Received:', msg);
-      if (typeof msg === 'string' && msg.startsWith('Sync_Inventory')) {
-        const data = parseSyncMessage(msg);
-        gameState.gold = data.gold || 0;
+      if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
+        var data = parseSyncMessage(msg);
+        gameState.gold = data.gold;
         document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
       }
     }
 
     // Message deduplication
-    let lastMessageId = '';
-    let lastMessageTime = 0;
+    var lastMessageId = '';
+    var lastMessageTime = 0;
     function processMessage(msg, source) {
-      const now = Date.now();
-      const msgId = msg + '_' + Math.floor(now / 100);
+      var now = Date.now();
+      var msgId = msg + '_' + Math.floor(now / 100);
       if (msgId === lastMessageId && now - lastMessageTime < 200) return;
       lastMessageId = msgId;
       lastMessageTime = now;
@@ -158,6 +187,14 @@
       if (event.data && typeof event.data === 'string') processMessage(event.data, 'postMessage-string');
       else if (event.data && event.data.portalsMessage) processMessage(event.data.portalsMessage, 'postMessage-portals');
       else if (event.data && event.data.message && typeof event.data.message === 'string') processMessage(event.data.message, 'postMessage-message');
+    });
+
+    // Visibility/Focus handlers
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) { triggerTask('Sync_Inventory'); }
+    });
+    window.addEventListener('focus', function() {
+      triggerTask('Sync_Inventory');
     });
 
     // Initialize
