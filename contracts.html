@@ -320,6 +320,9 @@
       'T_Contractor1': 't_contractor1', 'T_Contractor2': 't_contractor2', 'T_Contractor3': 't_contractor3'
     };
 
+    // 4-word keys that need explicit handling
+    const FOUR_WORD_KEYS = ['Has_Recipe_Meat_Pie'];
+
     const SKIP_PREFIXES = ['T_PlotRow', 'T_Green', 'T_Eager', 'T_Bountiful', 'T_Rapid', 'T_Crop',
       'T_Cow', 'T_Chicken', 'T_Quick', 'T_Sheep', 'T_Goat', 'T_Apiary', 'T_Husbandry', 'T_Pig', 'T_Animal',
       'T_Keen', 'T_Farm', 'T_Stock', 'T_Artisan', 'T_Seasoned', 'T_Bonus', 'T_Prodigy',
@@ -327,7 +330,7 @@
       'Has_Recipe', 'Has_Starter', 'Seeds_', 'Unspent_', 'Rebirth_', 'playerName', 'Contract_'];
 
     function shouldSkip(key) {
-      return SKIP_PREFIXES.some(p => key.indexOf(p) === 0);
+      return SKIP_PREFIXES.some(function(p) { return key.indexOf(p) === 0; });
     }
 
     function parseSyncInventory(msg) {
@@ -339,6 +342,16 @@
       while (i < parts.length) {
         let matched = false;
 
+        // 4-word keys (e.g., Has_Recipe_Meat_Pie)
+        if (!matched && i + 4 < parts.length) {
+          const k4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (FOUR_WORD_KEYS.indexOf(k4) !== -1) {
+            // Skip 4-word key + value
+            i += 5; matched = true;
+          }
+        }
+
+        // 3-word keys
         if (!matched && i + 3 < parts.length) {
           const k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
           if (SYNC_MAP[k3] !== undefined) {
@@ -350,6 +363,7 @@
           }
         }
 
+        // 2-word keys
         if (!matched && i + 2 < parts.length) {
           const k2 = parts[i] + '_' + parts[i+1];
           if (SYNC_MAP[k2] !== undefined) {
@@ -361,10 +375,11 @@
           }
         }
 
+        // 1-word keys
         if (!matched && i + 1 < parts.length) {
           if (SYNC_MAP[parts[i]] !== undefined) {
             const val = parseInt(parts[i+1]);
-            data[SYNC_MAP[parts[i]]] = isNaN(val) ? 0 : val;
+            data[SYNC_MAP[parts[i]]] = isNaN(val) ? 0 : Math.max(0, val);
             i += 2; matched = true;
           } else if (shouldSkip(parts[i])) {
             i += 2; matched = true;
@@ -373,6 +388,8 @@
 
         if (!matched) i++;
       }
+
+      console.log('[Contracts] Parsed values - Milk:', data.milk, 'Egg:', data.egg, 'Wool:', data.wool);
       return data;
     }
 
@@ -380,7 +397,16 @@
       if (typeof msg !== 'string') return;
       if (msg.indexOf('Sync_Inventory') !== 0) return;
 
-      console.log('[Contracts] Received Sync_Inventory');
+      console.log('[Contracts] Received Sync_Inventory, length:', msg.length);
+
+      // Debug: Find Milk in raw message
+      const milkIdx = msg.indexOf('_Milk_');
+      if (milkIdx !== -1) {
+        console.log('[Contracts] Raw Milk segment:', msg.substring(milkIdx, milkIdx + 20));
+      } else {
+        console.log('[Contracts] WARNING: _Milk_ not found in sync message!');
+      }
+
       const data = parseSyncInventory(msg);
       console.log('[Contracts] Parsed data:', data);
 
