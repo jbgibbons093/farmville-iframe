@@ -1570,7 +1570,7 @@
             <div style="text-align: center; margin-top: 8px; font-size: 11px; color: #888;">Visit the <span style="color: #2ecc71;">Contracts Stall</span> in the marketplace</div>
           </div>`;
           })()}
-          ${!gameState.claimedStarterSeeds ? `
+          ${(syncReceived && !gameState.claimedStarterSeeds) ? `
           <div class="dashboard-card" style="border-color: #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); animation: pulseGreen 2s infinite;">
             <div class="card-header"><span class="card-icon">&#x1F381;</span><div class="card-title" style="color: #2ecc71;">Free Starter Seeds!</div></div>
             <div style="text-align: center; padding: 10px 0;">

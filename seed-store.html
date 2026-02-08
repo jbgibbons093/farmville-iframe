@@ -157,7 +157,7 @@
 
       let html = '';
       Object.entries(SEEDS).forEach(([key, seed]) => {
-        const owned = gameState.seeds[key] || 0;
+        const owned = Math.max(0, gameState.seeds[key] || 0);
         const locked = gameState.level < seed.unlockLevel;
         const canBuy1 = !locked && !actionPending && gameState.gold >= seed.cost;
         const canBuy5 = !locked && !actionPending && gameState.gold >= seed.cost * 5;
