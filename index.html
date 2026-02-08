@@ -702,11 +702,15 @@
       saveGameQuiet();
 
       // Post-rebirth detection: check if rebirth count increased since last seen
-      var storedRC = parseInt(localStorage.getItem('hughberry_rebirth_count') || '0');
-      if (gameState.rebirthCount > storedRC && storedRC > 0) {
-        handlePostRebirthGrants();
+      try {
+        var storedRC = parseInt(localStorage.getItem('hughberry_rebirth_count') || '0');
+        if (gameState.rebirthCount > storedRC && storedRC > 0) {
+          handlePostRebirthGrants();
+        }
+        localStorage.setItem('hughberry_rebirth_count', String(gameState.rebirthCount));
+      } catch (e) {
+        // localStorage not available in sandboxed iframe
       }
-      localStorage.setItem('hughberry_rebirth_count', String(gameState.rebirthCount));
     }
 
     // ── Post-Rebirth Legacy Grant System ──
@@ -715,13 +719,17 @@
     function handlePostRebirthGrants() {
       if (postRebirthGrantPending) return;
       // Check localStorage flag to prevent double-grant
-      var grantKey = 'hughberry_rebirth_grant_' + gameState.rebirthCount;
-      if (localStorage.getItem(grantKey) === 'done') {
-        console.log('[Hughberry] Post-rebirth grants already applied for rebirth #' + gameState.rebirthCount);
-        return;
+      try {
+        var grantKey = 'hughberry_rebirth_grant_' + gameState.rebirthCount;
+        if (localStorage.getItem(grantKey) === 'done') {
+          console.log('[Hughberry] Post-rebirth grants already applied for rebirth #' + gameState.rebirthCount);
+          return;
+        }
+        localStorage.setItem(grantKey, 'done');
+      } catch (e) {
+        // localStorage not available in sandboxed iframe
       }
       postRebirthGrantPending = true;
-      localStorage.setItem(grantKey, 'done');
 
       var rb = gameState.rebirthBlessings;
       var rc = gameState.rebirthCount;
