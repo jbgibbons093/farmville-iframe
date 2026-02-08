@@ -302,6 +302,7 @@
     };
 
     let syncReceived = false; // Track if we've received at least one Sync_Inventory
+    let plantingInProgress = false; // Guard against rapid plant clicks
 
     let gameState = {
       gold: 0, xp: 0, level: 0,
@@ -886,8 +887,8 @@
       if (gameState.inventory[seedKey] < 1) { notify(`No ${crop.name} seeds!`, 'error'); return false; }
       if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); return false; }
 
-      // Optimistic seed deduction
-      gameState.inventory[seedKey]--;
+      // Optimistic seed deduction (guard against negative)
+      gameState.inventory[seedKey] = Math.max(0, (gameState.inventory[seedKey] || 0) - 1);
 
       plot.state = 'growing';
       plot.cropType = cropType;
@@ -907,7 +908,13 @@
 
     function plantAllEmpty() {
       console.log('[Hughberry] plantAllEmpty called');
-      console.log('[Hughberry] syncReceived:', syncReceived, 'gameState.inventory:', JSON.stringify(gameState.inventory));
+      console.log('[Hughberry] syncReceived:', syncReceived, 'plantingInProgress:', plantingInProgress);
+
+      // Guard against rapid clicks
+      if (plantingInProgress) {
+        console.log('[Hughberry] Planting already in progress, ignoring');
+        return;
+      }
 
       // Removed syncReceived block - just warn but continue
       if (!syncReceived) {
@@ -941,7 +948,7 @@
       for (let i = 0; i < toPlant; i++) {
         const { plot, idx } = emptyPlots[i];
         console.log('[Hughberry] Planting plot', idx + 1, 'with', c);
-        gameState.inventory[seedKey]--;
+        gameState.inventory[seedKey] = Math.max(0, (gameState.inventory[seedKey] || 0) - 1);
         plot.state = 'growing';
         plot.cropType = c;
         plot.plantedAt = Date.now();
@@ -957,6 +964,9 @@
       console.log('[Hughberry] Calling renderDashboard');
       renderDashboard();
       console.log('[Hughberry] Render complete');
+
+      // Block rapid clicks while tasks are staggered
+      plantingInProgress = true;
 
       // Stagger Portals tasks 300ms apart to avoid task collisions
       for (let i = 0; i < toPlant; i++) {
@@ -975,6 +985,12 @@
       setTimeout(function() {
         awardXP(totalPlantXP);
       }, toPlant * 300);
+
+      // Clear planting lock after all tasks sent + buffer for Portals to process
+      setTimeout(function() {
+        plantingInProgress = false;
+        console.log('[Hughberry] Planting lock cleared');
+      }, (toPlant * 300) + 500);
 
       notify('Planted ' + planted + ' crops! +' + totalPlantXP + ' XP', 'success');
       console.log('[Hughberry] plantAllEmpty completed, tasks staggered');
