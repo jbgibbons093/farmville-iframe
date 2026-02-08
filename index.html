@@ -594,7 +594,10 @@
             const mapping = varMapping[threeWordKey];
             if (mapping.isEquipment) gameState.equipment[mapping.target] = value;
             else if (mapping.isRecipe) gameState.recipes[mapping.target] = value > 0;
-            else if (mapping.isFlag) gameState[mapping.target] = value > 0;
+            else if (mapping.isFlag) {
+              gameState[mapping.target] = value > 0;
+              console.log('[Hughberry] Parsed FLAG:', threeWordKey, '=', value, '->', mapping.target, '=', gameState[mapping.target]);
+            }
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             console.log('[Hughberry] Parsed 3-word:', threeWordKey, '=', value);
