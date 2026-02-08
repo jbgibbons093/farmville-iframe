@@ -19,67 +19,73 @@
     .close-btn { background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); color: #fff; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; transition: all 0.2s; }
     .close-btn:hover { background: #c0392b; border-color: #e74c3c; }
 
-    .content { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+    .content { flex: 1; overflow: hidden; padding: 15px; display: flex; gap: 15px; }
 
-    /* Available Contracts Section */
-    .section-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(46, 204, 113, 0.2); border: 2px solid #27ae60; border-radius: 8px; }
-    .section-title { font-size: 14px; font-weight: 800; color: #2ecc71; text-transform: uppercase; letter-spacing: 1px; }
-    .refresh-timer { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #f39c12; font-weight: 700; }
+    /* Two-column layout */
+    .left-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .right-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 
-    .available-contracts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; min-height: 100px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(46, 204, 113, 0.2); border: 2px solid #27ae60; border-radius: 8px; margin-bottom: 10px; }
+    .panel-title { font-size: 13px; font-weight: 800; color: #2ecc71; text-transform: uppercase; letter-spacing: 1px; }
+    .panel-subtitle { font-size: 11px; color: #aaa; }
+    .refresh-timer { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #f39c12; font-weight: 700; }
 
-    .contract-card { width: 110px; background: linear-gradient(145deg, #2d4a3a 0%, #1a2f22 100%); border: 2px solid #3d6b4f; border-radius: 10px; padding: 10px; cursor: grab; transition: all 0.2s; user-select: none; }
-    .contract-card:hover { border-color: #2ecc71; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); }
-    .contract-card.dragging { opacity: 0.5; cursor: grabbing; }
-    .contract-card .items { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 8px; min-height: 44px; }
-    .contract-card .item { display: flex; align-items: center; gap: 2px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
-    .contract-card .item-icon { font-size: 14px; }
-    .contract-card .item-qty { color: #fff; font-weight: 700; }
-    .contract-card .rewards { display: flex; justify-content: center; gap: 8px; font-size: 11px; font-weight: 700; }
-    .contract-card .reward-gold { color: #FFD700; }
-    .contract-card .reward-xp { color: #9b59b6; }
+    /* Slots list (left panel) */
+    .slots-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
 
-    /* Your Slots Section */
-    .slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+    /* Available contracts list (right panel) */
+    .available-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 5px; }
 
-    .slot { background: linear-gradient(145deg, #1e3326 0%, #0f1a12 100%); border: 2px dashed #3d6b4f; border-radius: 10px; padding: 12px; min-height: 80px; transition: all 0.2s; }
+    /* Contract row (compact list item) */
+    .contract-row { display: flex; align-items: center; gap: 8px; background: linear-gradient(145deg, #2d4a3a 0%, #1a2f22 100%); border: 2px solid #3d6b4f; border-radius: 8px; padding: 8px 12px; cursor: grab; transition: all 0.2s; user-select: none; }
+    .contract-row:hover { border-color: #2ecc71; background: linear-gradient(145deg, #3d5a4a 0%, #2a3f32 100%); }
+    .contract-row.dragging { opacity: 0.5; cursor: grabbing; }
+    .contract-row .items { display: flex; gap: 6px; flex: 1; }
+    .contract-row .item { display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+    .contract-row .item-icon { font-size: 16px; }
+    .contract-row .item-qty { color: #fff; font-weight: 700; }
+    .contract-row .arrow { color: #666; font-size: 14px; }
+    .contract-row .rewards { display: flex; gap: 10px; font-size: 12px; font-weight: 700; }
+    .contract-row .reward-gold { color: #FFD700; }
+    .contract-row .reward-xp { color: #9b59b6; }
+
+    /* Slot cards */
+    .slot { background: linear-gradient(145deg, #1e3326 0%, #0f1a12 100%); border: 2px dashed #3d6b4f; border-radius: 10px; padding: 10px; transition: all 0.2s; }
     .slot.drag-over { border-color: #2ecc71; border-style: solid; background: rgba(46, 204, 113, 0.1); }
     .slot.locked { opacity: 0.5; border-style: solid; }
     .slot.has-contract { border-style: solid; border-color: #27ae60; }
     .slot.active { border-color: #f39c12; }
     .slot.cooldown { border-color: #555; }
 
-    .slot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .slot-num { font-size: 12px; color: #888; font-weight: 700; }
-    .slot-status { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+    .slot-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .slot-num { font-size: 11px; color: #888; font-weight: 700; }
+    .slot-timer-inline { font-size: 13px; font-weight: 800; color: #f39c12; }
+    .slot-status { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
     .status-empty { background: #333; color: #888; }
     .status-pending { background: #2980b9; color: #fff; }
     .status-active { background: #f39c12; color: #000; }
     .status-cooldown { background: #555; color: #aaa; }
     .status-locked { background: #333; color: #666; }
 
-    .slot-content { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .slot-empty-text { font-size: 12px; color: #666; text-align: center; }
-    .slot-locked-text { font-size: 12px; color: #888; }
-    .slot-locked-req { font-size: 11px; color: #f39c12; }
+    .slot-content { display: flex; flex-direction: column; gap: 6px; }
+    .slot-empty-text { font-size: 11px; color: #666; text-align: center; padding: 10px 0; }
+    .slot-locked-text { font-size: 18px; text-align: center; }
+    .slot-locked-req { font-size: 10px; color: #f39c12; text-align: center; }
 
     .slot-contract { width: 100%; }
-    .slot-contract .items { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 10px; }
-    .slot-contract .item { display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; }
-    .slot-contract .item-icon { font-size: 16px; }
-    .slot-contract .item-qty { font-size: 12px; font-weight: 700; }
+    .slot-contract .items { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+    .slot-contract .item { display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.3); padding: 3px 6px; border-radius: 4px; }
+    .slot-contract .item-icon { font-size: 14px; }
+    .slot-contract .item-qty { font-size: 11px; font-weight: 700; }
     .slot-contract .item-qty.has-enough { color: #2ecc71; }
     .slot-contract .item-qty.not-enough { color: #e74c3c; }
 
-    .slot-contract .rewards { display: flex; justify-content: center; gap: 12px; margin-bottom: 10px; font-size: 13px; font-weight: 700; }
+    .slot-contract .rewards { display: flex; gap: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 700; }
     .slot-contract .reward-gold { color: #FFD700; }
     .slot-contract .reward-xp { color: #9b59b6; }
 
-    .slot-timer { font-size: 18px; font-weight: 800; color: #f39c12; text-align: center; margin-bottom: 8px; }
-    .slot-cooldown-timer { font-size: 14px; color: #888; text-align: center; }
-
-    .slot-buttons { display: flex; gap: 8px; justify-content: center; }
-    .btn { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: 2px solid; }
+    .slot-buttons { display: flex; gap: 6px; }
+    .btn { padding: 6px 12px; border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: 2px solid; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
     .btn-accept { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border-color: #2ecc71; color: #fff; }
     .btn-accept:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
@@ -116,22 +122,28 @@
     </div>
 
     <div class="content">
-      <!-- Available Contracts -->
-      <div class="section-header">
-        <div class="section-title">Available Contracts</div>
-        <div class="refresh-timer">
-          <span>&#x1F504;</span>
-          <span>Refreshes in <span id="refresh-timer">2:00</span></span>
+      <!-- Left Panel: Your Slots -->
+      <div class="left-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Your Slots</div>
+            <div class="panel-subtitle"><span id="slots-unlocked">1</span> / 10 unlocked</div>
+          </div>
         </div>
+        <div class="slots-list" id="slots-list"></div>
       </div>
-      <div class="available-contracts" id="available-contracts"></div>
 
-      <!-- Your Slots -->
-      <div class="section-header">
-        <div class="section-title">Your Contract Slots</div>
-        <div style="font-size: 12px; color: #aaa;"><span id="slots-unlocked">1</span> / 10 unlocked</div>
+      <!-- Right Panel: Available Contracts -->
+      <div class="right-panel">
+        <div class="panel-header">
+          <div class="panel-title">Available</div>
+          <div class="refresh-timer">
+            <span>&#x1F504;</span>
+            <span id="refresh-timer">2:00</span>
+          </div>
+        </div>
+        <div class="available-list" id="available-list"></div>
       </div>
-      <div class="slots-grid" id="slots-grid"></div>
     </div>
   </div>
 
@@ -438,13 +450,16 @@
 
     function onDragStart(e, index) {
       draggedContractIndex = index;
-      e.target.classList.add('dragging');
+      // Find the contract-row element (might be a child that was clicked)
+      var row = e.target.closest('.contract-row');
+      if (row) row.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
     }
 
     function onDragEnd(e) {
       draggedContractIndex = null;
-      e.target.classList.remove('dragging');
+      var row = e.target.closest('.contract-row');
+      if (row) row.classList.remove('dragging');
     }
 
     function onSlotDragOver(e, slotIndex) {
@@ -707,17 +722,18 @@
     }
 
     function renderAvailableContracts() {
-      const container = document.getElementById('available-contracts');
-      let html = '';
+      var container = document.getElementById('available-list');
+      var html = '';
 
-      availableContracts.forEach((contract, index) => {
-        let itemsHtml = '';
-        contract.items.forEach(item => {
+      availableContracts.forEach(function(contract, index) {
+        var itemsHtml = '';
+        contract.items.forEach(function(item) {
           itemsHtml += '<div class="item"><span class="item-icon">' + item.icon + '</span><span class="item-qty">x' + item.qty + '</span></div>';
         });
 
-        html += '<div class="contract-card" draggable="true" ondragstart="onDragStart(event, ' + index + ')" ondragend="onDragEnd(event)">' +
+        html += '<div class="contract-row" draggable="true" ondragstart="onDragStart(event, ' + index + ')" ondragend="onDragEnd(event)">' +
           '<div class="items">' + itemsHtml + '</div>' +
+          '<span class="arrow">→</span>' +
           '<div class="rewards">' +
             '<span class="reward-gold">' + contract.goldReward + 'g</span>' +
             '<span class="reward-xp">' + contract.xpReward + 'xp</span>' +
@@ -726,20 +742,20 @@
       });
 
       if (availableContracts.length === 0) {
-        html = '<div style="color:#888;font-size:13px;">No contracts available</div>';
+        html = '<div style="color:#888;font-size:12px;text-align:center;padding:20px;">No contracts available</div>';
       }
 
       container.innerHTML = html;
     }
 
     function renderSlots() {
-      const container = document.getElementById('slots-grid');
-      const unlockedCount = getUnlockedSlots();
-      let html = '';
+      var container = document.getElementById('slots-list');
+      var unlockedCount = getUnlockedSlots();
+      var html = '';
 
-      slots.forEach((slot, i) => {
-        const isUnlocked = i < unlockedCount;
-        const slotClass = 'slot' +
+      slots.forEach(function(slot, i) {
+        var isUnlocked = i < unlockedCount;
+        var slotClass = 'slot' +
           (slot.state === 'pending' || slot.state === 'active' ? ' has-contract' : '') +
           (slot.state === 'active' ? ' active' : '') +
           (slot.state === 'cooldown' ? ' cooldown' : '') +
@@ -749,17 +765,22 @@
           (isUnlocked && slot.state === 'empty' ? 'ondragover="onSlotDragOver(event, ' + i + ')" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, ' + i + ')"' : '') +
           '>';
 
-        html += '<div class="slot-header">' +
-          '<span class="slot-num">Slot ' + (i + 1) + '</span>' +
-          '<span class="slot-status status-' + (isUnlocked ? slot.state : 'locked') + '">' +
-            (isUnlocked ? slot.state : 'Locked') +
-          '</span>' +
-        '</div>';
+        // Header with slot number, timer (if active), and status
+        html += '<div class="slot-header">';
+        html += '<span class="slot-num">Slot ' + (i + 1) + '</span>';
+        if (slot.state === 'active' && slot.endTime) {
+          html += '<span class="slot-timer-inline" id="slot-timer-' + i + '">' + formatTime(slot.endTime - Date.now()) + '</span>';
+        } else if (slot.state === 'cooldown' && slot.endTime) {
+          html += '<span class="slot-timer-inline" id="slot-timer-' + i + '" style="color:#888;">' + formatTime(slot.endTime - Date.now()) + '</span>';
+        }
+        html += '<span class="slot-status status-' + (isUnlocked ? slot.state : 'locked') + '">' +
+          (isUnlocked ? slot.state : 'Locked') + '</span>';
+        html += '</div>';
 
         html += '<div class="slot-content">';
 
         if (!isUnlocked) {
-          let req = i < 4 ? 'Contractor I' : (i < 7 ? 'Contractor II' : 'Contractor III');
+          var req = i < 4 ? 'Contractor I' : (i < 7 ? 'Contractor II' : 'Contractor III');
           html += '<div class="slot-locked-text">&#x1F512;</div>' +
             '<div class="slot-locked-req">Unlock with ' + req + '</div>';
         } else if (slot.state === 'empty') {
@@ -771,14 +792,13 @@
             '<button class="btn btn-remove" onclick="removeContract(' + i + ')">Remove</button>' +
           '</div>';
         } else if (slot.state === 'active' && slot.contract) {
-          html += '<div class="slot-timer" id="slot-timer-' + i + '">' + formatTime(slot.endTime - Date.now()) + '</div>';
           html += renderSlotContract(slot, i, true);
-          const canFill = canFillContract(slot);
+          var canFill = canFillContract(slot);
           html += '<div class="slot-buttons">' +
             '<button class="btn btn-fill" ' + (canFill && !actionPending ? 'onclick="fillContract(' + i + ')"' : 'disabled') + '>Fill Order</button>' +
           '</div>';
         } else if (slot.state === 'cooldown') {
-          html += '<div class="slot-cooldown-timer">Available in <span id="slot-timer-' + i + '">' + formatTime(slot.endTime - Date.now()) + '</span></div>';
+          html += '<div class="slot-empty-text" style="color:#888;">Cooldown...</div>';
         }
 
         html += '</div></div>';
@@ -788,11 +808,11 @@
     }
 
     function renderSlotContract(slot, slotIndex, showProgress) {
-      let html = '<div class="slot-contract">';
+      var html = '<div class="slot-contract">';
       html += '<div class="items">';
-      slot.contract.items.forEach(item => {
-        const owned = gameState.inventory[item.key] || 0;
-        const hasEnough = owned >= item.qty;
+      slot.contract.items.forEach(function(item) {
+        var owned = gameState.inventory[item.key] || 0;
+        var hasEnough = owned >= item.qty;
         html += '<div class="item">' +
           '<span class="item-icon">' + item.icon + '</span>' +
           '<span class="item-qty ' + (showProgress ? (hasEnough ? 'has-enough' : 'not-enough') : '') + '">' +
@@ -802,8 +822,8 @@
       });
       html += '</div>';
       html += '<div class="rewards">' +
-        '<span class="reward-gold">&#x1F4B0; ' + slot.contract.goldReward + 'g</span>' +
-        '<span class="reward-xp">&#x2B50; ' + slot.contract.xpReward + ' XP</span>' +
+        '<span class="reward-gold">' + slot.contract.goldReward + 'g</span>' +
+        '<span class="reward-xp">' + slot.contract.xpReward + ' XP</span>' +
       '</div>';
       html += '</div>';
       return html;
