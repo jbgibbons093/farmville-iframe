@@ -232,8 +232,8 @@
       // Calculate base cost
       const baseCost = selectedItems.reduce((sum, item) => sum + item.value * item.qty, 0);
 
-      // Random multiplier 1.5x to 2.5x (always profitable)
-      const profitMult = 1.5 + Math.random();
+      // Random multiplier 1.25x to 1.75x (always profitable)
+      const profitMult = 1.25 + (Math.random() * 0.5);
 
       // Apply tier multiplier - round gold to multiples of 25 (smallest denomination)
       const rawGold = baseCost * profitMult * tierConfig.goldMult;
