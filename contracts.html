@@ -323,9 +323,14 @@
 
     const varMapping = {
       // Root state
-      'Gold': { target: 'gold', isRoot: true },
-      'Level': { target: 'level', isRoot: true },
-      'XP': { target: 'xp', isRoot: true },
+      'Gold': { target: 'gold' },
+      'Level': { target: 'level' },
+      'XP': { target: 'xp' },
+      'playerName': { target: '_skip' },
+      // Seeds (2-word) - skip
+      'Seeds_Wheat': { target: '_skip' }, 'Seeds_Carrot': { target: '_skip' },
+      'Seeds_Corn': { target: '_skip' }, 'Seeds_Potato': { target: '_skip' },
+      'Seeds_Tomato': { target: '_skip' }, 'Seeds_Pumpkin': { target: '_skip' },
       // Crops (2-word)
       'Crop_Wheat': { target: 'wheat' },
       'Crop_Carrot': { target: 'carrot' },
@@ -352,10 +357,44 @@
       'Butter': { target: 'butter' },
       'Cake': { target: 'cake' },
       'Mead': { target: 'mead' },
-      // Contractor talents (2-word)
-      'T_Contractor1': { target: 't_contractor1', isTalent: true },
-      'T_Contractor2': { target: 't_contractor2', isTalent: true },
-      'T_Contractor3': { target: 't_contractor3', isTalent: true }
+      // Equipment flags (2-word and 3-word) - skip
+      'Has_Beesuit': { target: '_skip' }, 'Has_Basket': { target: '_skip' },
+      'Has_Milk_Pail': { target: '_skip' }, 'Has_Shearing_Kit': { target: '_skip' },
+      'Has_Butcher_Knife': { target: '_skip' }, 'Has_Truffle_Spade': { target: '_skip' },
+      'Has_Starter_Seeds': { target: '_skip' },
+      // Recipe flags (3-word and 4-word) - skip
+      'Has_Recipe_Flour': { target: '_skip' }, 'Has_Recipe_Bread': { target: '_skip' },
+      'Has_Recipe_Cheese': { target: '_skip' }, 'Has_Recipe_Stew': { target: '_skip' },
+      'Has_Recipe_Ragout': { target: '_skip' }, 'Has_Recipe_Pie': { target: '_skip' },
+      'Has_Recipe_Blanket': { target: '_skip' }, 'Has_Recipe_Butter': { target: '_skip' },
+      'Has_Recipe_Cake': { target: '_skip' }, 'Has_Recipe_Mead': { target: '_skip' },
+      'Has_Recipe_Meat_Pie': { target: '_skip' },
+      // Talent variables (2-word) - skip
+      'T_PlotRow2': { target: '_skip' }, 'T_GreenThumb': { target: '_skip' },
+      'T_EagerPlanter': { target: '_skip' }, 'T_PlotRow3': { target: '_skip' },
+      'T_BountifulHarvest': { target: '_skip' }, 'T_RapidGrowth': { target: '_skip' },
+      'T_PlotRow4': { target: '_skip' }, 'T_CropMastery': { target: '_skip' },
+      'T_CowHerd': { target: '_skip' }, 'T_ChickenFlock': { target: '_skip' },
+      'T_QuickHands': { target: '_skip' }, 'T_SheepPen': { target: '_skip' },
+      'T_GoatYard': { target: '_skip' }, 'T_ApiaryExpansion': { target: '_skip' },
+      'T_HusbandryKnowledge': { target: '_skip' }, 'T_PigSty': { target: '_skip' },
+      'T_AnimalMastery': { target: '_skip' }, 'T_KeenLearner': { target: '_skip' },
+      'T_FarmHand': { target: '_skip' }, 'T_Stockman': { target: '_skip' },
+      'T_Artisan': { target: '_skip' }, 'T_SeasonedWorker': { target: '_skip' },
+      'T_BonusPoint1': { target: '_skip' }, 'T_Prodigy': { target: '_skip' },
+      'T_BonusPoint2': { target: '_skip' },
+      // Contractor talents (2-word) - these we need
+      'T_Contractor1': { target: 't_contractor1' },
+      'T_Contractor2': { target: 't_contractor2' },
+      'T_Contractor3': { target: 't_contractor3' },
+      // Other skips
+      'Unspent_Talent_Points': { target: '_skip' },
+      'Rebirth_Count': { target: '_skip' },
+      'Contract_1_Done': { target: '_skip' }, 'Contract_2_Done': { target: '_skip' },
+      'Contract_3_Done': { target: '_skip' }, 'Contract_4_Done': { target: '_skip' },
+      'Contract_5_Done': { target: '_skip' }, 'Contract_6_Done': { target: '_skip' },
+      'Contract_7_Done': { target: '_skip' }, 'Contract_8_Done': { target: '_skip' },
+      'Contract_9_Done': { target: '_skip' }, 'Contract_10_Done': { target: '_skip' }
     };
 
     function parseSyncInventory(msg) {
@@ -370,8 +409,10 @@
         if (i + 4 < parts.length) {
           const k4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
           if (varMapping[k4]) {
-            const val = parseInt(parts[i+4]);
-            data[varMapping[k4].target] = Math.max(0, isNaN(val) ? 0 : val);
+            if (varMapping[k4].target !== '_skip') {
+              const val = parseInt(parts[i+4]);
+              data[varMapping[k4].target] = Math.max(0, isNaN(val) ? 0 : val);
+            }
             i += 5; matched = true;
           }
         }
@@ -380,8 +421,10 @@
         if (!matched && i + 3 < parts.length) {
           const k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
           if (varMapping[k3]) {
-            const val = parseInt(parts[i+3]);
-            data[varMapping[k3].target] = Math.max(0, isNaN(val) ? 0 : val);
+            if (varMapping[k3].target !== '_skip') {
+              const val = parseInt(parts[i+3]);
+              data[varMapping[k3].target] = Math.max(0, isNaN(val) ? 0 : val);
+            }
             i += 4; matched = true;
           }
         }
@@ -390,8 +433,10 @@
         if (!matched && i + 2 < parts.length) {
           const k2 = parts[i] + '_' + parts[i+1];
           if (varMapping[k2]) {
-            const val = parseInt(parts[i+2]);
-            data[varMapping[k2].target] = Math.max(0, isNaN(val) ? 0 : val);
+            if (varMapping[k2].target !== '_skip') {
+              const val = parseInt(parts[i+2]);
+              data[varMapping[k2].target] = Math.max(0, isNaN(val) ? 0 : val);
+            }
             i += 3; matched = true;
           }
         }
@@ -400,8 +445,10 @@
         if (!matched && i + 1 < parts.length) {
           const k1 = parts[i];
           if (varMapping[k1]) {
-            const val = parseInt(parts[i+1]);
-            data[varMapping[k1].target] = Math.max(0, isNaN(val) ? 0 : val);
+            if (varMapping[k1].target !== '_skip') {
+              const val = parseInt(parts[i+1]);
+              data[varMapping[k1].target] = Math.max(0, isNaN(val) ? 0 : val);
+            }
             i += 2; matched = true;
           }
         }
