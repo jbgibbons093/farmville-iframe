@@ -235,8 +235,9 @@
       // Random multiplier 1.5x to 2.5x (always profitable)
       const profitMult = 1.5 + Math.random();
 
-      // Apply tier multiplier
-      const goldReward = Math.floor(baseCost * profitMult * tierConfig.goldMult);
+      // Apply tier multiplier - round gold to multiples of 25 (smallest denomination)
+      const rawGold = baseCost * profitMult * tierConfig.goldMult;
+      const goldReward = Math.max(25, Math.round(rawGold / 25) * 25);
       const xpReward = Math.floor(goldReward * 0.3 * tierConfig.xpMult);
 
       return {
@@ -426,9 +427,9 @@
         }
       });
 
-      // Build reward tasks
+      // Build reward tasks (use only denominations that exist in Portals)
       const goldTasks = getRewardTasks(contract.goldReward, 'Add_Gold_', [1000, 500, 250, 100, 50, 25]);
-      const xpTasks = getRewardTasks(contract.xpReward, 'Add_XP_', [500, 250, 100, 50, 25, 10]);
+      const xpTasks = getRewardTasks(contract.xpReward, 'Add_XP_', [500, 250, 100, 50, 40, 35, 30, 25, 20, 15, 10, 8, 6, 5, 4, 3, 2, 1]);
 
       // Stagger all tasks
       let delay = 0;
