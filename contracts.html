@@ -426,8 +426,13 @@
 
       // Map inventory items - key in ITEMS matches key in data now
       Object.keys(ITEMS).forEach(function(key) {
-        gameState.inventory[key] = data[key] !== undefined ? data[key] : 0;
+        var val = data[key] !== undefined ? data[key] : 0;
+        gameState.inventory[key] = val;
+        if (key === 'milk' || key === 'egg' || key === 'wool') {
+          console.log('[Contracts] Mapping inventory:', key, '= data[' + key + '] =', data[key], '→', val);
+        }
       });
+      console.log('[Contracts] Final inventory.milk:', gameState.inventory.milk, 'inventory.egg:', gameState.inventory.egg);
 
       gameState.talents.contractor1 = data.t_contractor1 !== undefined ? data.t_contractor1 : 0;
       gameState.talents.contractor2 = data.t_contractor2 !== undefined ? data.t_contractor2 : 0;
@@ -537,9 +542,10 @@
         console.log('[Contracts] canFillContract FAIL - state:', slot.state, 'actionPending:', actionPending, 'contract:', !!slot.contract);
         return false;
       }
+      console.log('[Contracts] Checking contract items:', JSON.stringify(slot.contract.items));
       const result = slot.contract.items.every(item => {
         const owned = gameState.inventory[item.key] || 0;
-        console.log('[Contracts] Check item:', item.key, 'need:', item.qty, 'have:', owned, 'inventory:', gameState.inventory);
+        console.log('[Contracts] Check item key="' + item.key + '" need:', item.qty, 'have:', owned, 'key in inventory:', item.key in gameState.inventory);
         return owned >= item.qty;
       });
       console.log('[Contracts] canFillContract result:', result);
