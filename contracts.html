@@ -121,7 +121,7 @@
         <div class="section-title">Available Contracts</div>
         <div class="refresh-timer">
           <span>&#x1F504;</span>
-          <span>Refreshes in <span id="refresh-timer">3:00</span></span>
+          <span>Refreshes in <span id="refresh-timer">2:00</span></span>
         </div>
       </div>
       <div class="available-contracts" id="available-contracts"></div>
@@ -141,9 +141,9 @@
     // HUGHBERRY FARMS - CONTRACTS BOARD v2
     // ============================================
 
-    const REFRESH_MS = 3 * 60 * 1000; // 3 minutes
-    const FULFILL_MS = 10 * 60 * 1000; // 10 minutes to fulfill
-    const COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes cooldown after
+    const REFRESH_MS = 2 * 60 * 1000; // 2 minutes
+    const FULFILL_MS = 5 * 60 * 1000; // 5 minutes to fulfill
+    const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown after
 
     // Items with their properties
     const ITEMS = {
@@ -266,13 +266,14 @@
     }
 
     function refreshAvailableContracts() {
-      const count = getAvailableContractCount();
+      var count = getAvailableContractCount();
       availableContracts = [];
-      for (let i = 0; i < count; i++) {
-        const contract = generateContract(gameState.level);
+      for (var i = 0; i < count; i++) {
+        var contract = generateContract(gameState.level);
         if (contract) availableContracts.push(contract);
       }
       refreshEndTime = Date.now() + REFRESH_MS;
+      saveState();
       render();
     }
 
@@ -462,11 +463,11 @@
       e.preventDefault();
       e.currentTarget.classList.remove('drag-over');
 
-      const slot = slots[slotIndex];
+      var slot = slots[slotIndex];
       if (slot.state !== 'empty' || slotIndex >= getUnlockedSlots()) return;
       if (draggedContractIndex === null) return;
 
-      const contract = availableContracts[draggedContractIndex];
+      var contract = availableContracts[draggedContractIndex];
       if (!contract) return;
 
       // Move contract to slot as pending
@@ -478,6 +479,7 @@
       draggedContractIndex = null;
 
       playSound();
+      saveState();
       render();
     }
 
@@ -486,18 +488,19 @@
     // ============================================
 
     function acceptContract(slotIndex) {
-      const slot = slots[slotIndex];
+      var slot = slots[slotIndex];
       if (slot.state !== 'pending') return;
 
       slot.state = 'active';
       slot.endTime = Date.now() + FULFILL_MS;
 
       playSound();
+      saveState();
       render();
     }
 
     function removeContract(slotIndex) {
-      const slot = slots[slotIndex];
+      var slot = slots[slotIndex];
       if (slot.state !== 'pending') return;
 
       // Return contract to available pool
@@ -510,6 +513,7 @@
       slot.endTime = null;
 
       playSound();
+      saveState();
       render();
     }
 
@@ -550,9 +554,9 @@
       let delay = 0;
       const STAGGER = 200;
 
-      deductTasks.forEach(task => { setTimeout(() => triggerTask(task), delay); delay += STAGGER; });
-      goldTasks.forEach(task => { setTimeout(() => triggerTask(task), delay); delay += STAGGER; });
-      xpTasks.forEach(task => { setTimeout(() => triggerTask(task), delay); delay += STAGGER; });
+      deductTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
+      goldTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
+      xpTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
 
       // Set slot to cooldown
       slot.state = 'cooldown';
@@ -561,8 +565,12 @@
 
       notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
       render();
+      saveState();
 
-      setTimeout(() => { actionPending = false; render(); }, 5000);
+      // Calculate dynamic timeout based on actual task count
+      var totalTasks = deductTasks.length + goldTasks.length + xpTasks.length;
+      var unlockDelay = (totalTasks * STAGGER) + 500;
+      setTimeout(function() { actionPending = false; render(); }, unlockDelay);
     }
 
     function getRewardTasks(amount, prefix, denominations) {
@@ -578,8 +586,58 @@
     }
 
     // ============================================
+    // STATE PERSISTENCE
+    // ============================================
+
+    function saveState() {
+      try {
+        var state = {
+          slots: slots,
+          availableContracts: availableContracts,
+          refreshEndTime: refreshEndTime
+        };
+        localStorage.setItem('hughberry_contracts', JSON.stringify(state));
+      } catch (e) {
+        // localStorage not available in sandboxed iframe
+      }
+    }
+
+    function loadState() {
+      try {
+        var saved = localStorage.getItem('hughberry_contracts');
+        if (saved) {
+          var state = JSON.parse(saved);
+          if (state.slots && Array.isArray(state.slots)) {
+            state.slots.forEach(function(savedSlot, i) {
+              if (i < slots.length && savedSlot) {
+                slots[i].state = savedSlot.state || 'empty';
+                slots[i].contract = savedSlot.contract || null;
+                slots[i].endTime = savedSlot.endTime || null;
+              }
+            });
+          }
+          if (state.availableContracts && Array.isArray(state.availableContracts)) {
+            availableContracts = state.availableContracts;
+          }
+          if (state.refreshEndTime) {
+            refreshEndTime = state.refreshEndTime;
+          }
+        }
+      } catch (e) {
+        // localStorage not available or parse error
+      }
+    }
+
+    // ============================================
     // GAME LOOP
     // ============================================
+
+    var gameLoopInterval = null;
+
+    function startGameLoop() {
+      if (gameLoopInterval) clearInterval(gameLoopInterval);
+      gameLoopInterval = setInterval(gameLoop, 1000);
+    }
 
     function gameLoop() {
       const now = Date.now();
@@ -590,7 +648,8 @@
       }
 
       // Check slot timers
-      slots.forEach((slot, i) => {
+      var stateChanged = false;
+      slots.forEach(function(slot, i) {
         if (slot.endTime && now >= slot.endTime) {
           if (slot.state === 'active') {
             // Contract expired - failed
@@ -598,14 +657,21 @@
             slot.contract = null;
             slot.endTime = now + COOLDOWN_MS;
             notify('Contract expired!', 'error');
+            stateChanged = true;
           } else if (slot.state === 'cooldown') {
             // Cooldown finished
             slot.state = 'empty';
             slot.contract = null;
             slot.endTime = null;
+            stateChanged = true;
           }
         }
       });
+
+      if (stateChanged) {
+        saveState();
+        render();
+      }
 
       updateTimers();
     }
@@ -805,17 +871,26 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+      loadState();
       setupMessageListener();
-      setTimeout(function() { triggerTask('Sync_Inventory'); }, 300);
+      // Note: Sync_Inventory is triggered in setupMessageListener after SDK ready
       render();
-      setInterval(gameLoop, 1000);
+      startGameLoop();
     });
 
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
+        console.log('[Contracts] Visibility restored - restarting game loop');
+        startGameLoop();
         triggerTask('Sync_Inventory');
         render();
       }
+    });
+
+    window.addEventListener('focus', function() {
+      console.log('[Contracts] Window focused - restarting game loop');
+      startGameLoop();
+      gameLoop();
     });
   </script>
 </body>
