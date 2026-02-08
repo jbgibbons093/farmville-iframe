@@ -632,8 +632,8 @@
       <div class="guide-section-title">&#x1F33F; Talent System</div>
       <p class="guide-text">
         As you level up, you earn <strong>Talent Points</strong> that can be invested in
-        three specialization trees. Each talent point permanently enhances your farm!
-        Press <span class="guide-key">Y</span> in the 3D world to open the Talent Tree.
+        three specialization trees. The talent tree displays as a visual node graph with
+        connecting lines showing prerequisites. Press <span class="guide-key">Y</span> to open the Talent Tree.
       </p>
 
       <div class="guide-subsection">
@@ -642,9 +642,21 @@
           <li><strong>Earn points</strong> by leveling up &mdash; you get 1 talent point per level</li>
           <li>Open the <strong>Talent Tree</strong> by pressing <span class="guide-key">Y</span></li>
           <li>Choose one of <strong>three trees</strong>: Farming, Animal Husbandry, or General</li>
-          <li>Click the <strong>+</strong> button on any unlocked talent to invest a point</li>
+          <li>Click on any <strong>glowing green node</strong> to invest a point</li>
+          <li>Some talents require <strong>specific prerequisites</strong> (shown by connecting lines)</li>
           <li>Higher tiers unlock after investing enough points in that tree</li>
         </ol>
+      </div>
+
+      <div class="guide-subsection">
+        <div class="guide-subsection-title">Prerequisites</div>
+        <p class="guide-text">
+          Many talents require you to max or partially fill a prerequisite talent first.
+          <strong>Gray/locked nodes</strong> show talents you can't invest in yet.
+          <strong>Green glowing nodes</strong> show talents available to invest.
+          <strong>Gold nodes</strong> show maxed talents.
+          Hover over any node to see its prerequisites and current status.
+        </p>
       </div>
 
       <div class="guide-subsection">
@@ -658,18 +670,37 @@
       </div>
 
       <div class="guide-subsection">
+        <div class="guide-subsection-title">Respec System</div>
+        <p class="guide-text">
+          Made a mistake? You can <strong>Respec</strong> to reset all your talent points!
+          Click the <strong>Respec</strong> button in the talent tree header. The gold cost scales with your level:
+        </p>
+        <table class="guide-table">
+          <tr><th>Level</th><th>Respec Cost</th></tr>
+          <tr><td>0-9</td><td>200g</td></tr>
+          <tr><td>10-19</td><td>500g</td></tr>
+          <tr><td>20-29</td><td>1,000g</td></tr>
+          <tr><td>30-39</td><td>2,000g</td></tr>
+          <tr><td>40-50</td><td>3,000g</td></tr>
+        </table>
+        <p class="guide-text">
+          After respec, you receive talent points equal to your current level (since you earn 1 point per level).
+        </p>
+      </div>
+
+      <div class="guide-subsection">
         <div class="guide-subsection-title">Farming Tree (17 points to max)</div>
         <p class="guide-text">Unlock more crop plots, speed up growth, and boost harvest yields.</p>
         <table class="guide-table">
-          <tr><th>Tier</th><th>Talent</th><th>Ranks</th><th>Effect per Rank</th></tr>
-          <tr><td>1</td><td>Plot Row 2</td><td>1</td><td>Unlock plots 7&ndash;12</td></tr>
-          <tr><td>1</td><td>Green Thumb</td><td>3</td><td>-10% crop grow time</td></tr>
-          <tr><td>1</td><td>Eager Planter</td><td>3</td><td>+2 planting XP</td></tr>
-          <tr><td>2</td><td>Plot Row 3</td><td>1</td><td>Unlock plots 13&ndash;18</td></tr>
-          <tr><td>2</td><td>Bountiful Harvest</td><td>2</td><td>+1 bonus crop per harvest</td></tr>
-          <tr><td>2</td><td>Rapid Growth</td><td>3</td><td>-10% crop grow time</td></tr>
-          <tr><td>3</td><td>Plot Row 4</td><td>1</td><td>Unlock plots 19&ndash;24</td></tr>
-          <tr><td>3</td><td>Crop Mastery</td><td>3</td><td>+3 XP to all crop activities</td></tr>
+          <tr><th>Tier</th><th>Talent</th><th>Ranks</th><th>Prerequisite</th><th>Effect per Rank</th></tr>
+          <tr><td>1</td><td>Plot Row 2</td><td>1</td><td>&mdash;</td><td>Unlock plots 7&ndash;12</td></tr>
+          <tr><td>1</td><td>Green Thumb</td><td>3</td><td>&mdash;</td><td>-10% crop grow time</td></tr>
+          <tr><td>1</td><td>Eager Planter</td><td>3</td><td>&mdash;</td><td>+2 planting XP</td></tr>
+          <tr><td>2</td><td>Plot Row 3</td><td>1</td><td>Plot Row 2 (1)</td><td>Unlock plots 13&ndash;18</td></tr>
+          <tr><td>2</td><td>Bountiful Harvest</td><td>2</td><td>Green Thumb (3)</td><td>+1 bonus crop per harvest</td></tr>
+          <tr><td>2</td><td>Rapid Growth</td><td>3</td><td>Eager Planter (2)</td><td>-10% crop grow time</td></tr>
+          <tr><td>3</td><td>Plot Row 4</td><td>1</td><td>Plot Row 3 (1)</td><td>Unlock plots 19&ndash;24</td></tr>
+          <tr><td>3</td><td>Crop Mastery</td><td>3</td><td>Bountiful Harvest (2)</td><td>+3 XP to all crop activities</td></tr>
         </table>
       </div>
 
@@ -677,16 +708,16 @@
         <div class="guide-subsection-title">Animal Husbandry Tree (38 points to max)</div>
         <p class="guide-text">Unlock more animal slots, reduce cooldowns, and boost product yields.</p>
         <table class="guide-table">
-          <tr><th>Tier</th><th>Talent</th><th>Ranks</th><th>Effect per Rank</th></tr>
-          <tr><td>1</td><td>Cow Herd</td><td>5</td><td>+1 active cow</td></tr>
-          <tr><td>1</td><td>Chicken Flock</td><td>5</td><td>+1 active chicken</td></tr>
-          <tr><td>1</td><td>Quick Hands</td><td>3</td><td>-10% animal cooldown</td></tr>
-          <tr><td>2</td><td>Sheep Pen</td><td>5</td><td>+1 active sheep</td></tr>
-          <tr><td>2</td><td>Goat Yard</td><td>5</td><td>+1 active goat</td></tr>
-          <tr><td>2</td><td>Apiary Expansion</td><td>5</td><td>+1 active beehive</td></tr>
-          <tr><td>2</td><td>Husbandry Knowledge</td><td>3</td><td>+2 XP per animal collection</td></tr>
-          <tr><td>3</td><td>Pig Sty</td><td>5</td><td>+1 active pig</td></tr>
-          <tr><td>3</td><td>Animal Mastery</td><td>2</td><td>+1 bonus product per collection</td></tr>
+          <tr><th>Tier</th><th>Talent</th><th>Ranks</th><th>Prerequisite</th><th>Effect per Rank</th></tr>
+          <tr><td>1</td><td>Cow Herd</td><td>5</td><td>&mdash;</td><td>+1 active cow</td></tr>
+          <tr><td>1</td><td>Chicken Flock</td><td>5</td><td>&mdash;</td><td>+1 active chicken</td></tr>
+          <tr><td>1</td><td>Quick Hands</td><td>3</td><td>&mdash;</td><td>-10% animal cooldown</td></tr>
+          <tr><td>2</td><td>Sheep Pen</td><td>5</td><td>Cow Herd (3)</td><td>+1 active sheep</td></tr>
+          <tr><td>2</td><td>Goat Yard</td><td>5</td><td>Chicken Flock (3)</td><td>+1 active goat</td></tr>
+          <tr><td>2</td><td>Apiary Expansion</td><td>5</td><td>&mdash;</td><td>+1 active beehive</td></tr>
+          <tr><td>2</td><td>Husbandry Knowledge</td><td>3</td><td>Quick Hands (2)</td><td>+2 XP per animal collection</td></tr>
+          <tr><td>3</td><td>Pig Sty</td><td>5</td><td>Sheep Pen (3) OR Goat Yard (3)</td><td>+1 active pig</td></tr>
+          <tr><td>3</td><td>Animal Mastery</td><td>2</td><td>Husbandry Knowledge (3)</td><td>+1 bonus product per collection</td></tr>
         </table>
       </div>
 
@@ -694,18 +725,18 @@
         <div class="guide-subsection-title">General Tree (29 points to max)</div>
         <p class="guide-text">Boost XP gains across all activities, unlock contract slots, and earn bonus talent points.</p>
         <table class="guide-table">
-          <tr><th>Tier</th><th>Talent</th><th>Ranks</th><th>Effect per Rank</th></tr>
-          <tr><td>1</td><td>Keen Learner</td><td>3</td><td>+1 XP to all activities</td></tr>
-          <tr><td>1</td><td>Farm Hand</td><td>3</td><td>+2 XP to planting &amp; harvesting</td></tr>
-          <tr><td>1</td><td>Stockman</td><td>3</td><td>+2 XP to animal starts &amp; collections</td></tr>
-          <tr><td>1</td><td>Contractor I</td><td>3</td><td>+1 contract slot (slots 2-4)</td></tr>
-          <tr><td>2</td><td>Artisan</td><td>3</td><td>+3 XP to all crafting</td></tr>
-          <tr><td>2</td><td>Seasoned Worker</td><td>3</td><td>+2 XP to all activities</td></tr>
-          <tr><td>2</td><td>Bonus Talent Point I</td><td>1</td><td>Gain 1 extra talent point</td></tr>
-          <tr><td>2</td><td>Contractor II</td><td>3</td><td>+1 contract slot (slots 5-7)</td></tr>
-          <tr><td>3</td><td>Prodigy</td><td>3</td><td>+3 XP to all activities</td></tr>
-          <tr><td>3</td><td>Bonus Talent Point II</td><td>1</td><td>Gain 1 extra talent point</td></tr>
-          <tr><td>3</td><td>Contractor III</td><td>3</td><td>+1 contract slot (slots 8-10)</td></tr>
+          <tr><th>Tier</th><th>Talent</th><th>Ranks</th><th>Prerequisite</th><th>Effect per Rank</th></tr>
+          <tr><td>1</td><td>Keen Learner</td><td>3</td><td>&mdash;</td><td>+1 XP to all activities</td></tr>
+          <tr><td>1</td><td>Farm Hand</td><td>3</td><td>&mdash;</td><td>+2 XP to planting &amp; harvesting</td></tr>
+          <tr><td>1</td><td>Stockman</td><td>3</td><td>&mdash;</td><td>+2 XP to animal starts &amp; collections</td></tr>
+          <tr><td>1</td><td>Contractor I</td><td>3</td><td>&mdash;</td><td>+1 contract slot (slots 2-4)</td></tr>
+          <tr><td>2</td><td>Artisan</td><td>3</td><td>Keen Learner (2)</td><td>+3 XP to all crafting</td></tr>
+          <tr><td>2</td><td>Seasoned Worker</td><td>3</td><td>Farm Hand (2) OR Stockman (2)</td><td>+2 XP to all activities</td></tr>
+          <tr><td>2</td><td>Bonus Talent Point I</td><td>1</td><td>&mdash;</td><td>Gain 1 extra talent point</td></tr>
+          <tr><td>2</td><td>Contractor II</td><td>3</td><td>Contractor I (3)</td><td>+1 contract slot (slots 5-7)</td></tr>
+          <tr><td>3</td><td>Prodigy</td><td>3</td><td>Seasoned Worker (3)</td><td>+3 XP to all activities</td></tr>
+          <tr><td>3</td><td>Bonus Talent Point II</td><td>1</td><td>Bonus Point I (1)</td><td>Gain 1 extra talent point</td></tr>
+          <tr><td>3</td><td>Contractor III</td><td>3</td><td>Contractor II (3)</td><td>+1 contract slot (slots 8-10)</td></tr>
         </table>
       </div>
 
@@ -713,7 +744,7 @@
         <span class="guide-tip-icon">&#x1F4A1;</span>
         <span class="guide-tip-text"><strong>Tip:</strong> The General tree's <em>Bonus Talent Point</em> talents
         effectively give you a free point &mdash; invest in those early for maximum total points.
-        Green Thumb + Rapid Growth stack for up to -60% crop grow time!</span>
+        Green Thumb + Rapid Growth stack for up to -60% crop grow time! You can <strong>Respec</strong> at any time to try different builds.</span>
       </div>
     </div>
 
