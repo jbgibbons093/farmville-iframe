@@ -553,7 +553,7 @@
             <a class="xref" onclick="navigateTo('contracts')">Contracts</a> &mdash; Fulfill delivery orders for bonus rewards<br>
             <a class="xref" onclick="navigateTo('gold-store')">Gold Store</a> &mdash; Purchase gold with USDC<br>
             <a class="xref" onclick="navigateTo('rebirth')">Rebirth</a> &mdash; Reset at Level 50 for leaderboard glory<br>
-            <a class="xref" onclick="navigateTo('blessings')">Rebirth Blessings</a> &mdash; Permanent meta-progression with Rebirth Shards<br>
+            <a class="xref" onclick="navigateTo('blessings')">Rebirth Blessings</a> &mdash; Permanent meta-progression (Ritual Area, 2nd floor of house)<br>
             <a class="xref" onclick="navigateTo('controls')">Controls</a> &mdash; Keyboard and mouse reference<br>
             <a class="xref" onclick="navigateTo('faq')">FAQ</a> &mdash; Frequently asked questions
           </p>
@@ -1162,7 +1162,7 @@
         <div class="guide-tip">
           <span class="guide-tip-icon">&#x1F4A1;</span>
           <span class="guide-tip-text"><strong>Pro Tip:</strong> Each rebirth gets faster as you learn optimal farming routes and invest in
-          <a class="xref" onclick="navigateTo('blessings')">Rebirth Blessings</a>! You earn 2 Rebirth Shards per rebirth.
+          <a class="xref" onclick="navigateTo('blessings')">Rebirth Blessings</a>! You earn 1 Rebirth Shard per rebirth.
           Focus on high-XP activities like <a class="xref" onclick="navigateTo('crafting')">crafting Cake</a> and collecting <a class="xref" onclick="navigateTo('animals')">truffles</a> to speed-run back to Level 50!
           Check <a class="xref" onclick="navigateTo('tips')">Tips &amp; Strategies</a> for speed-running advice.</span>
         </div>
@@ -1174,11 +1174,11 @@
 
         <p class="guide-text">
           After your first <a class="xref" onclick="navigateTo('rebirth')">Rebirth</a>, you unlock <strong>Rebirth Blessings</strong> &mdash;
-          a permanent meta-progression system. Spend <strong>Rebirth Shards</strong> (earned 2 per rebirth) on powerful
+          a permanent meta-progression system. Spend <strong>Rebirth Shards</strong> (earned 1 per rebirth) on powerful
           bonuses that persist forever across all future runs.
         </p>
         <p class="guide-text">
-          Press <span class="guide-key">B</span> to open the Rebirth Blessings tree.
+          Visit the <strong>Ritual Area</strong> on the second floor of your house to access the Rebirth Blessings tree.
         </p>
 
         <div class="guide-subsection">
@@ -1257,7 +1257,6 @@
             <tr><td><span class="guide-key">Y</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('talents')">talent tree</a></td></tr>
             <tr><td><span class="guide-key">G</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('rebirth')">rebirth leaderboard</a></td></tr>
             <tr><td><span class="guide-key">V</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('gold-store')">gold store</a></td></tr>
-            <tr><td><span class="guide-key">B</span></td><td>Open/Close <a class="xref" onclick="navigateTo('blessings')">rebirth blessings</a></td></tr>
             <tr><td><span class="guide-key">L</span></td><td>Open/Close this game guide</td></tr>
             <tr><td><span class="guide-key">ESC</span></td><td>Close current menu/guide</td></tr>
             <tr><td><span class="guide-key">1-6</span></td><td>Switch between inventory tabs</td></tr>
@@ -1470,7 +1469,7 @@
     // Keyboard controls - ESC to close
     document.addEventListener('keydown', function(e) {
       var key = e.key.toLowerCase();
-      if (e.key === 'Escape' || key === 'l' || key === 'i' || key === 'y' || key === 'g' || key === 'v' || key === 'b') {
+      if (e.key === 'Escape' || key === 'l' || key === 'i' || key === 'y' || key === 'g' || key === 'v') {
         e.preventDefault();
         closeGuide();
       }
