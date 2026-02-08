@@ -291,6 +291,9 @@
     function triggerTask(taskName) {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
         PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
+        console.log('[Contracts] Triggered task:', taskName);
+      } else {
+        console.log('[Contracts] SDK not ready, cannot trigger:', taskName);
       }
     }
 
@@ -758,6 +761,8 @@
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
         PortalsSdk.setMessageListener(function(msg) { processMessage(msg, 'SDK'); });
         console.log('[Contracts] SDK listener registered');
+        // Trigger sync now that SDK is ready
+        setTimeout(function() { triggerTask('Sync_Inventory'); }, 100);
       } else {
         console.log('[Contracts] Waiting for SDK...');
         setTimeout(setupMessageListener, 100);
