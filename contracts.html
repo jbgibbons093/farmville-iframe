@@ -726,10 +726,10 @@
       slots.forEach(function(slot, i) {
         if (slot.endTime && now >= slot.endTime) {
           if (slot.state === 'active') {
-            // Contract expired - failed
-            slot.state = 'cooldown';
+            // Contract expired - no cooldown, just reset to empty
+            slot.state = 'empty';
             slot.contract = null;
-            slot.endTime = now + COOLDOWN_MS;
+            slot.endTime = null;
             notify('Contract expired!', 'error');
             stateChanged = true;
           } else if (slot.state === 'cooldown') {
