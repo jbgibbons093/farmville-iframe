@@ -314,7 +314,8 @@
         goatYard: 0, apiaryExpansion: 0, husbandryKnowledge: 0, pigSty: 0,
         animalMastery: 0,
         keenLearner: 0, farmHand: 0, stockman: 0, artisan: 0,
-        seasonedWorker: 0, bonusPoint1: 0, prodigy: 0, bonusPoint2: 0
+        seasonedWorker: 0, bonusPoint1: 0, prodigy: 0, bonusPoint2: 0,
+        contractor1: 0, contractor2: 0, contractor3: 0
       },
       claimedStarterSeeds: false,
       xpHistory: { planting: 0, harvesting: 0, animals: 0, crafting: 0, selling: 0 },
@@ -561,6 +562,9 @@
         'T_BonusPoint1': { target: 'bonusPoint1', isTalent: true },
         'T_Prodigy': { target: 'prodigy', isTalent: true },
         'T_BonusPoint2': { target: 'bonusPoint2', isTalent: true },
+        'T_Contractor1': { target: 'contractor1', isTalent: true },
+        'T_Contractor2': { target: 'contractor2', isTalent: true },
+        'T_Contractor3': { target: 'contractor3', isTalent: true },
         'Rebirth_Count': { target: 'rebirthCount', isRoot: true },
         'playerName': { target: '_skip', isSkip: true }
       };
@@ -1332,6 +1336,17 @@
               <div class="quick-stat"><span class="quick-stat-icon">&#x1F3AF;</span><div><div class="quick-stat-value">${gameState.level}</div><div class="quick-stat-label">Total Earned</div></div></div>
             </div>
             <div style="text-align: center; margin-top: 8px; font-size: ${hasPoints ? '12' : '11'}px; color: ${hasPoints ? '#b388ff; font-weight: 700' : '#888'};">Press <kbd style="background: #4a3a2a; padding: 2px 6px; border-radius: 4px; font-family: monospace;">Y</kbd> ${hasPoints ? 'to spend talents!' : 'for Talents'}</div>
+          </div>`;
+          })()}
+          ${(function() {
+            const slotsUnlocked = 1 + gameState.talents.contractor1 + gameState.talents.contractor2 + gameState.talents.contractor3;
+            return `<div class="dashboard-card">
+            <div class="card-header"><span class="card-icon">&#x1F4CB;</span><div class="card-title">Contracts</div></div>
+            <div class="quick-stats">
+              <div class="quick-stat"><span class="quick-stat-icon">&#x1F4E6;</span><div><div class="quick-stat-value">${slotsUnlocked}</div><div class="quick-stat-label">Slots</div></div></div>
+              <div class="quick-stat"><span class="quick-stat-icon">&#x1F512;</span><div><div class="quick-stat-value">${10 - slotsUnlocked}</div><div class="quick-stat-label">Locked</div></div></div>
+            </div>
+            <div style="text-align: center; margin-top: 8px; font-size: 11px; color: #888;">Visit the <span style="color: #2ecc71;">Contracts Stall</span> in the marketplace</div>
           </div>`;
           })()}
           ${!gameState.claimedStarterSeeds ? `
