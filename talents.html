@@ -1000,7 +1000,10 @@ function investPoint(treeName, talentKey) {
   notify(talent.name + ' ' + talentState[talentKey] + '/' + talent.maxRank, 'success');
   renderAll();
 
-  setTimeout(function() { actionPending = false; }, 1500);
+  setTimeout(function() {
+    actionPending = false;
+    triggerTask('Sync_Inventory'); // Request fresh sync after task should be processed
+  }, 1500);
 }
 
 // ── Buy Talent Point ──
@@ -1021,7 +1024,10 @@ function buyTalentPoint() {
   notify('Purchased 1 Talent Point for ' + BUY_POINT_COST + 'g', 'success');
   renderAll();
 
-  setTimeout(function() { buyPending = false; renderAll(); }, 400);
+  setTimeout(function() {
+    buyPending = false;
+    triggerTask('Sync_Inventory'); // Request fresh sync
+  }, 1000);
 }
 
 // ── Portals SDK ──
@@ -1077,9 +1083,12 @@ function processMessage(msg, source) {
 function handlePortalsMessage(msg) {
   if (typeof msg !== 'string') return;
   if (msg.indexOf('Sync_Inventory') === 0) {
+    // Skip sync if action is pending - wait for the authoritative sync after task completes
+    if (actionPending || buyPending) {
+      console.log('[Talents] Skipping stale sync while action pending');
+      return;
+    }
     parseAndSyncInventory(msg);
-    actionPending = false;
-    buyPending = false;
     renderAll();
   }
 }
