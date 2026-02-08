@@ -155,7 +155,14 @@
 
     const REFRESH_MS = 2 * 60 * 1000; // 2 minutes
     const FULFILL_MS = 5 * 60 * 1000; // 5 minutes to fulfill
-    const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown after
+    const BASE_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown after
+
+    function getCooldownMs() {
+      var rb = gameState.rebirthBlessings;
+      var reduction = rb.quickContracts * 0.10 + rb.timeWarp * 0.05;
+      reduction = Math.min(0.9, reduction);
+      return Math.max(30000, Math.ceil(BASE_COOLDOWN_MS * (1 - reduction)));
+    }
 
     // Items with their properties
     const ITEMS = {
@@ -196,7 +203,8 @@
       gold: 0,
       level: 0,
       inventory: {},
-      talents: { contractor1: 0, contractor2: 0, contractor3: 0 }
+      talents: { contractor1: 0, contractor2: 0, contractor3: 0 },
+      rebirthBlessings: { quickContracts: 0, timeWarp: 0 }
     };
 
     // Available contracts pool
@@ -387,6 +395,17 @@
       'T_Contractor1': { target: 't_contractor1' },
       'T_Contractor2': { target: 't_contractor2' },
       'T_Contractor3': { target: 't_contractor3' },
+      'RT_QuickContracts': { target: 'rt_quickcontracts' },
+      'RT_TimeWarp': { target: 'rt_timewarp' },
+      'Rebirth_Shards': { target: '_skip' }, 'Mystic_Essence': { target: '_skip' },
+      'RT_FleetHarvest': { target: '_skip' }, 'RT_SwiftHusbandry': { target: '_skip' },
+      'RT_RushingWinds': { target: '_skip' }, 'RT_NimbleHands': { target: '_skip' },
+      'RT_Windfall': { target: '_skip' }, 'RT_GreenFingers': { target: '_skip' },
+      'RT_Stockpiler': { target: '_skip' }, 'RT_ArtisanTouch': { target: '_skip' },
+      'RT_Fortune': { target: '_skip' }, 'RT_Cornucopia': { target: '_skip' },
+      'RT_NestEgg': { target: '_skip' }, 'RT_SeedVault': { target: '_skip' },
+      'RT_Seasoned': { target: '_skip' }, 'RT_ToolShed': { target: '_skip' },
+      'RT_RecipeTome': { target: '_skip' }, 'RT_QuickStart': { target: '_skip' },
       // Other skips
       'Unspent_Talent_Points': { target: '_skip' },
       'Rebirth_Count': { target: '_skip' },
@@ -484,6 +503,8 @@
       gameState.talents.contractor1 = data.t_contractor1 !== undefined ? data.t_contractor1 : 0;
       gameState.talents.contractor2 = data.t_contractor2 !== undefined ? data.t_contractor2 : 0;
       gameState.talents.contractor3 = data.t_contractor3 !== undefined ? data.t_contractor3 : 0;
+      gameState.rebirthBlessings.quickContracts = data.rt_quickcontracts !== undefined ? data.rt_quickcontracts : 0;
+      gameState.rebirthBlessings.timeWarp = data.rt_timewarp !== undefined ? data.rt_timewarp : 0;
 
       console.log('[Contracts] Inventory:', gameState.inventory);
 
@@ -635,7 +656,7 @@
       // Set slot to cooldown
       slot.state = 'cooldown';
       slot.contract = null;
-      slot.endTime = Date.now() + COOLDOWN_MS;
+      slot.endTime = Date.now() + getCooldownMs();
 
       notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
       render();

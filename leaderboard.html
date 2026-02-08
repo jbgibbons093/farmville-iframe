@@ -866,6 +866,16 @@ function parseAndSyncInventory(msg) {
 
   // Two-word keys this iframe cares about
   var twoWordKeys = {
+    'Rebirth_Shards': '_skip', 'Mystic_Essence': '_skip',
+    'RT_FleetHarvest': '_skip', 'RT_SwiftHusbandry': '_skip',
+    'RT_QuickContracts': '_skip', 'RT_RushingWinds': '_skip',
+    'RT_NimbleHands': '_skip', 'RT_TimeWarp': '_skip',
+    'RT_Windfall': '_skip', 'RT_GreenFingers': '_skip',
+    'RT_Stockpiler': '_skip', 'RT_ArtisanTouch': '_skip',
+    'RT_Fortune': '_skip', 'RT_Cornucopia': '_skip',
+    'RT_NestEgg': '_skip', 'RT_SeedVault': '_skip',
+    'RT_Seasoned': '_skip', 'RT_ToolShed': '_skip',
+    'RT_RecipeTome': '_skip', 'RT_QuickStart': '_skip',
     'Rebirth_Count': 'rebirth_count',
     // Include all T_* keys so parser doesn't desync
     'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',

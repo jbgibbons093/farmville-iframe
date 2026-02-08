@@ -89,7 +89,7 @@
       honey: '&#x1F36F;'
     };
 
-    let gameState = { inventory: {}, recipes: {}, talents: { keenLearner: 0, artisan: 0, seasonedWorker: 0, prodigy: 0 } };
+    let gameState = { inventory: {}, recipes: {}, talents: { keenLearner: 0, artisan: 0, seasonedWorker: 0, prodigy: 0 }, rebirthBlessings: { artisanTouch: 0 } };
     let actionPending = false;
     let notifyTimeout = null;
 
@@ -137,7 +137,8 @@
 
     function getCraftingXP(recipe) {
       const t = gameState.talents;
-      return recipe.xp + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3;
+      const rb = gameState.rebirthBlessings;
+      return recipe.xp + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3 + (rb.artisanTouch || 0) * 3;
     }
 
     // === Sound Effects (MP3 + Web Audio API fallback) ===
@@ -303,6 +304,17 @@
       'Has_Recipe_Mead': 'has_recipe_mead',
       'T_KeenLearner': 't_keenlearner', 'T_Artisan': 't_artisan',
       'T_SeasonedWorker': 't_seasonedworker', 'T_Prodigy': 't_prodigy',
+      'RT_ArtisanTouch': 'rt_artisantouch',
+      'Rebirth_Shards': '_skip', 'Mystic_Essence': '_skip',
+      'RT_FleetHarvest': '_skip', 'RT_SwiftHusbandry': '_skip',
+      'RT_QuickContracts': '_skip', 'RT_RushingWinds': '_skip',
+      'RT_NimbleHands': '_skip', 'RT_TimeWarp': '_skip',
+      'RT_Windfall': '_skip', 'RT_GreenFingers': '_skip',
+      'RT_Stockpiler': '_skip',
+      'RT_Fortune': '_skip', 'RT_Cornucopia': '_skip',
+      'RT_NestEgg': '_skip', 'RT_SeedVault': '_skip',
+      'RT_Seasoned': '_skip', 'RT_ToolShed': '_skip',
+      'RT_RecipeTome': '_skip', 'RT_QuickStart': '_skip',
       'Rebirth_Count': 'rebirth_count',
       'playerName': '_skip'
     };
@@ -381,6 +393,7 @@
         gameState.talents.artisan = data.t_artisan || 0;
         gameState.talents.seasonedWorker = data.t_seasonedworker || 0;
         gameState.talents.prodigy = data.t_prodigy || 0;
+        gameState.rebirthBlessings.artisanTouch = data.rt_artisantouch || 0;
         actionPending = false;
         render();
       }

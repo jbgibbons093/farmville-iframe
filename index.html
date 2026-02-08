@@ -318,6 +318,16 @@
         seasonedWorker: 0, bonusPoint1: 0, prodigy: 0, bonusPoint2: 0,
         contractor1: 0, contractor2: 0, contractor3: 0
       },
+      rebirthBlessings: {
+        fleetHarvest: 0, swiftHusbandry: 0, quickContracts: 0,
+        rushingWinds: 0, nimbleHands: 0, timeWarp: 0,
+        windfall: 0, greenFingers: 0, stockpiler: 0,
+        artisanTouch: 0, fortune: 0, cornucopia: 0,
+        nestEgg: 0, seedVault: 0, seasoned: 0,
+        toolShed: 0, recipeTome: 0, quickStart: 0
+      },
+      rebirthShards: 0,
+      mysticEssence: 0,
       claimedStarterSeeds: false,
       xpHistory: { planting: 0, harvesting: 0, animals: 0, crafting: 0, selling: 0 },
       inventory: {
@@ -400,22 +410,26 @@
 
     function getPlantingXP(crop) {
       const t = gameState.talents;
-      return crop.plantXP + t.eagerPlanter * 2 + t.cropMastery * 3 + t.keenLearner + t.farmHand * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+      const rb = gameState.rebirthBlessings;
+      return crop.plantXP + t.eagerPlanter * 2 + t.cropMastery * 3 + t.keenLearner + t.farmHand * 2 + t.seasonedWorker * 2 + t.prodigy * 3 + rb.greenFingers * 2;
     }
 
     function getHarvestXP(crop) {
       const t = gameState.talents;
-      return crop.harvestXP + t.cropMastery * 3 + t.keenLearner + t.farmHand * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+      const rb = gameState.rebirthBlessings;
+      return crop.harvestXP + t.cropMastery * 3 + t.keenLearner + t.farmHand * 2 + t.seasonedWorker * 2 + t.prodigy * 3 + rb.greenFingers * 2;
     }
 
     function getAnimalStartXP(config) {
       const t = gameState.talents;
-      return config.startXP + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+      const rb = gameState.rebirthBlessings;
+      return config.startXP + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3 + rb.stockpiler * 2;
     }
 
     function getAnimalCollectXP(station) {
       const t = gameState.talents;
-      const baseXP = station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3;
+      const rb = gameState.rebirthBlessings;
+      const baseXP = station.xpPerUnit + t.husbandryKnowledge * 2 + t.keenLearner + t.stockman * 2 + t.seasonedWorker * 2 + t.prodigy * 3 + rb.stockpiler * 2;
 
       // Tier 4 (Platinum): double XP bonus
       const equipmentTier = station.equipment ? (gameState.equipment[station.equipment] || 0) : 0;
@@ -426,19 +440,24 @@
 
     function getCropGrowTime(crop) {
       const t = gameState.talents;
-      const reduction = Math.min(0.9, (t.greenThumb + t.rapidGrowth) * 0.10);
+      const rb = gameState.rebirthBlessings;
+      const talentReduction = (t.greenThumb + t.rapidGrowth) * 0.10;
+      const blessingReduction = rb.fleetHarvest * 0.03 + rb.rushingWinds * 0.04 + rb.timeWarp * 0.05;
+      const reduction = Math.min(0.9, talentReduction + blessingReduction);
       return Math.max(Math.ceil(crop.growTime * (1 - reduction)), 3);
     }
 
     function getAnimalCooldown(config, equipmentKey) {
       const t = gameState.talents;
+      const rb = gameState.rebirthBlessings;
       const talentReduction = t.quickHands * 0.10;
+      const blessingReduction = rb.swiftHusbandry * 0.03 + rb.nimbleHands * 0.04 + rb.timeWarp * 0.05;
 
       // Tier 3+ (Gold): additional 10% cooldown reduction
       const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
       const tierReduction = equipmentTier >= 3 ? 0.10 : 0;
 
-      const totalReduction = Math.min(0.9, talentReduction + tierReduction);
+      const totalReduction = Math.min(0.9, talentReduction + blessingReduction + tierReduction);
       return Math.max(Math.ceil(config.cooldown * (1 - totalReduction)), 9);
     }
 
@@ -455,15 +474,16 @@
       return Math.min(1 + (talentMap[type] || 0), maxSlots);
     }
 
-    function getHarvestBonusCrops() { return gameState.talents.bountifulHarvest; }
+    function getHarvestBonusCrops() { return gameState.talents.bountifulHarvest + (gameState.rebirthBlessings.cornucopia || 0); }
     function getCollectionBonusProducts(equipmentKey) {
       const talentBonus = gameState.talents.animalMastery;
+      const blessingBonus = gameState.rebirthBlessings.cornucopia || 0;
 
       // Tier 2+ (Silver): +1 bonus product per collection
       const equipmentTier = equipmentKey ? (gameState.equipment[equipmentKey] || 0) : 0;
       const tierBonus = equipmentTier >= 2 ? 1 : 0;
 
-      return talentBonus + tierBonus;
+      return talentBonus + blessingBonus + tierBonus;
     }
 
     // Claim free starter seeds (one-time only)
@@ -568,6 +588,26 @@
         'T_Contractor2': { target: 'contractor2', isTalent: true },
         'T_Contractor3': { target: 'contractor3', isTalent: true },
         'Rebirth_Count': { target: 'rebirthCount', isRoot: true },
+        'Rebirth_Shards': { target: 'rebirthShards', isRoot: true },
+        'Mystic_Essence': { target: 'mysticEssence', isRoot: true },
+        'RT_FleetHarvest': { target: 'fleetHarvest', isBlessing: true },
+        'RT_SwiftHusbandry': { target: 'swiftHusbandry', isBlessing: true },
+        'RT_QuickContracts': { target: 'quickContracts', isBlessing: true },
+        'RT_RushingWinds': { target: 'rushingWinds', isBlessing: true },
+        'RT_NimbleHands': { target: 'nimbleHands', isBlessing: true },
+        'RT_TimeWarp': { target: 'timeWarp', isBlessing: true },
+        'RT_Windfall': { target: 'windfall', isBlessing: true },
+        'RT_GreenFingers': { target: 'greenFingers', isBlessing: true },
+        'RT_Stockpiler': { target: 'stockpiler', isBlessing: true },
+        'RT_ArtisanTouch': { target: 'artisanTouch', isBlessing: true },
+        'RT_Fortune': { target: 'fortune', isBlessing: true },
+        'RT_Cornucopia': { target: 'cornucopia', isBlessing: true },
+        'RT_NestEgg': { target: 'nestEgg', isBlessing: true },
+        'RT_SeedVault': { target: 'seedVault', isBlessing: true },
+        'RT_Seasoned': { target: 'seasoned', isBlessing: true },
+        'RT_ToolShed': { target: 'toolShed', isBlessing: true },
+        'RT_RecipeTome': { target: 'recipeTome', isBlessing: true },
+        'RT_QuickStart': { target: 'quickStart', isBlessing: true },
         'playerName': { target: '_skip', isSkip: true }
       };
 
@@ -622,6 +662,7 @@
             else if (mapping.isFlag) gameState[mapping.target] = value > 0;
             else if (mapping.isRoot) gameState[mapping.target] = value;
             else if (mapping.isTalent) gameState.talents[mapping.target] = value;
+            else if (mapping.isBlessing) gameState.rebirthBlessings[mapping.target] = value;
             else gameState.inventory[mapping.target] = value;
             i += 3; matched = true;
           }
@@ -659,6 +700,136 @@
       syncReceived = true;
       dashboardDirty = true;
       saveGameQuiet();
+
+      // Post-rebirth detection: check if rebirth count increased since last seen
+      var storedRC = parseInt(localStorage.getItem('hughberry_rebirth_count') || '0');
+      if (gameState.rebirthCount > storedRC && storedRC > 0) {
+        handlePostRebirthGrants();
+      }
+      localStorage.setItem('hughberry_rebirth_count', String(gameState.rebirthCount));
+    }
+
+    // ── Post-Rebirth Legacy Grant System ──
+    var postRebirthGrantPending = false;
+
+    function handlePostRebirthGrants() {
+      if (postRebirthGrantPending) return;
+      // Check localStorage flag to prevent double-grant
+      var grantKey = 'hughberry_rebirth_grant_' + gameState.rebirthCount;
+      if (localStorage.getItem(grantKey) === 'done') {
+        console.log('[Hughberry] Post-rebirth grants already applied for rebirth #' + gameState.rebirthCount);
+        return;
+      }
+      postRebirthGrantPending = true;
+      localStorage.setItem(grantKey, 'done');
+
+      var rb = gameState.rebirthBlessings;
+      var rc = gameState.rebirthCount;
+      var tasks = [];
+
+      // 1. Mystic Essence: Rebirth_Count * 10
+      var essenceAmount = rc * 10;
+      if (essenceAmount > 0) {
+        var essenceDenoms = [500, 100, 50, 10];
+        var essenceRemaining = essenceAmount;
+        while (essenceRemaining > 0) {
+          for (var ed = 0; ed < essenceDenoms.length; ed++) {
+            if (essenceDenoms[ed] <= essenceRemaining) {
+              tasks.push('Add_Mystic_Essence_' + essenceDenoms[ed]);
+              essenceRemaining -= essenceDenoms[ed];
+              break;
+            }
+          }
+        }
+      }
+
+      // 2. NestEgg gold: rank * 100 * Rebirth_Count
+      var nestEggGold = rb.nestEgg * 100 * rc;
+      if (nestEggGold > 0) {
+        var goldDenoms = [5000, 1000, 500, 250, 100, 50, 25];
+        var goldRemaining = nestEggGold;
+        while (goldRemaining > 0) {
+          for (var gd = 0; gd < goldDenoms.length; gd++) {
+            if (goldDenoms[gd] <= goldRemaining) {
+              tasks.push('Add_Gold_' + goldDenoms[gd]);
+              goldRemaining -= goldDenoms[gd];
+              break;
+            }
+          }
+        }
+      }
+
+      // 3. SeedVault seeds: rank * 10 * Rebirth_Count
+      var seedAmount = rb.seedVault * 10 * rc;
+      if (seedAmount > 0) {
+        var seedDenoms = [500, 100, 10];
+        var seedRemaining = seedAmount;
+        while (seedRemaining > 0) {
+          for (var sd = 0; sd < seedDenoms.length; sd++) {
+            if (seedDenoms[sd] <= seedRemaining) {
+              tasks.push('Grant_Seeds_Wheat_' + seedDenoms[sd]);
+              seedRemaining -= seedDenoms[sd];
+              break;
+            }
+          }
+        }
+      }
+
+      // 4. Seasoned talent pts: rank * Rebirth_Count
+      var talentPts = rb.seasoned * rc;
+      if (talentPts > 0) {
+        var tpDenoms = [50, 10, 5, 1];
+        var tpRemaining = talentPts;
+        while (tpRemaining > 0) {
+          for (var td = 0; td < tpDenoms.length; td++) {
+            if (tpDenoms[td] <= tpRemaining) {
+              tasks.push('Add_Talent_Points_' + tpDenoms[td]);
+              tpRemaining -= tpDenoms[td];
+              break;
+            }
+          }
+        }
+      }
+
+      // 5. ToolShed: Grant_All_Tools_{rank}
+      if (rb.toolShed > 0) {
+        tasks.push('Grant_All_Tools_' + rb.toolShed);
+      }
+
+      // 6. RecipeTome: Grant_All_Recipes
+      if (rb.recipeTome > 0) {
+        tasks.push('Grant_All_Recipes');
+      }
+
+      // 7. QuickStart: Grant_Level_3
+      if (rb.quickStart > 0) {
+        tasks.push('Grant_Level_3');
+      }
+
+      console.log('[Hughberry] Post-rebirth grants: ' + tasks.length + ' tasks for rebirth #' + rc);
+
+      // Fire tasks staggered 350ms apart
+      for (var i = 0; i < tasks.length; i++) {
+        (function(task, delay) {
+          setTimeout(function() { triggerTask(task); }, delay);
+        })(tasks[i], i * 350);
+      }
+
+      // Notify player
+      var grantMsgs = [];
+      if (essenceAmount > 0) grantMsgs.push('+' + essenceAmount + ' Mystic Essence');
+      if (nestEggGold > 0) grantMsgs.push('+' + nestEggGold + 'g');
+      if (seedAmount > 0) grantMsgs.push('+' + seedAmount + ' Seeds');
+      if (talentPts > 0) grantMsgs.push('+' + talentPts + ' Talent Pts');
+      if (rb.toolShed > 0) grantMsgs.push('Tools Tier ' + rb.toolShed);
+      if (rb.recipeTome > 0) grantMsgs.push('All Recipes');
+      if (rb.quickStart > 0) grantMsgs.push('Level 3 Start');
+      if (grantMsgs.length > 0) {
+        notify('Rebirth Blessings: ' + grantMsgs.join(', '), 'success');
+      }
+
+      // Clear pending after all tasks should be processed
+      setTimeout(function() { postRebirthGrantPending = false; }, tasks.length * 350 + 1000);
     }
 
     // Setup message listener with retry for SDK initialization
@@ -1254,6 +1425,31 @@
         console.log('[Hughberry] LEVEL UP! XP ' + gameState.xp + ' >= ' + xpNeeded);
         triggerTask('Add_Level_1');
         notify('LEVEL UP! Now Lv.' + (gameState.level + 1) + '!', 'success', 'levelup');
+
+        // Rebirth Blessing: Windfall/Fortune gold bonus on level-up
+        var rb = gameState.rebirthBlessings;
+        var bonusGold = rb.windfall * 25 + rb.fortune * 50;
+        if (bonusGold > 0) {
+          var goldDenoms = [5000, 1000, 500, 250, 100, 50, 25];
+          var goldRemaining = bonusGold;
+          var goldTasks = [];
+          while (goldRemaining > 0) {
+            for (var gd = 0; gd < goldDenoms.length; gd++) {
+              if (goldDenoms[gd] <= goldRemaining) {
+                goldTasks.push('Add_Gold_' + goldDenoms[gd]);
+                goldRemaining -= goldDenoms[gd];
+                break;
+              }
+            }
+          }
+          // Stagger at 500ms offset from level-up task, then 350ms apart
+          for (var gi = 0; gi < goldTasks.length; gi++) {
+            (function(task, delay) {
+              setTimeout(function() { triggerTask(task); }, delay);
+            })(goldTasks[gi], 500 + gi * 350);
+          }
+          notify('+' + bonusGold + 'g Blessing Bonus!', 'success');
+        }
 
         // Reset pending flag after a delay to allow Portals to process
         setTimeout(function() { levelUpPending = false; }, 2000);

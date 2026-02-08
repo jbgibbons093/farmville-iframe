@@ -503,6 +503,10 @@
         <span class="sidebar-icon">&#x1F504;</span>
         <span class="sidebar-label">Rebirth</span>
       </a>
+      <a class="sidebar-link" data-target="blessings" onclick="navigateTo('blessings')">
+        <span class="sidebar-icon">&#x2728;</span>
+        <span class="sidebar-label">Blessings</span>
+      </a>
       <a class="sidebar-link" data-target="controls" onclick="navigateTo('controls')">
         <span class="sidebar-icon">&#x1F3AE;</span>
         <span class="sidebar-label">Controls</span>
@@ -549,6 +553,7 @@
             <a class="xref" onclick="navigateTo('contracts')">Contracts</a> &mdash; Fulfill delivery orders for bonus rewards<br>
             <a class="xref" onclick="navigateTo('gold-store')">Gold Store</a> &mdash; Purchase gold with USDC<br>
             <a class="xref" onclick="navigateTo('rebirth')">Rebirth</a> &mdash; Reset at Level 50 for leaderboard glory<br>
+            <a class="xref" onclick="navigateTo('blessings')">Rebirth Blessings</a> &mdash; Permanent meta-progression with Rebirth Shards<br>
             <a class="xref" onclick="navigateTo('controls')">Controls</a> &mdash; Keyboard and mouse reference<br>
             <a class="xref" onclick="navigateTo('faq')">FAQ</a> &mdash; Frequently asked questions
           </p>
@@ -1156,9 +1161,87 @@
 
         <div class="guide-tip">
           <span class="guide-tip-icon">&#x1F4A1;</span>
-          <span class="guide-tip-text"><strong>Pro Tip:</strong> Each rebirth gets faster as you learn optimal farming routes.
+          <span class="guide-tip-text"><strong>Pro Tip:</strong> Each rebirth gets faster as you learn optimal farming routes and invest in
+          <a class="xref" onclick="navigateTo('blessings')">Rebirth Blessings</a>! You earn 2 Rebirth Shards per rebirth.
           Focus on high-XP activities like <a class="xref" onclick="navigateTo('crafting')">crafting Cake</a> and collecting <a class="xref" onclick="navigateTo('animals')">truffles</a> to speed-run back to Level 50!
           Check <a class="xref" onclick="navigateTo('tips')">Tips &amp; Strategies</a> for speed-running advice.</span>
+        </div>
+      </div>
+
+      <!-- Rebirth Blessings -->
+      <div class="guide-section" id="blessings">
+        <div class="guide-section-title">&#x2728; Rebirth Blessings</div>
+
+        <p class="guide-text">
+          After your first <a class="xref" onclick="navigateTo('rebirth')">Rebirth</a>, you unlock <strong>Rebirth Blessings</strong> &mdash;
+          a permanent meta-progression system. Spend <strong>Rebirth Shards</strong> (earned 2 per rebirth) on powerful
+          bonuses that persist forever across all future runs.
+        </p>
+        <p class="guide-text">
+          Press <span class="guide-key">B</span> to open the Rebirth Blessings tree.
+        </p>
+
+        <div class="guide-subsection">
+          <div class="guide-subsection-title">Haste Tree (15 shards max)</div>
+          <p class="guide-text">Reduce timers on crops, animals, and contracts.</p>
+          <table class="guide-table">
+            <tr><th>Blessing</th><th>Max</th><th>Effect</th></tr>
+            <tr><td>Fleet Harvest</td><td>3</td><td>-3% crop grow time per rank</td></tr>
+            <tr><td>Swift Husbandry</td><td>3</td><td>-3% animal cooldown per rank</td></tr>
+            <tr><td>Quick Contracts</td><td>3</td><td>-10% contract cooldown per rank</td></tr>
+            <tr><td>Rushing Winds</td><td>2</td><td>-4% crop &amp; animal time per rank (requires Fleet Harvest 2)</td></tr>
+            <tr><td>Nimble Hands</td><td>2</td><td>-4% crop &amp; animal time per rank (requires Swift Husbandry 2)</td></tr>
+            <tr><td>Time Warp</td><td>2</td><td>-5% ALL timers per rank (requires Rushing Winds 2 + Nimble Hands 2)</td></tr>
+          </table>
+        </div>
+
+        <div class="guide-subsection">
+          <div class="guide-subsection-title">Abundance Tree (15 shards max)</div>
+          <p class="guide-text">Boost XP, gold, and yields.</p>
+          <table class="guide-table">
+            <tr><th>Blessing</th><th>Max</th><th>Effect</th></tr>
+            <tr><td>Windfall</td><td>3</td><td>+25 gold per level-up per rank</td></tr>
+            <tr><td>Green Fingers</td><td>3</td><td>+2 planting &amp; harvest XP per rank</td></tr>
+            <tr><td>Stockpiler</td><td>3</td><td>+2 animal start &amp; collect XP per rank</td></tr>
+            <tr><td>Artisan Touch</td><td>3</td><td>+3 crafting XP per rank (requires Green Fingers 2)</td></tr>
+            <tr><td>Fortune</td><td>2</td><td>+50 gold per level-up per rank (requires Windfall 2)</td></tr>
+            <tr><td>Cornucopia</td><td>1</td><td>+1 bonus crop &amp; animal product (requires Fortune 2 + one of Green Fingers 2 or Stockpiler 2)</td></tr>
+          </table>
+        </div>
+
+        <div class="guide-subsection">
+          <div class="guide-subsection-title">Legacy Tree (15 shards max)</div>
+          <p class="guide-text">Start each run with bonus resources. Legacy bonuses scale with Rebirth Count!</p>
+          <table class="guide-table">
+            <tr><th>Blessing</th><th>Max</th><th>Effect</th></tr>
+            <tr><td>Nest Egg</td><td>3</td><td>Start with rank &times; 100 &times; Rebirth Count gold</td></tr>
+            <tr><td>Seed Vault</td><td>3</td><td>Start with rank &times; 10 &times; Rebirth Count wheat seeds</td></tr>
+            <tr><td>Seasoned</td><td>3</td><td>Start with rank &times; Rebirth Count talent points</td></tr>
+            <tr><td>Tool Shed</td><td>4</td><td>Start with all tools at tier = rank (requires Nest Egg 2)</td></tr>
+            <tr><td>Recipe Tome</td><td>1</td><td>Start with all 11 recipes unlocked (requires Seed Vault 2)</td></tr>
+            <tr><td>Quick Start</td><td>1</td><td>Start at Level 3 with 3 talent points (requires Seasoned 2)</td></tr>
+          </table>
+        </div>
+
+        <div class="guide-subsection">
+          <div class="guide-subsection-title">Respec</div>
+          <p class="guide-text">
+            You can respec all Rebirth Blessings for <strong>free</strong> at any time.
+            All invested shards will be refunded.
+          </p>
+        </div>
+
+        <div class="guide-subsection">
+          <div class="guide-subsection-title">Mystic Essence</div>
+          <p class="guide-text">
+            Each rebirth also grants <strong>Rebirth Count &times; 10 Mystic Essence</strong>, a cosmetic currency for future use.
+          </p>
+        </div>
+
+        <div class="guide-tip">
+          <span class="guide-tip-icon">&#x1F4A1;</span>
+          <span class="guide-tip-text"><strong>Pro Tip:</strong> Legacy blessings scale with your Rebirth Count, making each subsequent run significantly faster.
+          At Rebirth 10 with Nest Egg rank 3, you start with 3,000 gold!</span>
         </div>
       </div>
 
@@ -1174,6 +1257,7 @@
             <tr><td><span class="guide-key">Y</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('talents')">talent tree</a></td></tr>
             <tr><td><span class="guide-key">G</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('rebirth')">rebirth leaderboard</a></td></tr>
             <tr><td><span class="guide-key">V</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('gold-store')">gold store</a></td></tr>
+            <tr><td><span class="guide-key">B</span></td><td>Open/Close <a class="xref" onclick="navigateTo('blessings')">rebirth blessings</a></td></tr>
             <tr><td><span class="guide-key">L</span></td><td>Open/Close this game guide</td></tr>
             <tr><td><span class="guide-key">ESC</span></td><td>Close current menu/guide</td></tr>
             <tr><td><span class="guide-key">1-6</span></td><td>Switch between inventory tabs</td></tr>
@@ -1277,6 +1361,7 @@
       { id: 'contracts',       label: 'Contracts',         icon: '\u{1F4CB}' },
       { id: 'gold-store',      label: 'Gold Store',        icon: '\u{1FA99}' },
       { id: 'rebirth',         label: 'Rebirth',           icon: '\u{1F504}' },
+      { id: 'blessings',       label: 'Blessings',         icon: '\u2728' },
       { id: 'controls',        label: 'Controls',          icon: '\u{1F3AE}' },
       { id: 'faq',             label: 'FAQ',               icon: '\u2753' }
     ];
@@ -1385,7 +1470,7 @@
     // Keyboard controls - ESC to close
     document.addEventListener('keydown', function(e) {
       var key = e.key.toLowerCase();
-      if (e.key === 'Escape' || key === 'l' || key === 'i' || key === 'y' || key === 'g' || key === 'v') {
+      if (e.key === 'Escape' || key === 'l' || key === 'i' || key === 'y' || key === 'g' || key === 'v' || key === 'b') {
         e.preventDefault();
         closeGuide();
       }
