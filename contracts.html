@@ -544,7 +544,8 @@
       });
 
       const goldTasks = getRewardTasks(contract.goldReward, 'Add_Gold_', [1000, 500, 250, 100, 50, 25]);
-      const xpTasks = getRewardTasks(contract.xpReward, 'Add_XP_', [500, 250, 100, 50, 40, 35, 30, 25, 20, 15, 10, 8, 6, 5, 4, 3, 2, 1]);
+      // Only use XP denominations that actually exist as Portals tasks
+      const xpTasks = getRewardTasks(contract.xpReward, 'Add_XP_', [500, 250, 100, 50, 25, 10]);
 
       let delay = 0;
       const STAGGER = 200;
