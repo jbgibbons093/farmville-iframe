@@ -650,7 +650,7 @@ body {
     <button class="tree-tab active" data-tree="farming" onclick="switchTree('farming')">
       <span class="tab-icon">&#127807;</span>
       <span class="tab-label">Farming</span>
-      <span class="tab-points" id="tabPointsFarming">0 / 17</span>
+      <span class="tab-points" id="tabPointsFarming">0 / 23</span>
     </button>
     <button class="tree-tab" data-tree="animal" onclick="switchTree('animal')">
       <span class="tab-icon">&#128004;</span>
@@ -692,7 +692,7 @@ body {
 var TALENT_TREES = {
   farming: {
     name: 'Farming',
-    maxPoints: 17,
+    maxPoints: 23,
     tiers: [
       { tier: 1, gate: 0, y: 60 },
       { tier: 2, gate: 5, y: 200 },
@@ -700,16 +700,16 @@ var TALENT_TREES = {
     ],
     talents: [
       // Tier 1
-      { key: 'PlotRow2', name: 'Plot Row 2', icon: '\u{1F331}', maxRank: 1,
-        desc: 'Unlock plots 7-12 (12 total)', tier: 1, pos: { x: 25, y: 60 } },
+      { key: 'PlotRow2', name: 'Plot Row 2', icon: '\u{1F331}', maxRank: 3,
+        desc: '+2 plots per rank (7-12)', tier: 1, pos: { x: 25, y: 60 } },
       { key: 'GreenThumb', name: 'Green Thumb', icon: '\u{1F33F}', maxRank: 3,
         desc: '-10% crop grow time per rank', tier: 1, pos: { x: 50, y: 60 } },
       { key: 'EagerPlanter', name: 'Eager Planter', icon: '\u2728', maxRank: 3,
         desc: '+2 planting XP per rank', tier: 1, pos: { x: 75, y: 60 } },
       // Tier 2
-      { key: 'PlotRow3', name: 'Plot Row 3', icon: '\u{1F331}', maxRank: 1,
-        desc: 'Unlock plots 13-18 (18 total)', tier: 2, pos: { x: 25, y: 200 },
-        requires: { key: 'PlotRow2', rank: 1 } },
+      { key: 'PlotRow3', name: 'Plot Row 3', icon: '\u{1F331}', maxRank: 3,
+        desc: '+2 plots per rank (13-18)', tier: 2, pos: { x: 25, y: 200 },
+        requires: { key: 'PlotRow2', rank: 3 } },
       { key: 'BountifulHarvest', name: 'Bountiful Harvest', icon: '\u{1F33E}', maxRank: 2,
         desc: '+1 bonus crop per harvest per rank', tier: 2, pos: { x: 50, y: 200 },
         requires: { key: 'GreenThumb', rank: 3 } },
@@ -717,9 +717,9 @@ var TALENT_TREES = {
         desc: '-10% crop grow time per rank', tier: 2, pos: { x: 75, y: 200 },
         requires: { key: 'EagerPlanter', rank: 2 } },
       // Tier 3
-      { key: 'PlotRow4', name: 'Plot Row 4', icon: '\u{1F331}', maxRank: 1,
-        desc: 'Unlock plots 19-24 (all 24)', tier: 3, pos: { x: 30, y: 340 },
-        requires: { key: 'PlotRow3', rank: 1 } },
+      { key: 'PlotRow4', name: 'Plot Row 4', icon: '\u{1F331}', maxRank: 3,
+        desc: '+2 plots per rank (19-24)', tier: 3, pos: { x: 30, y: 340 },
+        requires: { key: 'PlotRow3', rank: 3 } },
       { key: 'CropMastery', name: 'Crop Mastery', icon: '\u{1F3C6}', maxRank: 3,
         desc: '+3 XP to all crop activities per rank', tier: 3, pos: { x: 70, y: 340 },
         requires: { key: 'BountifulHarvest', rank: 2 } }
@@ -1223,7 +1223,7 @@ function renderAll() {
   }
 
   // Tab point counters
-  document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 17';
+  document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 23';
   document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 38';
   document.getElementById('tabPointsEconomy').textContent = getPointsInTree('economy') + ' / 29';
 
