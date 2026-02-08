@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hughberry Farms - Contracts Board</title>
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito', sans-serif; background: transparent; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 700px; max-height: 85vh; background: linear-gradient(145deg, #1a3a2a 0%, #0d1f15 100%); border: 4px solid #2ecc71; border-radius: 20px; box-shadow: 0 0 30px rgba(46, 204, 113, 0.3); display: flex; flex-direction: column; overflow: hidden; }
+    .header { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .title { font-family: 'Luckiest Guy', cursive; font-size: 22px; color: #fff; text-shadow: 2px 2px 0 #145a32; letter-spacing: 2px; }
+    .header-stats { display: flex; gap: 10px; align-items: center; }
+    .stat-box { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 8px; }
+    .stat-icon { font-size: 16px; }
+    .stat-value { font-size: 14px; font-weight: 800; color: #FFD700; }
+    .close-btn { background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); color: #fff; width: 32px; height: 32px; border-radius: 8px; font-size: 18px; cursor: pointer; transition: all 0.2s; }
+    .close-btn:hover { background: #c0392b; border-color: #e74c3c; }
+
+    .content { flex: 1; overflow-y: auto; padding: 15px; }
+    .tier-info { background: rgba(46, 204, 113, 0.15); border: 2px solid #27ae60; border-radius: 10px; padding: 10px 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .tier-label { font-size: 14px; color: #2ecc71; font-weight: 700; }
+    .tier-value { font-size: 16px; color: #fff; font-weight: 800; }
+
+    .contracts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+
+    .contract-card { background: linear-gradient(145deg, #2d4a3a 0%, #1a2f22 100%); border: 2px solid #3d6b4f; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; transition: all 0.2s; }
+    .contract-card.available { border-color: #27ae60; }
+    .contract-card.cooldown { border-color: #f39c12; opacity: 0.8; }
+    .contract-card.locked { border-color: #555; opacity: 0.5; }
+    .contract-card.ready { border-color: #2ecc71; box-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
+
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .slot-num { font-size: 11px; color: #888; font-weight: 700; }
+    .card-status { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+    .status-available { background: #27ae60; color: #fff; }
+    .status-cooldown { background: #f39c12; color: #000; }
+    .status-locked { background: #555; color: #aaa; }
+
+    .contract-items { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; min-height: 50px; align-items: center; justify-content: center; }
+    .item-req { display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px; }
+    .item-icon { font-size: 18px; }
+    .item-qty { font-size: 12px; color: #fff; font-weight: 700; }
+    .item-qty.has-enough { color: #2ecc71; }
+    .item-qty.not-enough { color: #e74c3c; }
+
+    .rewards { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; }
+    .reward { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; }
+    .reward-gold { color: #FFD700; }
+    .reward-xp { color: #9b59b6; }
+
+    .cooldown-timer { font-size: 20px; font-weight: 800; color: #f39c12; text-align: center; padding: 10px 0; }
+    .locked-text { font-size: 12px; color: #888; text-align: center; padding: 15px 0; }
+    .locked-req { font-size: 11px; color: #f39c12; margin-top: 5px; }
+
+    .fill-btn { background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%); border: 2px solid #2ecc71; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; width: 100%; }
+    .fill-btn:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 0 15px rgba(46, 204, 113, 0.5); }
+    .fill-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+    .notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 10px; font-weight: 700; z-index: 1000; animation: slideIn 0.3s ease; }
+    .notification.success { background: #27ae60; color: #fff; }
+    .notification.error { background: #e74c3c; color: #fff; }
+    @keyframes slideIn { from { opacity: 0; top: 0; } to { opacity: 1; top: 20px; } }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: #27ae60; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">CONTRACTS</div>
+      <div class="header-stats">
+        <div class="stat-box">
+          <span class="stat-icon">&#x1F4B0;</span>
+          <span class="stat-value" id="gold-display">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-icon">&#x2B50;</span>
+          <span class="stat-value">Lv.<span id="level-display">0</span></span>
+        </div>
+        <button class="close-btn" onclick="closeIframe()">&#x2715;</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="tier-info">
+        <div>
+          <div class="tier-label">Reward Tier</div>
+          <div class="tier-value" id="tier-display">Tier 1</div>
+        </div>
+        <div style="text-align: right;">
+          <div class="tier-label">Slots Unlocked</div>
+          <div class="tier-value"><span id="slots-unlocked">1</span> / 10</div>
+        </div>
+      </div>
+
+      <div class="contracts-grid" id="contracts-grid"></div>
+    </div>
+  </div>
+
+  <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+  <script>
+    // ============================================
+    // HUGHBERRY FARMS - CONTRACTS BOARD
+    // ============================================
+
+    const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes
+
+    // Items available at each level with their sell values
+    const ITEMS = {
+      // Crops
+      wheat: { name: 'Wheat', icon: '&#x1F33E;', value: 5, unlockLevel: 0, varKey: 'crop_wheat', deductTask: 'Deduct_Crop_Wheat_1' },
+      carrot: { name: 'Carrot', icon: '&#x1F955;', value: 10, unlockLevel: 3, varKey: 'crop_carrot', deductTask: 'Deduct_Crop_Carrot_1' },
+      corn: { name: 'Corn', icon: '&#x1F33D;', value: 8, unlockLevel: 7, varKey: 'crop_corn', deductTask: 'Deduct_Crop_Corn_1' },
+      potato: { name: 'Potato', icon: '&#x1F954;', value: 12, unlockLevel: 10, varKey: 'crop_potato', deductTask: 'Deduct_Crop_Potato_1' },
+      tomato: { name: 'Tomato', icon: '&#x1F345;', value: 15, unlockLevel: 16, varKey: 'crop_tomato', deductTask: 'Deduct_Crop_Tomato_1' },
+      pumpkin: { name: 'Pumpkin', icon: '&#x1F383;', value: 30, unlockLevel: 23, varKey: 'crop_pumpkin', deductTask: 'Deduct_Crop_Pumpkin_1' },
+      // Animal products
+      milk: { name: 'Milk', icon: '&#x1F95B;', value: 12, unlockLevel: 2, varKey: 'milk', deductTask: 'Deduct_Milk_1' },
+      egg: { name: 'Egg', icon: '&#x1F95A;', value: 8, unlockLevel: 6, varKey: 'egg', deductTask: 'Deduct_Egg_1' },
+      wool: { name: 'Wool', icon: '&#x1F9F6;', value: 15, unlockLevel: 13, varKey: 'wool', deductTask: 'Deduct_Wool_1' },
+      goat_meat: { name: 'Goat Meat', icon: '&#x1F356;', value: 20, unlockLevel: 18, varKey: 'goat_meat', deductTask: 'Deduct_Goat_Meat_1' },
+      honey: { name: 'Honey', icon: '&#x1F36F;', value: 25, unlockLevel: 21, varKey: 'honey', deductTask: 'Deduct_Honey_1' },
+      truffle: { name: 'Truffle', icon: '&#x1F344;', value: 50, unlockLevel: 26, varKey: 'truffle', deductTask: 'Deduct_Truffle_1' },
+      // Crafted items
+      flour: { name: 'Flour', icon: '&#x1F35E;', value: 10, unlockLevel: 4, varKey: 'flour', deductTask: 'Deduct_Flour_1' },
+      butter: { name: 'Butter', icon: '&#x1F9C8;', value: 30, unlockLevel: 8, varKey: 'butter', deductTask: 'Deduct_Butter_1' },
+      cheese: { name: 'Cheese', icon: '&#x1F9C0;', value: 45, unlockLevel: 9, varKey: 'cheese', deductTask: 'Deduct_Cheese_1' },
+      bread: { name: 'Bread', icon: '&#x1F956;', value: 35, unlockLevel: 11, varKey: 'bread', deductTask: 'Deduct_Bread_1' },
+      blanket: { name: 'Blanket', icon: '&#x1F9E3;', value: 60, unlockLevel: 14, varKey: 'blanket', deductTask: 'Deduct_Blanket_1' },
+      stew: { name: 'Stew', icon: '&#x1F372;', value: 50, unlockLevel: 15, varKey: 'stew', deductTask: 'Deduct_Stew_1' },
+      ragout: { name: 'Ragout', icon: '&#x1F356;', value: 75, unlockLevel: 19, varKey: 'ragout', deductTask: 'Deduct_Ragout_1' },
+      mead: { name: 'Mead', icon: '&#x1F37A;', value: 100, unlockLevel: 22, varKey: 'mead', deductTask: 'Deduct_Mead_1' },
+      pie: { name: 'Pie', icon: '&#x1F967;', value: 100, unlockLevel: 24, varKey: 'pie', deductTask: 'Deduct_Pie_1' },
+      meat_pie: { name: 'Meat Pie', icon: '&#x1F969;', value: 90, unlockLevel: 27, varKey: 'meat_pie', deductTask: 'Deduct_Meat_Pie_1' },
+      cake: { name: 'Cake', icon: '&#x1F370;', value: 150, unlockLevel: 28, varKey: 'cake', deductTask: 'Deduct_Cake_1' }
+    };
+
+    // Tier multipliers for rewards
+    const TIER_CONFIG = {
+      1: { minLevel: 0, maxLevel: 9, goldMult: 1.0, xpMult: 1.0 },
+      2: { minLevel: 10, maxLevel: 19, goldMult: 1.5, xpMult: 1.5 },
+      3: { minLevel: 20, maxLevel: 29, goldMult: 2.0, xpMult: 2.0 },
+      4: { minLevel: 30, maxLevel: 39, goldMult: 2.5, xpMult: 2.5 },
+      5: { minLevel: 40, maxLevel: 50, goldMult: 3.0, xpMult: 3.0 }
+    };
+
+    let gameState = {
+      gold: 0,
+      level: 0,
+      inventory: {},
+      talents: { contractor1: 0, contractor2: 0, contractor3: 0 },
+      contractsDone: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    };
+
+    // Contract slots state (client-side)
+    let contractSlots = [];
+    for (let i = 0; i < 10; i++) {
+      contractSlots.push({
+        id: i + 1,
+        contract: null,       // Generated contract data
+        cooldownEnd: null,    // Timestamp when cooldown ends
+        done: false           // From Portals
+      });
+    }
+
+    let actionPending = false;
+    let notificationTimeout = null;
+
+    // ============================================
+    // UTILITY FUNCTIONS
+    // ============================================
+
+    function getTier(level) {
+      if (level >= 40) return 5;
+      if (level >= 30) return 4;
+      if (level >= 20) return 3;
+      if (level >= 10) return 2;
+      return 1;
+    }
+
+    function getUnlockedSlots() {
+      const t = gameState.talents;
+      return 1 + t.contractor1 + t.contractor2 + t.contractor3;
+    }
+
+    function getAvailableItems(level) {
+      return Object.entries(ITEMS)
+        .filter(([key, item]) => item.unlockLevel <= level)
+        .map(([key, item]) => ({ key, ...item }));
+    }
+
+    function seededRandom(seed) {
+      const x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    }
+
+    function generateContract(slotId, level) {
+      const tier = getTier(level);
+      const tierConfig = TIER_CONFIG[tier];
+      const availableItems = getAvailableItems(level);
+
+      if (availableItems.length === 0) return null;
+
+      // Use a seed based on slot, time, and some randomness
+      const seed = slotId * 1000 + Date.now() % 100000 + Math.random() * 1000;
+      const rand = () => seededRandom(seed + Math.random() * 1000);
+
+      // Pick 1-2 items (weighted towards 1)
+      const numItems = rand() < 0.7 ? 1 : 2;
+      const selectedItems = [];
+      const usedIndices = new Set();
+
+      for (let i = 0; i < numItems && i < availableItems.length; i++) {
+        let idx;
+        do {
+          idx = Math.floor(Math.random() * availableItems.length);
+        } while (usedIndices.has(idx) && usedIndices.size < availableItems.length);
+        usedIndices.add(idx);
+
+        const item = availableItems[idx];
+        // Quantity inversely proportional to item value
+        const maxQty = Math.max(2, Math.floor(100 / item.value));
+        const qty = Math.max(1, Math.floor(Math.random() * maxQty) + 1);
+
+        selectedItems.push({ ...item, qty });
+      }
+
+      // Calculate base cost
+      const baseCost = selectedItems.reduce((sum, item) => sum + item.value * item.qty, 0);
+
+      // Random multiplier 1.5x to 2.5x (always profitable)
+      const profitMult = 1.5 + Math.random();
+
+      // Apply tier multiplier
+      const goldReward = Math.floor(baseCost * profitMult * tierConfig.goldMult);
+      const xpReward = Math.floor(goldReward * 0.3 * tierConfig.xpMult);
+
+      return {
+        items: selectedItems,
+        goldReward,
+        xpReward,
+        tier
+      };
+    }
+
+    // ============================================
+    // PORTALS COMMUNICATION
+    // ============================================
+
+    function triggerTask(taskName) {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' }));
+      }
+    }
+
+    function closeIframe() {
+      playSound();
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+        PortalsSdk.closeIframe();
+      }
+    }
+
+    // ============================================
+    // SYNC INVENTORY PARSER
+    // ============================================
+
+    const SYNC_MAP = {
+      'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
+      'Crop_Wheat': 'crop_wheat', 'Crop_Carrot': 'crop_carrot', 'Crop_Corn': 'crop_corn',
+      'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
+      'Milk': 'milk', 'Egg': 'egg', 'Wool': 'wool', 'Goat_Meat': 'goat_meat',
+      'Truffle': 'truffle', 'Honey': 'honey',
+      'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
+      'Ragout': 'ragout', 'Pie': 'pie', 'Meat_Pie': 'meat_pie', 'Blanket': 'blanket',
+      'Butter': 'butter', 'Cake': 'cake', 'Mead': 'mead',
+      'T_Contractor1': 't_contractor1', 'T_Contractor2': 't_contractor2', 'T_Contractor3': 't_contractor3',
+      'Contract_1_Done': 'contract_1_done', 'Contract_2_Done': 'contract_2_done',
+      'Contract_3_Done': 'contract_3_done', 'Contract_4_Done': 'contract_4_done',
+      'Contract_5_Done': 'contract_5_done', 'Contract_6_Done': 'contract_6_done',
+      'Contract_7_Done': 'contract_7_done', 'Contract_8_Done': 'contract_8_done',
+      'Contract_9_Done': 'contract_9_done', 'Contract_10_Done': 'contract_10_done'
+    };
+
+    // Keys to skip (talents, equipment, recipes we don't need)
+    const SKIP_PREFIXES = ['T_PlotRow', 'T_Green', 'T_Eager', 'T_Bountiful', 'T_Rapid', 'T_Crop',
+      'T_Cow', 'T_Chicken', 'T_Quick', 'T_Sheep', 'T_Goat', 'T_Apiary', 'T_Husbandry', 'T_Pig', 'T_Animal',
+      'T_Keen', 'T_Farm', 'T_Stock', 'T_Artisan', 'T_Seasoned', 'T_Bonus', 'T_Prodigy',
+      'Has_Milk', 'Has_Basket', 'Has_Bee', 'Has_Shearing', 'Has_Butcher', 'Has_Truffle',
+      'Has_Recipe', 'Has_Starter', 'Seeds_', 'Unspent_', 'Rebirth_', 'playerName'];
+
+    function shouldSkip(key) {
+      return SKIP_PREFIXES.some(p => key.indexOf(p) === 0);
+    }
+
+    function parseSyncInventory(msg) {
+      const data = {};
+      const parts = msg.split('_');
+      let i = 0;
+
+      // Skip "Sync_Inventory" prefix
+      if (parts[0] === 'Sync' && parts[1] === 'Inventory') i = 2;
+
+      while (i < parts.length) {
+        let matched = false;
+
+        // Try 3-word keys
+        if (!matched && i + 3 < parts.length) {
+          const k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+          if (SYNC_MAP[k3] !== undefined) {
+            const val = parseInt(parts[i+3]);
+            data[SYNC_MAP[k3]] = isNaN(val) ? 0 : val;
+            i += 4; matched = true;
+          } else if (shouldSkip(k3)) {
+            i += 4; matched = true;
+          }
+        }
+
+        // Try 2-word keys
+        if (!matched && i + 2 < parts.length) {
+          const k2 = parts[i] + '_' + parts[i+1];
+          if (SYNC_MAP[k2] !== undefined) {
+            const val = parseInt(parts[i+2]);
+            data[SYNC_MAP[k2]] = isNaN(val) ? 0 : val;
+            i += 3; matched = true;
+          } else if (shouldSkip(k2)) {
+            i += 3; matched = true;
+          }
+        }
+
+        // Try 1-word keys
+        if (!matched && i + 1 < parts.length) {
+          if (SYNC_MAP[parts[i]] !== undefined) {
+            const val = parseInt(parts[i+1]);
+            data[SYNC_MAP[parts[i]]] = isNaN(val) ? 0 : val;
+            i += 2; matched = true;
+          } else if (shouldSkip(parts[i])) {
+            i += 2; matched = true;
+          }
+        }
+
+        if (!matched) i++;
+      }
+
+      return data;
+    }
+
+    function handlePortalsMessage(msg) {
+      if (typeof msg !== 'string') return;
+      if (msg.indexOf('Sync_Inventory') !== 0) return;
+
+      console.log('[Contracts] Received Sync_Inventory');
+      const data = parseSyncInventory(msg);
+
+      gameState.gold = data.gold || 0;
+      gameState.level = data.level || 0;
+
+      // Inventory
+      Object.keys(ITEMS).forEach(key => {
+        const varKey = ITEMS[key].varKey;
+        gameState.inventory[key] = data[varKey] || 0;
+      });
+
+      // Talents
+      gameState.talents.contractor1 = data.t_contractor1 || 0;
+      gameState.talents.contractor2 = data.t_contractor2 || 0;
+      gameState.talents.contractor3 = data.t_contractor3 || 0;
+
+      // Contract done flags
+      for (let i = 0; i < 10; i++) {
+        const done = data['contract_' + (i+1) + '_done'] || 0;
+        const wasDone = contractSlots[i].done;
+        contractSlots[i].done = done === 1;
+
+        // If just became done (completed), start cooldown
+        if (done === 1 && !wasDone && !contractSlots[i].cooldownEnd) {
+          contractSlots[i].cooldownEnd = Date.now() + COOLDOWN_MS;
+        }
+
+        // If not done and no contract, generate one
+        if (done === 0 && !contractSlots[i].contract) {
+          contractSlots[i].contract = generateContract(i + 1, gameState.level);
+          contractSlots[i].cooldownEnd = null;
+        }
+      }
+
+      actionPending = false;
+      render();
+    }
+
+    // ============================================
+    // FILL CONTRACT
+    // ============================================
+
+    function canFillContract(slot) {
+      if (!slot.contract || slot.done || actionPending) return false;
+
+      return slot.contract.items.every(item => {
+        const owned = gameState.inventory[item.key] || 0;
+        return owned >= item.qty;
+      });
+    }
+
+    function fillContract(slotId) {
+      const slot = contractSlots[slotId - 1];
+      if (!canFillContract(slot)) return;
+
+      actionPending = true;
+      playSound();
+
+      const contract = slot.contract;
+
+      // Optimistically deduct items locally
+      contract.items.forEach(item => {
+        gameState.inventory[item.key] = (gameState.inventory[item.key] || 0) - item.qty;
+      });
+
+      // Build list of all deduct tasks
+      const deductTasks = [];
+      contract.items.forEach(item => {
+        for (let i = 0; i < item.qty; i++) {
+          deductTasks.push(item.deductTask);
+        }
+      });
+
+      // Build reward tasks
+      const goldTasks = getRewardTasks(contract.goldReward, 'Add_Gold_', [1000, 500, 250, 100, 50, 25]);
+      const xpTasks = getRewardTasks(contract.xpReward, 'Add_XP_', [500, 250, 100, 50, 25, 10]);
+
+      // Stagger all tasks
+      let delay = 0;
+      const STAGGER = 200;
+
+      deductTasks.forEach(task => {
+        setTimeout(() => triggerTask(task), delay);
+        delay += STAGGER;
+      });
+
+      goldTasks.forEach(task => {
+        setTimeout(() => triggerTask(task), delay);
+        delay += STAGGER;
+      });
+
+      xpTasks.forEach(task => {
+        setTimeout(() => triggerTask(task), delay);
+        delay += STAGGER;
+      });
+
+      // Complete contract task
+      setTimeout(() => {
+        triggerTask('Complete_Contract_' + slotId);
+      }, delay);
+
+      // Start cooldown locally
+      slot.done = true;
+      slot.cooldownEnd = Date.now() + COOLDOWN_MS;
+
+      notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
+      render();
+
+      // Safety timeout
+      setTimeout(() => { actionPending = false; render(); }, 5000);
+    }
+
+    function getRewardTasks(amount, prefix, denominations) {
+      const tasks = [];
+      let remaining = amount;
+
+      for (const denom of denominations) {
+        while (remaining >= denom) {
+          tasks.push(prefix + denom);
+          remaining -= denom;
+        }
+      }
+
+      return tasks;
+    }
+
+    // ============================================
+    // COOLDOWN TIMER
+    // ============================================
+
+    function updateCooldowns() {
+      const now = Date.now();
+      let needsRender = false;
+
+      contractSlots.forEach((slot, i) => {
+        if (slot.cooldownEnd && now >= slot.cooldownEnd) {
+          // Cooldown finished - clear and generate new contract
+          slot.cooldownEnd = null;
+          slot.done = false;
+          slot.contract = generateContract(i + 1, gameState.level);
+          triggerTask('Clear_Contract_' + (i + 1));
+          needsRender = true;
+        }
+      });
+
+      if (needsRender) render();
+    }
+
+    function formatTime(ms) {
+      if (ms <= 0) return '0:00';
+      const totalSec = Math.ceil(ms / 1000);
+      const min = Math.floor(totalSec / 60);
+      const sec = totalSec % 60;
+      return min + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    // ============================================
+    // RENDER
+    // ============================================
+
+    function render() {
+      document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
+      document.getElementById('level-display').textContent = gameState.level;
+      document.getElementById('tier-display').textContent = 'Tier ' + getTier(gameState.level);
+      document.getElementById('slots-unlocked').textContent = getUnlockedSlots();
+
+      const grid = document.getElementById('contracts-grid');
+      let html = '';
+
+      const unlockedSlots = getUnlockedSlots();
+      const now = Date.now();
+
+      for (let i = 0; i < 10; i++) {
+        const slot = contractSlots[i];
+        const slotNum = i + 1;
+        const isUnlocked = slotNum <= unlockedSlots;
+        const inCooldown = slot.cooldownEnd && now < slot.cooldownEnd;
+
+        if (!isUnlocked) {
+          // Locked slot
+          let unlockReq = '';
+          if (slotNum <= 4) unlockReq = 'Contractor I';
+          else if (slotNum <= 7) unlockReq = 'Contractor II';
+          else unlockReq = 'Contractor III';
+
+          html += '<div class="contract-card locked">' +
+            '<div class="card-header">' +
+              '<span class="slot-num">Slot ' + slotNum + '</span>' +
+              '<span class="card-status status-locked">Locked</span>' +
+            '</div>' +
+            '<div class="locked-text">' +
+              '<div>&#x1F512;</div>' +
+              '<div class="locked-req">Unlock with ' + unlockReq + '</div>' +
+            '</div>' +
+          '</div>';
+        } else if (inCooldown) {
+          // Cooldown slot
+          const remaining = slot.cooldownEnd - now;
+          html += '<div class="contract-card cooldown">' +
+            '<div class="card-header">' +
+              '<span class="slot-num">Slot ' + slotNum + '</span>' +
+              '<span class="card-status status-cooldown">Cooldown</span>' +
+            '</div>' +
+            '<div class="cooldown-timer" data-slot="' + i + '">' + formatTime(remaining) + '</div>' +
+            '<div style="text-align:center;color:#888;font-size:12px;">New contract soon...</div>' +
+          '</div>';
+        } else if (slot.contract) {
+          // Available contract
+          const contract = slot.contract;
+          const canFill = canFillContract(slot);
+
+          let itemsHtml = '';
+          contract.items.forEach(item => {
+            const owned = gameState.inventory[item.key] || 0;
+            const hasEnough = owned >= item.qty;
+            itemsHtml += '<div class="item-req">' +
+              '<span class="item-icon">' + item.icon + '</span>' +
+              '<span class="item-qty ' + (hasEnough ? 'has-enough' : 'not-enough') + '">' +
+                owned + '/' + item.qty +
+              '</span>' +
+            '</div>';
+          });
+
+          html += '<div class="contract-card ' + (canFill ? 'ready' : 'available') + '">' +
+            '<div class="card-header">' +
+              '<span class="slot-num">Slot ' + slotNum + '</span>' +
+              '<span class="card-status status-available">Available</span>' +
+            '</div>' +
+            '<div class="contract-items">' + itemsHtml + '</div>' +
+            '<div class="rewards">' +
+              '<span class="reward reward-gold">&#x1F4B0; ' + contract.goldReward + 'g</span>' +
+              '<span class="reward reward-xp">&#x2B50; ' + contract.xpReward + ' XP</span>' +
+            '</div>' +
+            '<button class="fill-btn" ' + (canFill && !actionPending ? 'onclick="fillContract(' + slotNum + ')"' : 'disabled') + '>' +
+              'Fill Order' +
+            '</button>' +
+          '</div>';
+        } else {
+          // No contract generated yet
+          html += '<div class="contract-card available">' +
+            '<div class="card-header">' +
+              '<span class="slot-num">Slot ' + slotNum + '</span>' +
+            '</div>' +
+            '<div class="locked-text">Loading...</div>' +
+          '</div>';
+        }
+      }
+
+      grid.innerHTML = html;
+    }
+
+    function updateTimerDisplays() {
+      const now = Date.now();
+      contractSlots.forEach((slot, i) => {
+        if (slot.cooldownEnd && now < slot.cooldownEnd) {
+          const el = document.querySelector('.cooldown-timer[data-slot="' + i + '"]');
+          if (el) {
+            el.textContent = formatTime(slot.cooldownEnd - now);
+          }
+        }
+      });
+    }
+
+    // ============================================
+    // NOTIFICATIONS & SOUND
+    // ============================================
+
+    function notify(message, type) {
+      if (notificationTimeout) clearTimeout(notificationTimeout);
+
+      const existing = document.querySelector('.notification');
+      if (existing) existing.remove();
+
+      const div = document.createElement('div');
+      div.className = 'notification ' + type;
+      div.textContent = message;
+      document.body.appendChild(div);
+
+      notificationTimeout = setTimeout(() => div.remove(), 3000);
+    }
+
+    var _clickSound = new Audio('click.mp3');
+    _clickSound.preload = 'auto';
+    _clickSound.volume = 0.3;
+
+    function playSound() {
+      try { _clickSound.currentTime = 0; _clickSound.play().catch(function(){}); } catch(e) {}
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    let lastMessageId = '';
+    let lastMessageTime = 0;
+
+    function processMessage(msg, source) {
+      const now = Date.now();
+      const msgId = msg + '_' + Math.floor(now / 100);
+      if (msgId === lastMessageId && now - lastMessageTime < 200) return;
+      lastMessageId = msgId;
+      lastMessageTime = now;
+      handlePortalsMessage(msg);
+    }
+
+    function setupMessageListener() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+        PortalsSdk.setMessageListener(function(msg) { processMessage(msg, 'SDK'); });
+        console.log('[Contracts] SDK listener registered');
+      } else {
+        setTimeout(setupMessageListener, 100);
+      }
+    }
+
+    window.addEventListener('message', function(event) {
+      if (event.data && typeof event.data === 'string') {
+        processMessage(event.data, 'postMessage');
+      } else if (event.data && event.data.portalsMessage) {
+        processMessage(event.data.portalsMessage, 'postMessage-portals');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('[Contracts] Contracts Board loaded');
+      setupMessageListener();
+
+      // Request sync
+      setTimeout(function() { triggerTask('Sync_Inventory'); }, 300);
+
+      // Initial render
+      render();
+
+      // Update cooldowns every second
+      setInterval(function() {
+        updateCooldowns();
+        updateTimerDisplays();
+      }, 1000);
+    });
+
+    // Visibility handler
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        triggerTask('Sync_Inventory');
+        updateCooldowns();
+        render();
+      }
+    });
+  </script>
+</body>
+</html>

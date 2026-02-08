@@ -506,7 +506,7 @@ body {
     <button class="tree-tab" data-tree="economy" onclick="switchTree('economy')">
       <span class="tab-icon">&#128218;</span>
       <span class="tab-label">General</span>
-      <span class="tab-points" id="tabPointsEconomy">0 / 20</span>
+      <span class="tab-points" id="tabPointsEconomy">0 / 29</span>
     </button>
   </div>
 
@@ -602,7 +602,7 @@ var TALENT_TREES = {
   },
   economy: {
     name: 'General',
-    maxPoints: 20,
+    maxPoints: 29,
     tiers: [
       {
         tier: 1, gate: 0,
@@ -612,7 +612,9 @@ var TALENT_TREES = {
           { key: 'FarmHand', name: 'Farm Hand', icon: '\u{1F9D1}\u200D\u{1F33E}', maxRank: 3,
             desc: '+2 XP to planting & harvesting per rank' },
           { key: 'Stockman', name: 'Stockman', icon: '\u{1F920}', maxRank: 3,
-            desc: '+2 XP to animal starts & collections per rank' }
+            desc: '+2 XP to animal starts & collections per rank' },
+          { key: 'Contractor1', name: 'Contractor I', icon: '\u{1F4CB}', maxRank: 3,
+            desc: '+1 contract slot per rank (slots 2-4)' }
         ]
       },
       {
@@ -623,7 +625,9 @@ var TALENT_TREES = {
           { key: 'SeasonedWorker', name: 'Seasoned Worker', icon: '\u{1F4AA}', maxRank: 3,
             desc: '+2 XP to all activities per rank' },
           { key: 'BonusPoint1', name: 'Bonus Talent Point I', icon: '\u{1F381}', maxRank: 1,
-            desc: 'Gain 1 extra talent point immediately' }
+            desc: 'Gain 1 extra talent point immediately' },
+          { key: 'Contractor2', name: 'Contractor II', icon: '\u{1F4CB}', maxRank: 3,
+            desc: '+1 contract slot per rank (slots 5-7)' }
         ]
       },
       {
@@ -632,7 +636,9 @@ var TALENT_TREES = {
           { key: 'Prodigy', name: 'Prodigy', icon: '\u{1F31F}', maxRank: 3,
             desc: '+3 XP to all activities per rank' },
           { key: 'BonusPoint2', name: 'Bonus Talent Point II', icon: '\u{1F381}', maxRank: 1,
-            desc: 'Gain 1 extra talent point immediately' }
+            desc: 'Gain 1 extra talent point immediately' },
+          { key: 'Contractor3', name: 'Contractor III', icon: '\u{1F4CB}', maxRank: 3,
+            desc: '+1 contract slot per rank (slots 8-10)' }
         ]
       }
     ]
@@ -961,7 +967,7 @@ function renderAll() {
   // Tab point counters
   document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 17';
   document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 38';
-  document.getElementById('tabPointsEconomy').textContent = getPointsInTree('economy') + ' / 20';
+  document.getElementById('tabPointsEconomy').textContent = getPointsInTree('economy') + ' / 29';
 
   renderTree();
 }
