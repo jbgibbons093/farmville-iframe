@@ -8,9 +8,10 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html {
+    html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
     }
 
     body {
@@ -19,6 +20,8 @@
       overflow-x: hidden;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
     }
 
     .guide-container {
@@ -38,7 +41,7 @@
       display: flex;
       flex: 1;
       overflow: hidden;
-      max-height: 70vh;
+      height: calc(95vh - 60px);
     }
 
     /* Sidebar Navigation */
