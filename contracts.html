@@ -377,7 +377,9 @@
       if (typeof msg !== 'string') return;
       if (msg.indexOf('Sync_Inventory') !== 0) return;
 
+      console.log('[Contracts] Received Sync_Inventory');
       const data = parseSyncInventory(msg);
+      console.log('[Contracts] Parsed data:', data);
 
       gameState.gold = data.gold !== undefined ? data.gold : 0;
       gameState.level = data.level !== undefined ? data.level : 0;
@@ -390,6 +392,8 @@
       gameState.talents.contractor1 = data.t_contractor1 !== undefined ? data.t_contractor1 : 0;
       gameState.talents.contractor2 = data.t_contractor2 !== undefined ? data.t_contractor2 : 0;
       gameState.talents.contractor3 = data.t_contractor3 !== undefined ? data.t_contractor3 : 0;
+
+      console.log('[Contracts] Inventory:', gameState.inventory);
 
       // Initialize available contracts if not done
       if (availableContracts.length === 0) {
@@ -753,7 +757,9 @@
     function setupMessageListener() {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
         PortalsSdk.setMessageListener(function(msg) { processMessage(msg, 'SDK'); });
+        console.log('[Contracts] SDK listener registered');
       } else {
+        console.log('[Contracts] Waiting for SDK...');
         setTimeout(setupMessageListener, 100);
       }
     }
@@ -763,6 +769,8 @@
         processMessage(event.data, 'postMessage');
       } else if (event.data && event.data.portalsMessage) {
         processMessage(event.data.portalsMessage, 'postMessage-portals');
+      } else if (event.data && event.data.message && typeof event.data.message === 'string') {
+        processMessage(event.data.message, 'postMessage-message');
       }
     });
 
