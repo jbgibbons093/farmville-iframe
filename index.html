@@ -444,8 +444,8 @@
 
     function getActivePlotCount() {
       const t = gameState.talents;
-      // Each rank unlocks 2 plots (3 ranks = 6 plots per row)
-      return 6 + (t.plotRow2 * 2) + (t.plotRow3 * 2) + (t.plotRow4 * 2);
+      // Each rank unlocks 1 plot (6 ranks = 6 plots per row)
+      return 6 + t.plotRow2 + t.plotRow3 + t.plotRow4;
     }
 
     function getActiveAnimalSlots(type) {
