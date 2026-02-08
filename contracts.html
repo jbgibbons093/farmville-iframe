@@ -533,11 +533,17 @@
     }
 
     function canFillContract(slot) {
-      if (!slot.contract || slot.state !== 'active' || actionPending) return false;
-      return slot.contract.items.every(item => {
+      if (!slot.contract || slot.state !== 'active' || actionPending) {
+        console.log('[Contracts] canFillContract FAIL - state:', slot.state, 'actionPending:', actionPending, 'contract:', !!slot.contract);
+        return false;
+      }
+      const result = slot.contract.items.every(item => {
         const owned = gameState.inventory[item.key] || 0;
+        console.log('[Contracts] Check item:', item.key, 'need:', item.qty, 'have:', owned, 'inventory:', gameState.inventory);
         return owned >= item.qty;
       });
+      console.log('[Contracts] canFillContract result:', result);
+      return result;
     }
 
     function fillContract(slotIndex) {
