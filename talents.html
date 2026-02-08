@@ -1027,12 +1027,16 @@ function buyTalentPoint() {
 // ── Portals SDK ──
 function triggerTask(taskName, targetState) {
   targetState = targetState || 'SetNotActiveToActive';
-  console.log('[Talents] triggerTask:', taskName);
+  console.log('[Talents] triggerTask:', taskName, 'targetState:', targetState);
   if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-    PortalsSdk.sendMessageToUnity(JSON.stringify({
+    var msg = JSON.stringify({
       TaskName: taskName,
       TaskTargetState: targetState
-    }));
+    });
+    console.log('[Talents] Sending to Portals:', msg);
+    PortalsSdk.sendMessageToUnity(msg);
+  } else {
+    console.error('[Talents] PortalsSdk not available!');
   }
 }
 
