@@ -1526,7 +1526,7 @@ function hideTooltip() {
 var _mp3Sounds = {};
 (function() {
   var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3' };
-  for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
+  for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click' || k === 'talent') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
 })();
 var _audioCtx = null;
 function _getAudioCtx() {
