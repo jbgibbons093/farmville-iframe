@@ -34,80 +34,89 @@
     .hud-container {
       display: inline-flex;
       align-items: center;
-      gap: 14px;
-      padding: 8px 16px;
-      background: linear-gradient(160deg, rgba(25, 20, 12, 0.92) 0%, rgba(15, 12, 6, 0.95) 100%);
-      border-radius: 14px;
-      border: 3px solid rgba(120, 90, 50, 0.7);
+      gap: 18px;
+      padding: 12px 24px;
+      background: linear-gradient(160deg, rgba(30, 24, 14, 0.94) 0%, rgba(18, 14, 8, 0.96) 100%);
+      border-radius: 22px;
+      border: 4px solid rgba(255, 215, 0, 0.5);
       pointer-events: none;
       margin-top: 4px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+      box-shadow: 0 6px 30px rgba(0,0,0,0.6), 0 0 20px rgba(255,215,0,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
     }
 
-    /* Logo Section */
+    /* Logo Section - Stacked */
     .logo-section {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .logo-icon {
-      font-size: 28px;
-      filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.6));
+      font-size: 36px;
+      filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.7));
     }
 
     .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .logo-hughberry {
       font-family: 'Luckiest Guy', cursive;
       font-size: 22px;
       color: #FFD700;
-      text-shadow: 2px 2px 0 #8B4513, 0 0 10px rgba(255,215,0,0.3);
-      letter-spacing: 1.5px;
+      text-shadow: 2px 2px 0 #8B4513, 0 0 12px rgba(255,215,0,0.4);
+      letter-spacing: 2px;
     }
 
-    .logo-text .farms {
+    .logo-farms {
+      font-family: 'Luckiest Guy', cursive;
+      font-size: 18px;
       color: #66ff88;
-      text-shadow: 2px 2px 0 #1a6630, 0 0 10px rgba(102,255,136,0.3);
+      text-shadow: 2px 2px 0 #1a6630, 0 0 12px rgba(102,255,136,0.4);
+      letter-spacing: 3px;
     }
 
     /* Stats Section */
     .stats-section {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .stat-box {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: linear-gradient(160deg, rgba(50, 42, 28, 0.9) 0%, rgba(35, 28, 16, 0.9) 100%);
-      padding: 6px 14px;
-      border-radius: 10px;
-      border: 2px solid #6a5535;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      gap: 10px;
+      background: linear-gradient(160deg, rgba(50, 42, 28, 0.92) 0%, rgba(35, 28, 16, 0.92) 100%);
+      padding: 10px 18px;
+      border-radius: 16px;
+      border: 3px solid #6a5535;
+      box-shadow: 0 5px 0 rgba(40, 30, 15, 0.8), 0 6px 15px rgba(0,0,0,0.4);
     }
 
     .stat-icon {
-      font-size: 22px;
-      filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.6));
+      font-size: 28px;
+      filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7));
     }
 
     .stat-info {
       display: flex;
       flex-direction: column;
-      gap: 1px;
+      gap: 2px;
     }
 
     .stat-label {
-      font-size: 10px;
-      color: #aaa;
+      font-size: 11px;
+      color: #bbb;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.5px;
       font-weight: 800;
     }
 
     .stat-value {
-      font-size: 18px;
+      font-size: 24px;
       font-weight: 900;
       color: #FFD700;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
@@ -116,7 +125,7 @@
 
     .stat-value.level {
       color: #5cb8ff;
-      text-shadow: 0 0 8px rgba(92,184,255,0.4);
+      text-shadow: 0 0 10px rgba(92,184,255,0.5);
       animation: shimmerBlue 3s ease-in-out infinite;
     }
 
@@ -124,35 +133,36 @@
     .xp-bar-container {
       display: flex;
       flex-direction: column;
-      gap: 3px;
-      min-width: 140px;
+      gap: 4px;
+      min-width: 170px;
     }
 
     .xp-bar-label {
       display: flex;
       justify-content: space-between;
-      font-size: 10px;
-      color: #bbb;
+      font-size: 12px;
+      color: #ccc;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.5px;
       font-weight: 800;
     }
 
     .xp-bar {
-      height: 14px;
+      height: 18px;
       background: rgba(0, 0, 0, 0.6);
-      border-radius: 7px;
-      border: 2px solid #5a4530;
+      border-radius: 10px;
+      border: 3px solid #5a4530;
       overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
     }
 
     .xp-bar-fill {
       height: 100%;
       background: linear-gradient(90deg, #ff6b35, #ff4444, #ff6b35);
       background-size: 200% 100%;
-      border-radius: 5px;
+      border-radius: 7px;
       transition: width 0.5s ease;
-      box-shadow: 0 0 12px rgba(255, 107, 53, 0.6);
+      box-shadow: 0 0 14px rgba(255, 107, 53, 0.7);
       animation: xpShine 2s linear infinite;
     }
 
@@ -160,67 +170,25 @@
     .gold-display {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: linear-gradient(160deg, rgba(60, 48, 25, 0.9) 0%, rgba(40, 32, 16, 0.9) 100%);
-      padding: 6px 14px;
-      border-radius: 10px;
-      border: 2px solid #DAA520;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3), 0 0 12px rgba(218,165,32,0.15);
+      gap: 8px;
+      background: linear-gradient(160deg, rgba(60, 48, 25, 0.92) 0%, rgba(40, 32, 16, 0.92) 100%);
+      padding: 10px 18px;
+      border-radius: 16px;
+      border: 3px solid #DAA520;
+      box-shadow: 0 5px 0 rgba(100, 75, 15, 0.6), 0 6px 15px rgba(0,0,0,0.4), 0 0 16px rgba(218,165,32,0.2);
     }
 
     .gold-icon {
-      font-size: 20px;
+      font-size: 26px;
+      filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.6));
     }
 
     .gold-value {
-      font-size: 18px;
+      font-size: 24px;
       font-weight: 900;
       color: #FFD700;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
       animation: shimmerGold 3s ease-in-out infinite;
-    }
-
-    /* Keyboard Hints */
-    .hints-section {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .key-hint {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(160deg, rgba(55, 55, 55, 0.85) 0%, rgba(35, 35, 35, 0.85) 100%);
-      padding: 5px 10px;
-      border-radius: 8px;
-      border: 2px solid #666;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-
-    .key-box {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      background: linear-gradient(180deg, #555, #3a3a3a);
-      border: 2px solid #777;
-      border-bottom-color: #444;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-      box-shadow: 0 3px 0 #222, 0 0 6px rgba(255,255,255,0.05);
-    }
-
-    .key-label {
-      font-size: 11px;
-      font-weight: 800;
-      color: #bbb;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     /* Talent Notification */
@@ -228,16 +196,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 6px;
-      padding: 8px 18px;
+      margin-top: 8px;
+      padding: 12px 24px;
       background: linear-gradient(160deg, rgba(60, 50, 20, 0.95) 0%, rgba(40, 32, 10, 0.95) 100%);
       border: 3px solid #DAA520;
-      border-radius: 12px;
-      font-size: 15px;
+      border-radius: 18px;
+      font-size: 18px;
       font-weight: 800;
       color: #FFD700;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 8px rgba(255,215,0,0.3);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 10px rgba(255,215,0,0.4);
       pointer-events: none;
+      box-shadow: 0 5px 0 rgba(100, 75, 15, 0.5), 0 0 20px rgba(255,215,0,0.15);
       animation: talentPulse 2s ease-in-out infinite;
     }
 
@@ -246,22 +215,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-top: 6px;
-      padding: 10px 20px;
+      gap: 12px;
+      margin-top: 8px;
+      padding: 14px 26px;
       background: linear-gradient(160deg, rgba(15, 60, 30, 0.95) 0%, rgba(8, 40, 18, 0.95) 100%);
       border: 3px solid #00ff88;
-      border-radius: 12px;
-      font-size: 16px;
+      border-radius: 18px;
+      font-size: 18px;
       font-weight: 800;
       color: #00ff88;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 10px rgba(0,255,136,0.3);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 12px rgba(0,255,136,0.4);
       pointer-events: none;
+      box-shadow: 0 5px 0 rgba(0, 100, 50, 0.5), 0 0 20px rgba(0,255,136,0.15);
       animation: firstJoinPulse 1.5s ease-in-out infinite;
     }
 
     .first-join-notif .fj-icon {
-      font-size: 22px;
+      font-size: 26px;
     }
 
     /* HUD Notifications Container */
@@ -279,13 +249,13 @@
     .hud-notif {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 18px;
+      gap: 12px;
+      padding: 12px 22px;
       background: linear-gradient(160deg, rgba(25, 20, 12, 0.95) 0%, rgba(15, 12, 6, 0.95) 100%);
-      border-radius: 12px;
-      border: 2px solid;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      font-size: 15px;
+      border-radius: 16px;
+      border: 3px solid;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.5);
+      font-size: 17px;
       font-weight: 800;
       pointer-events: none;
       animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -313,13 +283,13 @@
     .hud-notif.level-up {
       border-color: #5cb8ff;
       color: #88ddff;
-      text-shadow: 0 0 10px rgba(92,184,255,0.5);
-      font-size: 18px;
+      text-shadow: 0 0 12px rgba(92,184,255,0.6);
+      font-size: 22px;
       animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, levelUpFlash 0.6s ease-in-out 3;
     }
 
     .hud-notif .notif-icon {
-      font-size: 22px;
+      font-size: 26px;
     }
 
     .hud-notif.fade-out {
@@ -371,11 +341,12 @@
 <body>
   <div class="hud-wrapper">
     <div class="hud-container">
-      <!-- Logo Section -->
+      <!-- Logo Section (Stacked) -->
       <div class="logo-section">
         <span class="logo-icon">&#x1F33E;</span>
         <div class="logo-text">
-          Hughberry <span class="farms">Farms</span>
+          <span class="logo-hughberry">HUGHBERRY</span>
+          <span class="logo-farms">FARMS</span>
         </div>
       </div>
 
@@ -408,30 +379,6 @@
               <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Keyboard Hints Section -->
-      <div class="hints-section">
-        <div class="key-hint">
-          <span class="key-box">E</span>
-          <span class="key-label">Inventory</span>
-        </div>
-        <div class="key-hint">
-          <span class="key-box">Y</span>
-          <span class="key-label">Talents</span>
-        </div>
-        <div class="key-hint">
-          <span class="key-box">G</span>
-          <span class="key-label">Leaderboard</span>
-        </div>
-        <div class="key-hint">
-          <span class="key-box">V</span>
-          <span class="key-label">Gold Store</span>
-        </div>
-        <div class="key-hint">
-          <span class="key-box">L</span>
-          <span class="key-label">Guide</span>
         </div>
       </div>
     </div>
