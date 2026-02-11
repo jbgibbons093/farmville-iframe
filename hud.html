@@ -210,6 +210,30 @@
       animation: talentPulse 2s ease-in-out infinite;
     }
 
+    /* Rebirth Ready Notification */
+    .rebirth-notif {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(160deg, rgba(60, 20, 70, 0.95) 0%, rgba(35, 10, 45, 0.95) 100%);
+      border: 3px solid #cc66ff;
+      border-radius: 18px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #dd88ff;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 12px rgba(204,102,255,0.4);
+      pointer-events: none;
+      box-shadow: 0 5px 0 rgba(80, 30, 100, 0.5), 0 0 20px rgba(204,102,255,0.15);
+      animation: rebirthPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes rebirthPulse {
+      0%, 100% { box-shadow: 0 5px 0 rgba(80,30,100,0.5), 0 0 10px rgba(204,102,255,0.3); }
+      50% { box-shadow: 0 5px 0 rgba(80,30,100,0.5), 0 0 25px rgba(204,102,255,0.6), 0 0 50px rgba(204,102,255,0.2); }
+    }
+
     /* First-Join Notification */
     .first-join-notif {
       display: flex;
@@ -384,6 +408,7 @@
     </div>
 
     <div id="talent-notif" class="talent-notif" style="display:none"></div>
+    <div id="rebirth-notif" class="rebirth-notif" style="display:none">&#x1F52E; You've reached Level 50! Press G to Rebirth! &#x1F52E;</div>
     <div id="first-join-notif" class="first-join-notif" style="display:none">
       <span class="fj-icon">&#x1F381;</span>
       <span>Press E to open Inventory &amp; claim FREE seeds!</span>
@@ -640,6 +665,14 @@
         talentNotif.style.display = 'flex';
       } else {
         talentNotif.style.display = 'none';
+      }
+
+      // Rebirth ready notification
+      var rebirthNotif = document.getElementById('rebirth-notif');
+      if (level >= 50) {
+        rebirthNotif.style.display = 'flex';
+      } else {
+        rebirthNotif.style.display = 'none';
       }
     }
 
