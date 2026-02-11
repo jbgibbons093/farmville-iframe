@@ -454,7 +454,7 @@
   </style>
 </head>
 <body>
-<script>try{new Audio('ui-pop.mp3').play().catch(function(){});}catch(e){}</script>
+<script>var _uiPop=new Audio('ui-pop.mp3');_uiPop.preload='auto';_uiPop.volume=0.5;var _uiPopPlayed=false;</script>
   <div class="guide-container">
   <!-- Header Bar -->
   <div class="header-bar">
@@ -1503,6 +1503,7 @@
     function setupMessageListener() {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
         PortalsSdk.setMessageListener(function(msg) {
+          if(!_uiPopPlayed){_uiPopPlayed=true;_uiPop.play().catch(function(){});}
           console.log('[Guide] Received message:', msg);
         });
         console.log('[Guide] SDK listener registered');

@@ -523,7 +523,7 @@ body {
 </style>
 </head>
 <body>
-<script>try{new Audio('ui-pop.mp3').play().catch(function(){});}catch(e){}</script>
+<script>var _uiPop=new Audio('ui-pop.mp3');_uiPop.preload='auto';_uiPop.volume=0.5;var _uiPopPlayed=false;</script>
 
 <div class="leaderboard-container">
   <div class="lb-header">
@@ -875,6 +875,7 @@ var lastMessageId = '';
 var lastMessageTime = 0;
 
 function processMessage(msg, source) {
+  if(!_uiPopPlayed){_uiPopPlayed=true;_uiPop.play().catch(function(){});}
   var now = Date.now();
   var msgId = msg + '_' + Math.floor(now / 100);
   if (msgId === lastMessageId && now - lastMessageTime < 200) {
