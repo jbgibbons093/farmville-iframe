@@ -899,6 +899,10 @@
 
     setupMessageListener();
 
+    document.addEventListener('click', function() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+    });
+
     // Request inventory sync from Portals when iframe loads - immediate request
     setTimeout(function() {
       triggerTask('Sync_Inventory');
@@ -913,6 +917,7 @@
       }
     }, 2000);
 
+    var _prevXP = -1, _prevLevel = -1, _firstXPSync = true;
     function handlePortalsMessage(msg) {
       console.log('[Hughberry] Received:', msg);
       if (typeof msg !== 'string') return;
@@ -931,6 +936,8 @@
       }
       else if (msg.indexOf('Sync_Inventory') === 0) {
         parseAndSyncInventory(msg);
+        if (_firstXPSync) { _firstXPSync = false; _prevXP = gameState.xp; _prevLevel = gameState.level; }
+        else { if (gameState.level === _prevLevel && gameState.xp > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = gameState.xp; _prevLevel = gameState.level; }
         checkLevelUp(); // Detect level-ups and trigger Add_Level_1 to Portals
         updateAllUI();
       }
@@ -1983,7 +1990,7 @@
     // === Sound Effects (MP3 + Web Audio API fallback) ===
     var _mp3Sounds = {};
     (function() {
-      var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', cow: 'cow.mp3', chicken: 'chicken.mp3', sheep: 'sheep.mp3', goat: 'goat.mp3', pig: 'pig.mp3', bee: 'bee.mp3', cropready: 'cropready.mp3' };
+      var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', xp: 'xp-gain.mp3', cow: 'cow.mp3', chicken: 'chicken.mp3', sheep: 'sheep.mp3', goat: 'goat.mp3', pig: 'pig.mp3', bee: 'bee.mp3', cropready: 'cropready.mp3' };
       for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
     })();
     var _audioCtx = null;

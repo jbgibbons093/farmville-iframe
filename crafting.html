@@ -147,7 +147,7 @@
     // === Sound Effects (MP3 + Web Audio API fallback) ===
     var _mp3Sounds = {};
     (function() {
-      var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3' };
+      var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', xp: 'xp-gain.mp3' };
       for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
     })();
     var _audioCtx = null;
@@ -349,6 +349,7 @@
     }
     // === End Standard Parser ===
 
+    var _prevXP = -1, _prevLevel = -1, _firstXPSync = true;
     function handlePortalsMessage(msg) {
       console.log('[Hughberry Crafting] Received:', msg);
       if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
@@ -398,6 +399,8 @@
         gameState.talents.prodigy = data.t_prodigy || 0;
         gameState.rebirthBlessings.artisanTouch = data.rt_artisantouch || 0;
         actionPending = false;
+        if (_firstXPSync) { _firstXPSync = false; _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
+        else { if ((data.level || 0) === _prevLevel && (data.xp || 0) > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
         render();
       }
     }
@@ -434,6 +437,10 @@
     gameState.inventory = {};
     render();
     setupMessageListener();
+
+    document.addEventListener('click', function() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+    });
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {

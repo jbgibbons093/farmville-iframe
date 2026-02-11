@@ -992,6 +992,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       loadState();
       setupMessageListener();
+
+      document.addEventListener('click', function() {
+        if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+      });
+
       // Note: Sync_Inventory is triggered in setupMessageListener after SDK ready
       render();
       startGameLoop();
