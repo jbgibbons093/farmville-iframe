@@ -905,9 +905,14 @@
 
     setupMessageListener();
 
-    document.addEventListener('click', function() {
+    // Continuously refocus game keyboard so WASD movement keeps working
+    function _refocusGame() {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
-    });
+    }
+    document.addEventListener('click', _refocusGame);
+    document.addEventListener('mouseup', _refocusGame);
+    document.addEventListener('keydown', _refocusGame);
+    setInterval(_refocusGame, 500);
 
     // Request inventory sync from Portals when iframe loads - immediate request
     setTimeout(function() {
