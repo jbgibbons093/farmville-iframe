@@ -905,6 +905,7 @@ function investPoint(treeName, talentKey) {
 
   actionPending = true;
   triggerTask('Invest_RT_' + talentKey);
+  playSound('talent');
 
   // Optimistic update
   blessingState[talentKey] = (blessingState[talentKey] || 0) + 1;

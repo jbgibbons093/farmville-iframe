@@ -1037,6 +1037,7 @@ function investPoint(treeName, talentKey) {
 
   actionPending = true;
   triggerTask('Invest_' + talentKey);
+  playSound('talent');
 
   // Optimistic update
   talentState[talentKey] = (talentState[talentKey] || 0) + 1;

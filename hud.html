@@ -453,15 +453,34 @@
     // HUGHBERRY FARMS - GLOBAL HUD
     // ============================================
 
-    // Preload XP gain sound effect
-    var xpGainSound = new Audio('xp-gain.mp3');
-    xpGainSound.volume = 0.5;
+    // XP gain sound - use fetch + AudioContext to bypass autoplay restrictions
+    // (HUD has pointer-events:none so it never gets user gestures)
+    var _xpAudioCtx = null;
+    var _xpSoundBuffer = null;
+
+    (function() {
+      try {
+        _xpAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        fetch('xp-gain.mp3')
+          .then(function(r) { return r.arrayBuffer(); })
+          .then(function(buf) { return _xpAudioCtx.decodeAudioData(buf); })
+          .then(function(decoded) { _xpSoundBuffer = decoded; })
+          .catch(function() {});
+      } catch(e) {}
+    })();
 
     function playXpSound() {
-      // Clone so overlapping plays don't cut each other off
-      var s = xpGainSound.cloneNode();
-      s.volume = 0.5;
-      s.play().catch(function() {});
+      try {
+        if (!_xpAudioCtx || !_xpSoundBuffer) return;
+        if (_xpAudioCtx.state === 'suspended') _xpAudioCtx.resume();
+        var source = _xpAudioCtx.createBufferSource();
+        var gain = _xpAudioCtx.createGain();
+        source.buffer = _xpSoundBuffer;
+        gain.gain.value = 0.5;
+        source.connect(gain);
+        gain.connect(_xpAudioCtx.destination);
+        source.start(0);
+      } catch(e) {}
     }
 
     // Game state - all values come from Portals via Sync_Inventory
