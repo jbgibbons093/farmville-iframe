@@ -208,6 +208,7 @@
     let gameState = {
       gold: 0,
       level: 0,
+      xp: 0,
       inventory: {},
       talents: { contractor1: 0, contractor2: 0, contractor3: 0 },
       rebirthBlessings: { quickContracts: 0, timeWarp: 0 }
@@ -485,6 +486,8 @@
       return data;
     }
 
+    var _prevXP = -1, _prevLevel = -1, _firstXPSync = true;
+
     function handlePortalsMessage(msg) {
       if (typeof msg !== 'string') return;
       if (msg.indexOf('Sync_Inventory') !== 0) return;
@@ -495,6 +498,7 @@
 
       gameState.gold = data.gold !== undefined ? data.gold : 0;
       gameState.level = data.level !== undefined ? data.level : 0;
+      gameState.xp = data.xp !== undefined ? data.xp : 0;
 
       // Map inventory items - key in ITEMS matches key in data now
       Object.keys(ITEMS).forEach(function(key) {
@@ -519,6 +523,10 @@
       if (availableContracts.length === 0 || availableContracts.length > maxAvailable) {
         refreshAvailableContracts();
       }
+
+      // XP sound delta tracking
+      if (_firstXPSync) { _firstXPSync = false; _prevXP = gameState.xp; _prevLevel = gameState.level; }
+      else { if (gameState.level === _prevLevel && gameState.xp > _prevXP) { setTimeout(function() { try { _xpSound.currentTime = 0; _xpSound.play().catch(function(){}); } catch(e) {} }, 500); } _prevXP = gameState.xp; _prevLevel = gameState.level; }
 
       actionPending = false;
       render();
@@ -935,6 +943,9 @@
     var _clickSound = new Audio('click.mp3');
     _clickSound.preload = 'auto';
     _clickSound.volume = 0.6;
+    var _xpSound = new Audio('xp-gain.mp3');
+    _xpSound.preload = 'auto';
+    _xpSound.volume = 0.3;
     function playSound() {
       try { _clickSound.currentTime = 0; _clickSound.play().catch(function(){}); } catch(e) {}
     }

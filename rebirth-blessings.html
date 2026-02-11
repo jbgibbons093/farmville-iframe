@@ -974,8 +974,13 @@ function handlePortalsMessage(msg) {
     }
     parseAndSyncInventory(msg);
     renderAll();
+    if (_firstXPSync) { _firstXPSync = false; _prevXP = _parsedXP; _prevLevel = _parsedLevel; }
+    else { if (_parsedLevel === _prevLevel && _parsedXP > _prevXP) { setTimeout(function() { playSound('xp'); }, 500); } _prevXP = _parsedXP; _prevLevel = _parsedLevel; }
   }
 }
+
+var _parsedXP = 0, _parsedLevel = 0;
+var _prevXP = -1, _prevLevel = -1, _firstXPSync = true;
 
 function parseAndSyncInventory(msg) {
   msg = msg.replace('Sync_Inventory_', '');
@@ -1054,7 +1059,17 @@ function parseAndSyncInventory(msg) {
         i += 3; continue;
       }
     }
-    // One-word skip
+    // One-word keys
+    if (parts[i] === 'XP' && i + 1 < parts.length) {
+      var xv = parseInt(parts[i + 1]);
+      _parsedXP = isNaN(xv) ? 0 : Math.max(0, xv);
+      i += 2; continue;
+    }
+    if (parts[i] === 'Level' && i + 1 < parts.length) {
+      var lv = parseInt(parts[i + 1]);
+      _parsedLevel = isNaN(lv) ? 0 : Math.max(0, lv);
+      i += 2; continue;
+    }
     if (parts[i] === 'playerName' && i + 1 < parts.length) { i += 2; continue; }
     i++;
   }
@@ -1357,7 +1372,7 @@ function hideTooltip() {
 // ── Sound Effects ──
 var _mp3Sounds = {};
 (function() {
-  var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3' };
+  var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', xp: 'xp-gain.mp3' };
   for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click' || k === 'talent') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
 })();
 var _audioCtx = null;

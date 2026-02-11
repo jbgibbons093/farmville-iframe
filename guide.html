@@ -1499,11 +1499,27 @@
       }
     });
 
+    // XP sound
+    var _xpSound = new Audio('xp-gain.mp3'); _xpSound.preload = 'auto'; _xpSound.volume = 0.3;
+    var _guidePrevXP = -1, _guidePrevLevel = -1, _guideFirstXP = true;
+
     // Setup SDK listener
     function setupMessageListener() {
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
         PortalsSdk.setMessageListener(function(msg) {
           if(!_uiPopPlayed){_uiPopPlayed=true;try{if(_uiPopCtx&&_uiPopBuf){if(_uiPopCtx.state==='suspended')_uiPopCtx.resume();var _s=_uiPopCtx.createBufferSource();var _g=_uiPopCtx.createGain();_s.buffer=_uiPopBuf;_g.gain.value=0.5;_s.connect(_g);_g.connect(_uiPopCtx.destination);_s.start(0)}}catch(e){}}
+          // XP sound tracking
+          if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
+            var _parts = msg.split('_'); var _xp = -1, _lv = -1;
+            for (var _i = 0; _i < _parts.length - 1; _i++) {
+              if (_parts[_i] === 'XP') { var v = parseInt(_parts[_i+1]); _xp = isNaN(v) ? 0 : v; }
+              if (_parts[_i] === 'Level') { var v2 = parseInt(_parts[_i+1]); _lv = isNaN(v2) ? 0 : v2; }
+            }
+            if (_xp >= 0 && _lv >= 0) {
+              if (_guideFirstXP) { _guideFirstXP = false; _guidePrevXP = _xp; _guidePrevLevel = _lv; }
+              else { if (_lv === _guidePrevLevel && _xp > _guidePrevXP) { setTimeout(function() { try { _xpSound.currentTime = 0; _xpSound.play().catch(function(){}); } catch(e) {} }, 500); } _guidePrevXP = _xp; _guidePrevLevel = _lv; }
+            }
+          }
           console.log('[Guide] Received message:', msg);
         });
         console.log('[Guide] SDK listener registered');
