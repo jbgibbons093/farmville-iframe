@@ -88,6 +88,9 @@
       filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7));
     }
 
+    .icon-star { animation: starPulse 2.5s ease-in-out infinite; }
+    .icon-bolt { animation: boltFlicker 1.8s ease-in-out infinite; }
+
     .stat-info {
       display: flex;
       flex-direction: column;
@@ -168,6 +171,7 @@
     .gold-icon {
       font-size: 26px;
       filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.6));
+      animation: coinBounce 2s ease-in-out infinite;
     }
 
     .gold-value {
@@ -348,6 +352,24 @@
       100% { background-position: -200% 0; }
     }
 
+    @keyframes coinBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      25% { transform: translateY(-3px) scale(1.1); }
+      50% { transform: translateY(0) scale(1); }
+    }
+
+    @keyframes starPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7)); }
+      50% { transform: scale(1.2); filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+    }
+
+    @keyframes boltFlicker {
+      0%, 100% { transform: scale(1); filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7)); }
+      30% { transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(255,200,50,0.8)); }
+      40% { transform: scale(1); filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7)); }
+      50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,200,50,0.6)); }
+    }
+
     @keyframes talentPulse {
       0%, 100% { box-shadow: 0 0 8px rgba(218, 165, 32, 0.3); }
       50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.2); }
@@ -390,7 +412,7 @@
         </div>
 
         <div class="stat-box">
-          <span class="stat-icon">&#x2B50;</span>
+          <span class="stat-icon icon-star">&#x2B50;</span>
           <div class="stat-info">
             <span class="stat-label">Level</span>
             <span class="stat-value level" id="level-value">0</span>
@@ -398,7 +420,7 @@
         </div>
 
         <div class="stat-box">
-          <span class="stat-icon">&#x26A1;</span>
+          <span class="stat-icon icon-bolt">&#x26A1;</span>
           <div class="xp-bar-container">
             <div class="xp-bar-label">
               <span>XP</span>
