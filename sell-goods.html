@@ -86,8 +86,8 @@
       // Prices must match Excel Sell tasks
       crops: [
         { key: 'wheat', name: 'Wheat', icon: '&#x1F33E;', price: 5, taskPrefix: 'Sell_Crop_Wheat' },
-        { key: 'carrot', name: 'Carrot', icon: '&#x1F955;', price: 10, taskPrefix: 'Sell_Crop_Carrot' },
         { key: 'corn', name: 'Corn', icon: '&#x1F33D;', price: 8, taskPrefix: 'Sell_Crop_Corn' },
+        { key: 'carrot', name: 'Carrot', icon: '&#x1F955;', price: 10, taskPrefix: 'Sell_Crop_Carrot' },
         { key: 'potato', name: 'Potato', icon: '&#x1F954;', price: 12, taskPrefix: 'Sell_Crop_Potato' },
         { key: 'tomato', name: 'Tomato', icon: '&#x1F345;', price: 15, taskPrefix: 'Sell_Crop_Tomato' },
         { key: 'pumpkin', name: 'Pumpkin', icon: '&#x1F383;', price: 30, taskPrefix: 'Sell_Crop_Pumpkin' }
@@ -139,7 +139,7 @@
     var _mp3Sounds = {};
     (function() {
       var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3' };
-      for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = 0.3; _mp3Sounds[k] = a; }
+      for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
     })();
     var _audioCtx = null;
     function _getAudioCtx() {
