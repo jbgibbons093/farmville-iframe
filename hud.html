@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hughberry Farms HUD</title>
-  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -17,25 +17,31 @@
     body {
       font-family: 'Nunito', sans-serif;
       background: transparent !important;
-      overflow: hidden;
+      overflow: visible;
       margin: 0;
       padding: 0;
       pointer-events: none;
+      width: 100%;
+    }
+
+    .hud-wrapper {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       width: 100%;
     }
 
     .hud-container {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      padding: 6px 12px;
-      background: linear-gradient(145deg, rgba(30, 25, 18, 0.9) 0%, rgba(20, 16, 10, 0.9) 100%);
-      border-radius: 10px;
-      border: 2px solid rgba(90, 69, 48, 0.8);
+      gap: 14px;
+      padding: 8px 16px;
+      background: linear-gradient(160deg, rgba(25, 20, 12, 0.92) 0%, rgba(15, 12, 6, 0.95) 100%);
+      border-radius: 14px;
+      border: 3px solid rgba(120, 90, 50, 0.7);
       pointer-events: none;
       margin-top: 4px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
     /* Logo Section */
@@ -46,20 +52,21 @@
     }
 
     .logo-icon {
-      font-size: 24px;
-      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+      font-size: 28px;
+      filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.6));
     }
 
     .logo-text {
       font-family: 'Luckiest Guy', cursive;
-      font-size: 18px;
+      font-size: 22px;
       color: #FFD700;
-      text-shadow: 2px 2px 0 #8B4513, 3px 3px 4px rgba(0,0,0,0.5);
-      letter-spacing: 1px;
+      text-shadow: 2px 2px 0 #8B4513, 0 0 10px rgba(255,215,0,0.3);
+      letter-spacing: 1.5px;
     }
 
     .logo-text .farms {
-      color: #90EE90;
+      color: #66ff88;
+      text-shadow: 2px 2px 0 #1a6630, 0 0 10px rgba(102,255,136,0.3);
     }
 
     /* Stats Section */
@@ -72,16 +79,17 @@
     .stat-box {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: linear-gradient(145deg, rgba(60, 50, 35, 0.85) 0%, rgba(40, 32, 20, 0.85) 100%);
-      padding: 5px 10px;
-      border-radius: 8px;
-      border: 2px solid #5a4530;
+      gap: 8px;
+      background: linear-gradient(160deg, rgba(50, 42, 28, 0.9) 0%, rgba(35, 28, 16, 0.9) 100%);
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 2px solid #6a5535;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
     }
 
     .stat-icon {
-      font-size: 18px;
-      filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5));
+      font-size: 22px;
+      filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.6));
     }
 
     .stat-info {
@@ -91,212 +99,353 @@
     }
 
     .stat-label {
-      font-size: 9px;
-      color: #999;
+      font-size: 10px;
+      color: #aaa;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-weight: 800;
     }
 
     .stat-value {
-      font-size: 15px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 900;
       color: #FFD700;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      animation: shimmerGold 3s ease-in-out infinite;
     }
 
     .stat-value.level {
-      color: #67b8f7;
+      color: #5cb8ff;
+      text-shadow: 0 0 8px rgba(92,184,255,0.4);
+      animation: shimmerBlue 3s ease-in-out infinite;
     }
 
     /* XP Bar */
     .xp-bar-container {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      min-width: 120px;
+      gap: 3px;
+      min-width: 140px;
     }
 
     .xp-bar-label {
       display: flex;
       justify-content: space-between;
-      font-size: 9px;
-      color: #999;
+      font-size: 10px;
+      color: #bbb;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-weight: 800;
     }
 
     .xp-bar {
-      height: 10px;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 5px;
-      border: 1px solid #5a4530;
+      height: 14px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 7px;
+      border: 2px solid #5a4530;
       overflow: hidden;
     }
 
     .xp-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #f39c12, #e74c3c);
-      border-radius: 4px;
+      background: linear-gradient(90deg, #ff6b35, #ff4444, #ff6b35);
+      background-size: 200% 100%;
+      border-radius: 5px;
       transition: width 0.5s ease;
-      box-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+      box-shadow: 0 0 12px rgba(255, 107, 53, 0.6);
+      animation: xpShine 2s linear infinite;
     }
 
     /* Gold display */
     .gold-display {
       display: flex;
       align-items: center;
-      gap: 5px;
-      background: linear-gradient(145deg, rgba(60, 50, 35, 0.85) 0%, rgba(40, 32, 20, 0.85) 100%);
-      padding: 5px 10px;
-      border-radius: 8px;
-      border: 2px solid #B8860B;
+      gap: 6px;
+      background: linear-gradient(160deg, rgba(60, 48, 25, 0.9) 0%, rgba(40, 32, 16, 0.9) 100%);
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 2px solid #DAA520;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3), 0 0 12px rgba(218,165,32,0.15);
     }
 
     .gold-icon {
-      font-size: 16px;
+      font-size: 20px;
     }
 
     .gold-value {
-      font-size: 14px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 900;
       color: #FFD700;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      animation: shimmerGold 3s ease-in-out infinite;
     }
 
     /* Keyboard Hints */
     .hints-section {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .key-hint {
       display: flex;
       align-items: center;
       gap: 6px;
-      background: linear-gradient(145deg, rgba(50, 50, 50, 0.8) 0%, rgba(30, 30, 30, 0.8) 100%);
+      background: linear-gradient(160deg, rgba(55, 55, 55, 0.85) 0%, rgba(35, 35, 35, 0.85) 100%);
       padding: 5px 10px;
-      border-radius: 6px;
-      border: 1px solid #555;
+      border-radius: 8px;
+      border: 2px solid #666;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .key-box {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 22px;
-      height: 22px;
-      background: linear-gradient(145deg, #444, #333);
-      border: 1px solid #666;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 800;
+      width: 26px;
+      height: 26px;
+      background: linear-gradient(180deg, #555, #3a3a3a);
+      border: 2px solid #777;
+      border-bottom-color: #444;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 900;
       color: #fff;
       text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-      box-shadow: 0 2px 0 #222;
+      box-shadow: 0 3px 0 #222, 0 0 6px rgba(255,255,255,0.05);
     }
 
     .key-label {
       font-size: 11px;
-      font-weight: 700;
-      color: #aaa;
+      font-weight: 800;
+      color: #bbb;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
+    /* Talent Notification */
     .talent-notif {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 4px;
-      padding: 5px 14px;
-      background: linear-gradient(145deg, rgba(60, 50, 35, 0.9) 0%, rgba(40, 32, 20, 0.9) 100%);
-      border: 2px solid #B8860B;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
+      margin-top: 6px;
+      padding: 8px 18px;
+      background: linear-gradient(160deg, rgba(60, 50, 20, 0.95) 0%, rgba(40, 32, 10, 0.95) 100%);
+      border: 3px solid #DAA520;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 800;
       color: #FFD700;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 8px rgba(255,215,0,0.3);
       pointer-events: none;
       animation: talentPulse 2s ease-in-out infinite;
     }
 
+    /* First-Join Notification */
+    .first-join-notif {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 6px;
+      padding: 10px 20px;
+      background: linear-gradient(160deg, rgba(15, 60, 30, 0.95) 0%, rgba(8, 40, 18, 0.95) 100%);
+      border: 3px solid #00ff88;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #00ff88;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 10px rgba(0,255,136,0.3);
+      pointer-events: none;
+      animation: firstJoinPulse 1.5s ease-in-out infinite;
+    }
+
+    .first-join-notif .fj-icon {
+      font-size: 22px;
+    }
+
+    /* HUD Notifications Container */
+    .hud-notifications {
+      position: fixed;
+      top: 80px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .hud-notif {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      background: linear-gradient(160deg, rgba(25, 20, 12, 0.95) 0%, rgba(15, 12, 6, 0.95) 100%);
+      border-radius: 12px;
+      border: 2px solid;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      font-size: 15px;
+      font-weight: 800;
+      pointer-events: none;
+      animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      white-space: nowrap;
+    }
+
+    .hud-notif.item-gain {
+      border-color: #00cc66;
+      color: #66ffaa;
+      text-shadow: 0 0 6px rgba(0,204,102,0.3);
+    }
+
+    .hud-notif.xp-gain {
+      border-color: #ff6b35;
+      color: #ffaa77;
+      text-shadow: 0 0 6px rgba(255,107,53,0.3);
+    }
+
+    .hud-notif.gold-gain {
+      border-color: #DAA520;
+      color: #FFD700;
+      text-shadow: 0 0 6px rgba(255,215,0,0.3);
+    }
+
+    .hud-notif.level-up {
+      border-color: #5cb8ff;
+      color: #88ddff;
+      text-shadow: 0 0 10px rgba(92,184,255,0.5);
+      font-size: 18px;
+      animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, levelUpFlash 0.6s ease-in-out 3;
+    }
+
+    .hud-notif .notif-icon {
+      font-size: 22px;
+    }
+
+    .hud-notif.fade-out {
+      animation: notifFadeOut 0.5s ease forwards;
+    }
+
+    /* Animations */
+    @keyframes shimmerGold {
+      0%, 100% { text-shadow: 1px 1px 2px rgba(0,0,0,0.5), 0 0 4px rgba(255,215,0,0.2); }
+      50% { text-shadow: 1px 1px 2px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.5); }
+    }
+
+    @keyframes shimmerBlue {
+      0%, 100% { text-shadow: 0 0 4px rgba(92,184,255,0.2); }
+      50% { text-shadow: 0 0 14px rgba(92,184,255,0.5); }
+    }
+
+    @keyframes xpShine {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     @keyframes talentPulse {
-      0%, 100% { box-shadow: 0 0 8px rgba(184, 134, 11, 0.4); }
-      50% { box-shadow: 0 0 16px rgba(255, 215, 0, 0.6); }
+      0%, 100% { box-shadow: 0 0 8px rgba(218, 165, 32, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.2); }
+    }
+
+    @keyframes firstJoinPulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.6), 0 0 40px rgba(0, 255, 136, 0.2); }
+    }
+
+    @keyframes notifSlideIn {
+      0% { transform: translateX(120px); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes notifFadeOut {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(80px); opacity: 0; }
+    }
+
+    @keyframes levelUpFlash {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.4); }
     }
   </style>
 </head>
 <body>
-  <div class="hud-container">
-    <!-- Logo Section -->
-    <div class="logo-section">
-      <span class="logo-icon">&#x1F33E;</span>
-      <div class="logo-text">
-        Hughberry <span class="farms">Farms</span>
-      </div>
-    </div>
-
-    <!-- Stats Section -->
-    <div class="stats-section">
-      <!-- Gold -->
-      <div class="gold-display">
-        <span class="gold-icon">&#x1FA99;</span>
-        <span class="gold-value" id="gold-value">0</span>
-      </div>
-
-      <!-- Level -->
-      <div class="stat-box">
-        <span class="stat-icon">&#x2B50;</span>
-        <div class="stat-info">
-          <span class="stat-label">Level</span>
-          <span class="stat-value level" id="level-value">0</span>
+  <div class="hud-wrapper">
+    <div class="hud-container">
+      <!-- Logo Section -->
+      <div class="logo-section">
+        <span class="logo-icon">&#x1F33E;</span>
+        <div class="logo-text">
+          Hughberry <span class="farms">Farms</span>
         </div>
       </div>
 
-      <!-- XP Bar -->
-      <div class="stat-box">
-        <span class="stat-icon">&#x1F4CA;</span>
-        <div class="xp-bar-container">
-          <div class="xp-bar-label">
-            <span>XP</span>
-            <span id="xp-text">0 / 100</span>
+      <!-- Stats Section -->
+      <div class="stats-section">
+        <!-- Gold -->
+        <div class="gold-display">
+          <span class="gold-icon">&#x1FA99;</span>
+          <span class="gold-value" id="gold-value">0</span>
+        </div>
+
+        <!-- Level -->
+        <div class="stat-box">
+          <span class="stat-icon">&#x2B50;</span>
+          <div class="stat-info">
+            <span class="stat-label">Level</span>
+            <span class="stat-value level" id="level-value">0</span>
           </div>
-          <div class="xp-bar">
-            <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
+        </div>
+
+        <!-- XP Bar -->
+        <div class="stat-box">
+          <span class="stat-icon">&#x1F4CA;</span>
+          <div class="xp-bar-container">
+            <div class="xp-bar-label">
+              <span>XP</span>
+              <span id="xp-text">0 / 100</span>
+            </div>
+            <div class="xp-bar">
+              <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Keyboard Hints Section -->
+      <div class="hints-section">
+        <div class="key-hint">
+          <span class="key-box">E</span>
+          <span class="key-label">Inventory</span>
+        </div>
+        <div class="key-hint">
+          <span class="key-box">Y</span>
+          <span class="key-label">Talents</span>
+        </div>
+        <div class="key-hint">
+          <span class="key-box">G</span>
+          <span class="key-label">Leaderboard</span>
+        </div>
+        <div class="key-hint">
+          <span class="key-box">V</span>
+          <span class="key-label">Gold Store</span>
+        </div>
+        <div class="key-hint">
+          <span class="key-box">L</span>
+          <span class="key-label">Guide</span>
         </div>
       </div>
     </div>
 
-    <!-- Keyboard Hints Section -->
-    <div class="hints-section">
-      <div class="key-hint">
-        <span class="key-box">I</span>
-        <span class="key-label">Inventory</span>
-      </div>
-      <div class="key-hint">
-        <span class="key-box">Y</span>
-        <span class="key-label">Talents</span>
-      </div>
-      <div class="key-hint">
-        <span class="key-box">G</span>
-        <span class="key-label">Leaderboard</span>
-      </div>
-      <div class="key-hint">
-        <span class="key-box">V</span>
-        <span class="key-label">Gold Store</span>
-      </div>
-      <div class="key-hint">
-        <span class="key-box">L</span>
-        <span class="key-label">Guide</span>
-      </div>
+    <div id="talent-notif" class="talent-notif" style="display:none"></div>
+    <div id="first-join-notif" class="first-join-notif" style="display:none">
+      <span class="fj-icon">&#x1F381;</span>
+      <span>Press E to open Inventory &amp; claim FREE seeds!</span>
+      <span class="fj-icon">&#x1F33E;</span>
     </div>
   </div>
 
-  <div id="talent-notif" class="talent-notif" style="display:none"></div>
+  <!-- Floating notifications (top-right) -->
+  <div id="hud-notifications" class="hud-notifications"></div>
 
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
@@ -305,20 +454,185 @@
     // ============================================
 
     // Game state - all values come from Portals via Sync_Inventory
-    let gold = 0;
-    let xp = 0;
-    let level = 0;
-    let unspentTalentPoints = 0;
+    var gold = 0;
+    var xp = 0;
+    var level = 0;
+    var unspentTalentPoints = 0;
+    var hasStarterSeeds = 0;
+
+    // Previous values for delta detection
+    var prevGold = -1;
+    var prevXP = -1;
+    var prevLevel = -1;
+    var prevInventory = {};
+    var firstSync = true; // Skip notifications on initial load
+
+    // Item display names and icons for notifications
+    var ITEM_INFO = {
+      // Crops
+      crop_wheat: { name: 'Wheat', icon: '\u{1F33E}' },
+      crop_carrot: { name: 'Carrot', icon: '\u{1F955}' },
+      crop_corn: { name: 'Corn', icon: '\u{1F33D}' },
+      crop_potato: { name: 'Potato', icon: '\u{1F954}' },
+      crop_tomato: { name: 'Tomato', icon: '\u{1F345}' },
+      crop_pumpkin: { name: 'Pumpkin', icon: '\u{1F383}' },
+      // Seeds
+      seeds_wheat: { name: 'Wheat Seeds', icon: '\u{1F331}' },
+      seeds_carrot: { name: 'Carrot Seeds', icon: '\u{1F331}' },
+      seeds_corn: { name: 'Corn Seeds', icon: '\u{1F331}' },
+      seeds_potato: { name: 'Potato Seeds', icon: '\u{1F331}' },
+      seeds_tomato: { name: 'Tomato Seeds', icon: '\u{1F331}' },
+      seeds_pumpkin: { name: 'Pumpkin Seeds', icon: '\u{1F331}' },
+      // Animal products
+      milk: { name: 'Milk', icon: '\u{1F95B}' },
+      wool: { name: 'Wool', icon: '\u{1F411}' },
+      goat_meat: { name: 'Goat Meat', icon: '\u{1F356}' },
+      truffle: { name: 'Truffle', icon: '\u{1F344}' },
+      egg: { name: 'Egg', icon: '\u{1F95A}' },
+      honey: { name: 'Honey', icon: '\u{1F36F}' },
+      // Crafted items
+      flour: { name: 'Flour', icon: '\u{1F4E6}' },
+      bread: { name: 'Bread', icon: '\u{1F35E}' },
+      cheese: { name: 'Cheese', icon: '\u{1F9C0}' },
+      stew: { name: 'Stew', icon: '\u{1F372}' },
+      ragout: { name: 'Ragout', icon: '\u{1F35B}' },
+      pie: { name: 'Pie', icon: '\u{1F967}' },
+      meat_pie: { name: 'Meat Pie', icon: '\u{1F967}' },
+      blanket: { name: 'Blanket', icon: '\u{1F9F6}' },
+      butter: { name: 'Butter', icon: '\u{1F9C8}' },
+      cake: { name: 'Cake', icon: '\u{1F370}' },
+      mead: { name: 'Mead', icon: '\u{1F37A}' }
+    };
+
+    // Keys to track for delta notifications (subset of SYNC_MAP that are inventory items)
+    var TRACKED_KEYS = [
+      'crop_wheat', 'crop_carrot', 'crop_corn', 'crop_potato', 'crop_tomato', 'crop_pumpkin',
+      'seeds_wheat', 'seeds_carrot', 'seeds_corn', 'seeds_potato', 'seeds_tomato', 'seeds_pumpkin',
+      'milk', 'wool', 'goat_meat', 'truffle', 'egg', 'honey',
+      'flour', 'bread', 'cheese', 'stew', 'ragout', 'pie', 'meat_pie', 'blanket', 'butter', 'cake', 'mead'
+    ];
 
     // XP required at each level to advance (XP resets to 0 on level-up)
-    // Level 0->1: 50, 1->2: 75, 2->3: 100, 3->4: 125, 4->5: 150, etc.
-    const levelThresholds = [
+    var levelThresholds = [
       50, 75, 100, 125, 150, 200, 250, 300, 375, 450,
       525, 600, 700, 800, 900, 1000, 1100, 1250, 1400, 1600,
       1800, 2000, 2200, 2500, 2800, 3000, 3300, 3600, 4000, 4500,
       5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500,
       10000, 10500, 11000, 11500, 12000, 12500, 13000, 13500, 14000, 15000
     ];
+
+    // ============================================
+    // NOTIFICATION SYSTEM
+    // ============================================
+
+    function showHudNotification(html, type, duration) {
+      var container = document.getElementById('hud-notifications');
+      // Cap at 6 notifications
+      while (container.children.length >= 6) {
+        container.removeChild(container.firstChild);
+      }
+      var notif = document.createElement('div');
+      notif.className = 'hud-notif ' + type;
+      notif.innerHTML = html;
+      container.appendChild(notif);
+      var dur = duration || 4000;
+      setTimeout(function() {
+        notif.classList.add('fade-out');
+        setTimeout(function() { if (notif.parentNode) notif.remove(); }, 500);
+      }, dur);
+    }
+
+    function checkDeltas(data) {
+      if (firstSync) {
+        // Store initial values, don't show notifications
+        firstSync = false;
+        if (data.gold !== undefined) prevGold = data.gold;
+        if (data.xp !== undefined) prevXP = data.xp;
+        if (data.level !== undefined) prevLevel = data.level;
+        TRACKED_KEYS.forEach(function(key) {
+          if (data[key] !== undefined) prevInventory[key] = data[key];
+        });
+        return;
+      }
+
+      // Check level up first (most exciting)
+      if (data.level !== undefined && prevLevel >= 0 && data.level > prevLevel) {
+        showHudNotification(
+          '<span class="notif-icon">\u{2B50}</span> LEVEL UP! Now Lv.' + data.level + '!',
+          'level-up', 5000
+        );
+      }
+
+      // Check gold gain
+      if (data.gold !== undefined && prevGold >= 0 && data.gold > prevGold) {
+        var goldDelta = data.gold - prevGold;
+        showHudNotification(
+          '<span class="notif-icon">\u{1FA99}</span> +' + goldDelta.toLocaleString() + ' Gold',
+          'gold-gain', 3500
+        );
+      }
+
+      // Check item gains - group all item changes into one notification
+      var itemGains = [];
+      TRACKED_KEYS.forEach(function(key) {
+        if (data[key] !== undefined) {
+          var prev = prevInventory[key] !== undefined ? prevInventory[key] : 0;
+          if (data[key] > prev) {
+            var delta = data[key] - prev;
+            var info = ITEM_INFO[key];
+            if (info) {
+              itemGains.push({ icon: info.icon, name: info.name, delta: delta });
+            }
+          }
+        }
+      });
+
+      if (itemGains.length > 0) {
+        // Build notification: show up to 3 items
+        var parts = [];
+        for (var g = 0; g < Math.min(itemGains.length, 3); g++) {
+          parts.push(itemGains[g].icon + ' +' + itemGains[g].delta + ' ' + itemGains[g].name);
+        }
+        if (itemGains.length > 3) parts.push('...');
+        showHudNotification(
+          '<span class="notif-icon">' + itemGains[0].icon + '</span> ' + parts.join('  '),
+          'item-gain', 4000
+        );
+      }
+
+      // Check XP gain (show after items so it appears below)
+      if (data.xp !== undefined && prevXP >= 0) {
+        // XP can reset on level up, so only show gain if level didn't change
+        var levelChanged = data.level !== undefined && prevLevel >= 0 && data.level !== prevLevel;
+        if (!levelChanged && data.xp > prevXP) {
+          var xpDelta = data.xp - prevXP;
+          showHudNotification(
+            '<span class="notif-icon">\u{2728}</span> +' + xpDelta + ' XP',
+            'xp-gain', 3000
+          );
+        }
+      }
+
+      // Update previous values
+      if (data.gold !== undefined) prevGold = data.gold;
+      if (data.xp !== undefined) prevXP = data.xp;
+      if (data.level !== undefined) prevLevel = data.level;
+      TRACKED_KEYS.forEach(function(key) {
+        if (data[key] !== undefined) prevInventory[key] = data[key];
+      });
+    }
+
+    function checkFirstJoinNotif(data) {
+      var fjNotif = document.getElementById('first-join-notif');
+      if (data.has_starter_seeds !== undefined) hasStarterSeeds = data.has_starter_seeds;
+      if (data.level !== undefined) level = data.level;
+      // Show if player hasn't claimed starter seeds and is level 0
+      if (hasStarterSeeds === 0 && level === 0) {
+        fjNotif.style.display = 'flex';
+      } else {
+        fjNotif.style.display = 'none';
+      }
+    }
 
     // ============================================
     // UI UPDATE FUNCTIONS
@@ -332,19 +646,19 @@
       document.getElementById('level-value').textContent = level;
 
       // XP resets each level - progress is current XP / threshold for current level
-      const isMaxLevel = level >= levelThresholds.length;
-      const xpNeeded = isMaxLevel ? 0 : levelThresholds[level];
-      const xpPercent = isMaxLevel ? 100 : Math.min(100, Math.max(0, (xp / xpNeeded) * 100));
+      var isMaxLevel = level >= levelThresholds.length;
+      var xpNeeded = isMaxLevel ? 0 : levelThresholds[level];
+      var xpPercent = isMaxLevel ? 100 : Math.min(100, Math.max(0, (xp / xpNeeded) * 100));
 
       // Update XP bar - show "current / needed"
-      const xpText = isMaxLevel ? `${xp.toLocaleString()} (MAX)` : `${xp.toLocaleString()} / ${xpNeeded.toLocaleString()}`;
+      var xpText = isMaxLevel ? xp.toLocaleString() + ' (MAX)' : xp.toLocaleString() + ' / ' + xpNeeded.toLocaleString();
       document.getElementById('xp-text').textContent = xpText;
       document.getElementById('xp-bar-fill').style.width = xpPercent + '%';
 
       // Talent point notification
       var talentNotif = document.getElementById('talent-notif');
       if (unspentTalentPoints > 0) {
-        talentNotif.textContent = unspentTalentPoints + ' Talent Point' + (unspentTalentPoints > 1 ? 's' : '') + ' available! Press Y';
+        talentNotif.innerHTML = '\u{2728} ' + unspentTalentPoints + ' Talent Point' + (unspentTalentPoints > 1 ? 's' : '') + ' available! Press Y \u{2728}';
         talentNotif.style.display = 'flex';
       } else {
         talentNotif.style.display = 'none';
@@ -355,7 +669,7 @@
     // PORTALS SDK INTEGRATION
     // ============================================
 
-    let sdkReady = false;
+    var sdkReady = false;
 
     function triggerTask(taskName) {
       if (!sdkReady) {
@@ -376,12 +690,12 @@
     }
 
     // Message deduplication
-    let lastMessageId = '';
-    let lastMessageTime = 0;
+    var lastMessageId = '';
+    var lastMessageTime = 0;
 
     function processMessage(msg, source) {
-      const now = Date.now();
-      const msgId = msg + '_' + Math.floor(now / 100);
+      var now = Date.now();
+      var msgId = msg + '_' + Math.floor(now / 100);
       if (msgId === lastMessageId && now - lastMessageTime < 200) {
         console.log('[HUD] Duplicate message ignored:', source);
         return;
@@ -392,7 +706,7 @@
     }
 
     // === Standard Sync_Inventory Parser (same in all iframes) ===
-    const SYNC_MAP = {
+    var SYNC_MAP = {
       'Has_Milk_Pail': 'has_milk_pail', 'Has_Shearing_Kit': 'has_shearing_kit',
       'Has_Butcher_Knife': 'has_butcher_knife', 'Has_Truffle_Spade': 'has_truffle_spade',
       'Has_Starter_Seeds': 'has_starter_seeds',
@@ -430,6 +744,7 @@
       'T_Artisan': 't_artisan', 'T_SeasonedWorker': 't_seasonedworker',
       'T_BonusPoint1': 't_bonuspoint1', 'T_Prodigy': 't_prodigy',
       'T_BonusPoint2': 't_bonuspoint2',
+      'T_Contractor1': '_skip', 'T_Contractor2': '_skip', 'T_Contractor3': '_skip',
       'Rebirth_Shards': '_skip', 'Mystic_Essence': '_skip',
       'RT_FleetHarvest': '_skip', 'RT_SwiftHusbandry': '_skip',
       'RT_QuickContracts': '_skip', 'RT_RushingWinds': '_skip',
@@ -441,33 +756,47 @@
       'RT_Seasoned': '_skip', 'RT_ToolShed': '_skip',
       'RT_RecipeTome': '_skip', 'RT_QuickStart': '_skip',
       'Rebirth_Count': 'rebirth_count',
+      'Contract_1_Done': '_skip', 'Contract_2_Done': '_skip', 'Contract_3_Done': '_skip',
+      'Contract_4_Done': '_skip', 'Contract_5_Done': '_skip', 'Contract_6_Done': '_skip',
+      'Contract_7_Done': '_skip', 'Contract_8_Done': '_skip', 'Contract_9_Done': '_skip',
+      'Contract_10_Done': '_skip',
       'playerName': '_skip'
     };
 
     function parseSyncMessage(msg) {
-      const parts = msg.replace('Sync_Inventory_', '').split('_');
-      const data = {};
-      let i = 0;
+      var parts = msg.replace('Sync_Inventory_', '').split('_');
+      var data = {};
+      var i = 0;
       while (i < parts.length) {
-        let matched = false;
+        var matched = false;
         // 4-word keys (e.g., Has_Recipe_Meat_Pie)
         if (!matched && i + 4 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+4]) || 0; i += 5; matched = true; }
+          var k4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (SYNC_MAP[k4] !== undefined) {
+            var v4 = parseInt(parts[i+4]); data[SYNC_MAP[k4]] = isNaN(v4) ? 0 : v4;
+            i += 5; matched = true;
+          }
         }
-        // 3-word keys (e.g., Has_Milk_Pail, Has_Recipe_Flour, Unspent_Talent_Points)
+        // 3-word keys
         if (!matched && i + 3 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
+          var k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+          if (SYNC_MAP[k3] !== undefined) {
+            var v3 = parseInt(parts[i+3]); data[SYNC_MAP[k3]] = isNaN(v3) ? 0 : v3;
+            i += 4; matched = true;
+          }
         }
-        // 2-word keys (e.g., Seeds_Wheat, Crop_Carrot, T_PlotRow2)
+        // 2-word keys
         if (!matched && i + 2 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
+          var k2 = parts[i] + '_' + parts[i+1];
+          if (SYNC_MAP[k2] !== undefined) {
+            var v2 = parseInt(parts[i+2]); data[SYNC_MAP[k2]] = isNaN(v2) ? 0 : v2;
+            i += 3; matched = true;
+          }
         }
-        // 1-word keys (e.g., Gold, XP, Level, Milk)
+        // 1-word keys
         if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
-          data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
+          var v1 = parseInt(parts[i+1]); data[SYNC_MAP[parts[i]]] = isNaN(v1) ? 0 : v1;
+          i += 2; matched = true;
         }
         if (!matched) i++;
       }
@@ -479,7 +808,10 @@
       console.log('[HUD] Received message:', msg.substring(0, 100) + '...');
 
       if (msg.indexOf('Sync_Inventory_') === 0 || (msg.indexOf('_Gold_') !== -1 && msg.indexOf('_XP_') !== -1 && msg.indexOf('_Level_') !== -1)) {
-        const data = parseSyncMessage(msg);
+        var data = parseSyncMessage(msg);
+        // Check deltas BEFORE updating state (so we compare new vs old)
+        checkDeltas(data);
+        checkFirstJoinNotif(data);
         if (data.gold !== undefined) gold = data.gold;
         if (data.xp !== undefined) xp = data.xp;
         if (data.level !== undefined) level = data.level;
@@ -488,7 +820,7 @@
         console.log('[HUD] Updated - Gold:', gold, 'XP:', xp, 'Level:', level);
       }
       else if (msg.indexOf('init_') === 0 || msg.indexOf('hud_') === 0) {
-        const parts = msg.split('_');
+        var parts = msg.split('_');
         if (parts.length >= 4) {
           gold = parseInt(parts[1]) || 0;
           level = parseInt(parts[2]) || 0;

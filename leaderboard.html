@@ -23,9 +23,9 @@ body {
   max-width: 750px;
   max-height: 96vh;
   background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
-  border: 4px solid #8B4513;
-  border-radius: 20px;
-  box-shadow: 0 0 0 2px #5a3a1a, 0 20px 60px rgba(0,0,0,0.8);
+  border: 4px solid #D4880B;
+  border-radius: 22px;
+  box-shadow: 0 0 30px rgba(212,136,11,0.3), 0 20px 60px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -34,12 +34,12 @@ body {
 
 /* -- Header -- */
 .lb-header {
-  background: linear-gradient(180deg, #8B4513 0%, #5a2d0a 100%);
-  padding: 14px 20px;
+  background: linear-gradient(180deg, #B06020 0%, #7a3a10 100%);
+  padding: 16px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 3px solid #a0522d;
+  border-bottom: 3px solid #D4880B;
   flex-shrink: 0;
 }
 
@@ -49,11 +49,11 @@ body {
   gap: 10px;
 }
 
-.header-icon { font-size: 24px; }
+.header-icon { font-size: 28px; }
 
 .header-title {
   font-family: 'Luckiest Guy', cursive;
-  font-size: 20px;
+  font-size: 28px;
   color: #FFD700;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   letter-spacing: 1px;
@@ -61,13 +61,13 @@ body {
 
 .rebirth-badge {
   background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
-  border: 2px solid #FFD700;
-  border-radius: 12px;
-  padding: 6px 14px;
+  border: 3px solid #FFD700;
+  border-radius: 14px;
+  padding: 8px 16px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 17px;
   color: #FFD700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   white-space: nowrap;
 }
 
@@ -75,25 +75,27 @@ body {
   background: rgba(0,0,0,0.3);
   border: 2px solid rgba(255,255,255,0.2);
   color: #fff;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .close-btn:hover {
   background: rgba(192, 57, 43, 0.8);
   border-color: #e74c3c;
+  box-shadow: 0 0 12px rgba(231,76,60,0.4);
+  transform: scale(1.08);
 }
 
 /* -- Player Info Bar -- */
 .player-info {
   background: rgba(0,0,0,0.3);
-  padding: 10px 20px;
+  padding: 12px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -103,14 +105,14 @@ body {
 
 .player-name {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 18px;
   color: #ddd;
 }
 
 .player-stats {
   display: flex;
   gap: 16px;
-  font-size: 13px;
+  font-size: 15px;
   color: #aaa;
 }
 
@@ -123,6 +125,7 @@ body {
 .stat-value {
   color: #FFD700;
   font-weight: 700;
+  font-size: 18px;
 }
 
 /* -- Leaderboard Table -- */
@@ -139,11 +142,11 @@ body {
 }
 
 .lb-table thead th {
-  font-size: 11px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #8B7355;
-  padding: 6px 8px;
+  padding: 10px 10px;
   text-align: left;
   border-bottom: 2px solid #5a3a1a;
   position: sticky;
@@ -165,8 +168,8 @@ body {
 }
 
 .lb-table tbody td {
-  padding: 10px 8px;
-  font-size: 14px;
+  padding: 12px 10px;
+  font-size: 16px;
 }
 
 .lb-table tbody td:last-child {
@@ -177,23 +180,24 @@ body {
 
 /* Rank column */
 .rank-cell {
-  width: 50px;
+  width: 56px;
   font-weight: 700;
   color: #8B7355;
 }
 
-.rank-1 { color: #FFD700; font-size: 16px; }
-.rank-2 { color: #C0C0C0; font-size: 15px; }
-.rank-3 { color: #CD7F32; font-size: 15px; }
+.rank-1 { color: #FFD700; font-size: 20px; }
+.rank-2 { color: #C0C0C0; font-size: 18px; }
+.rank-3 { color: #CD7F32; font-size: 18px; }
 
 .rank-medal {
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   text-align: center;
-  line-height: 24px;
-  font-size: 14px;
+  line-height: 30px;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .medal-gold { background: linear-gradient(145deg, #FFD700, #DAA520); color: #1a1208; }
@@ -220,14 +224,14 @@ body {
   text-align: center;
   padding: 40px 20px;
   color: #8B7355;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .lb-loading {
   text-align: center;
   padding: 40px 20px;
   color: #8B7355;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .lb-loading::after {
@@ -245,7 +249,7 @@ body {
 
 /* -- Rebirth Button Area -- */
 .rebirth-section {
-  padding: 14px 20px;
+  padding: 16px 22px;
   border-top: 2px solid #5a3a1a;
   background: rgba(0,0,0,0.2);
   flex-shrink: 0;
@@ -253,29 +257,30 @@ body {
 }
 
 .rebirth-requirement {
-  font-size: 11px;
+  font-size: 14px;
   color: #8B7355;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .rebirth-btn {
   background: linear-gradient(180deg, #c0392b 0%, #922b21 100%);
-  border: 2px solid #e74c3c;
-  border-radius: 12px;
+  border: 3px solid #e74c3c;
+  border-radius: 14px;
   color: #fff;
   font-family: 'Luckiest Guy', cursive;
-  font-size: 18px;
-  letter-spacing: 1px;
-  padding: 10px 32px;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  padding: 14px 40px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 0 #8b0000;
 }
 
 .rebirth-btn:hover:not(:disabled) {
   background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #8b0000, 0 0 20px rgba(231, 76, 60, 0.5);
 }
 
 .rebirth-btn:disabled {
@@ -284,10 +289,12 @@ body {
   color: #888;
   cursor: not-allowed;
   text-shadow: none;
+  box-shadow: none;
 }
 
 .rebirth-btn:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #8b0000;
 }
 
 /* -- Confirmation Modal -- */
@@ -307,24 +314,25 @@ body {
 
 .modal-box {
   background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
-  border: 3px solid #c0392b;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 380px;
+  border: 4px solid #e74c3c;
+  border-radius: 22px;
+  padding: 28px;
+  max-width: 400px;
   width: 90%;
   text-align: center;
+  box-shadow: 0 0 30px rgba(231,76,60,0.3), 0 20px 60px rgba(0,0,0,0.5);
 }
 
 .modal-title {
   font-family: 'Luckiest Guy', cursive;
-  font-size: 22px;
+  font-size: 28px;
   color: #e74c3c;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .modal-text {
-  font-size: 14px;
+  font-size: 15px;
   color: #ccc;
   line-height: 1.6;
   margin-bottom: 20px;
@@ -333,7 +341,7 @@ body {
 .modal-warning {
   color: #e74c3c;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
   margin-bottom: 16px;
 }
 
@@ -348,30 +356,46 @@ body {
   padding: 10px 24px;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .modal-btn-cancel {
   background: rgba(255,255,255,0.1);
   border: 2px solid rgba(255,255,255,0.2);
   color: #ccc;
+  box-shadow: 0 4px 0 #333;
 }
 
 .modal-btn-cancel:hover {
   background: rgba(255,255,255,0.2);
   color: #fff;
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #333;
+}
+
+.modal-btn-cancel:active {
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #333;
 }
 
 .modal-btn-confirm {
   background: linear-gradient(180deg, #c0392b 0%, #922b21 100%);
   border: 2px solid #e74c3c;
   color: #fff;
+  box-shadow: 0 4px 0 #8b0000;
 }
 
 .modal-btn-confirm:hover {
   background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #8b0000, 0 0 16px rgba(231,76,60,0.4);
+}
+
+.modal-btn-confirm:active {
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #8b0000;
 }
 
 /* -- Notifications -- */
@@ -388,34 +412,34 @@ body {
 }
 
 .notification {
-  padding: 8px 18px;
-  border-radius: 10px;
+  padding: 14px 22px;
+  border-radius: 14px;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 16px;
   animation: notifIn 0.3s ease-out;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
 .notification.success {
   background: linear-gradient(135deg, #27ae60, #1e8449);
   color: #fff;
-  border: 1px solid #2ecc71;
+  border: 3px solid #2ecc71;
 }
 
 .notification.error {
   background: linear-gradient(135deg, #c0392b, #922b21);
   color: #fff;
-  border: 1px solid #e74c3c;
+  border: 3px solid #e74c3c;
 }
 
 /* -- Error Banner -- */
 .db-error {
   background: rgba(192, 57, 43, 0.15);
-  border: 1px solid rgba(231, 76, 60, 0.3);
-  border-radius: 8px;
-  padding: 10px 14px;
+  border: 2px solid rgba(231, 76, 60, 0.3);
+  border-radius: 14px;
+  padding: 12px 16px;
   margin: 10px 16px 0;
-  font-size: 12px;
+  font-size: 14px;
   color: #e74c3c;
   text-align: center;
   display: none;
@@ -434,9 +458,9 @@ body {
 }
 
 /* -- Scrollbar -- */
-.lb-scroll::-webkit-scrollbar { width: 6px; }
-.lb-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
-.lb-scroll::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 3px; }
+.lb-scroll::-webkit-scrollbar { width: 10px; }
+.lb-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 5px; }
+.lb-scroll::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 5px; }
 
 /* -- Pagination Controls -- */
 .pagination-bar {
@@ -454,38 +478,47 @@ body {
 .page-btn {
   background: linear-gradient(180deg, #5a3a1a 0%, #3a2810 100%);
   border: 2px solid #8B4513;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #FFD700;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
-  font-size: 13px;
-  padding: 6px 16px;
+  font-size: 14px;
+  padding: 10px 18px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 0 #2a1808;
 }
 
 .page-btn:hover:not(:disabled) {
   background: linear-gradient(180deg, #8B4513 0%, #5a3a1a 100%);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #2a1808, 0 0 12px rgba(255,215,0,0.2);
+}
+
+.page-btn:active:not(:disabled) {
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #2a1808;
 }
 
 .page-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .page-info {
   color: #8B7355;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 /* -- Responsive -- */
 @media (max-width: 500px) {
-  .leaderboard-container { max-height: 95vh; border-radius: 14px; }
-  .lb-header { padding: 10px 14px; }
-  .header-title { font-size: 17px; }
-  .lb-table tbody td { padding: 8px 6px; font-size: 13px; }
-  .rebirth-btn { font-size: 16px; padding: 8px 24px; }
+  .leaderboard-container { max-height: 95vh; border-radius: 16px; }
+  .lb-header { padding: 12px 14px; }
+  .header-title { font-size: 22px; }
+  .lb-table tbody td { padding: 10px 8px; font-size: 15px; }
+  .rebirth-btn { font-size: 18px; padding: 12px 30px; }
 }
 </style>
 </head>

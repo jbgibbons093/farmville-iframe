@@ -30,12 +30,12 @@ body {
 
 .container {
   width: 100%;
-  max-width: 600px;
+  max-width: 620px;
   max-height: 90vh;
   background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%);
-  border: 4px solid #B8860B;
-  border-radius: 20px;
-  box-shadow: 0 0 0 2px #5a3a1a, 0 20px 60px rgba(0,0,0,0.8);
+  border: 4px solid #E8A820;
+  border-radius: 22px;
+  box-shadow: 0 0 30px rgba(232,168,32,0.3), 0 20px 60px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -46,15 +46,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  background: linear-gradient(180deg, #B8860B 0%, #8B6914 100%);
-  border-bottom: 3px solid #DAA520;
+  padding: 16px 22px;
+  background: linear-gradient(180deg, #D4980B 0%, #A87714 100%);
+  border-bottom: 3px solid #E8A820;
   flex-shrink: 0;
 }
 
 .title {
   font-family: 'Luckiest Guy', cursive;
-  font-size: 24px;
+  font-size: 28px;
   color: #fff;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   letter-spacing: 1px;
@@ -63,7 +63,7 @@ body {
   gap: 10px;
 }
 
-.title-icon { font-size: 28px; }
+.title-icon { font-size: 34px; }
 
 .header-right {
   display: flex;
@@ -74,17 +74,17 @@ body {
 .gold-display {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: rgba(0,0,0,0.3);
-  padding: 6px 14px;
-  border-radius: 10px;
-  border: 2px solid rgba(255,215,0,0.4);
+  padding: 8px 16px;
+  border-radius: 14px;
+  border: 3px solid rgba(255,215,0,0.5);
 }
 
-.gold-icon { font-size: 18px; }
+.gold-icon { font-size: 22px; }
 
 .gold-value {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 800;
   color: #FFD700;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
@@ -94,20 +94,22 @@ body {
   background: rgba(0,0,0,0.3);
   border: 2px solid rgba(255,255,255,0.2);
   color: #fff;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .close-btn:hover {
   background: rgba(192, 57, 43, 0.8);
   border-color: #e74c3c;
+  box-shadow: 0 0 12px rgba(231,76,60,0.4);
+  transform: scale(1.08);
 }
 
 /* Content */
@@ -122,9 +124,9 @@ body {
 
 .store-intro {
   text-align: center;
-  font-size: 14px;
+  font-size: 15px;
   color: #aaa;
-  padding: 0 10px 8px;
+  padding: 0 10px 10px;
   border-bottom: 1px solid rgba(90, 58, 26, 0.4);
 }
 
@@ -134,24 +136,25 @@ body {
 .package-grid {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .package-card {
   background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%);
-  border: 2px solid #4a3a2a;
-  border-radius: 14px;
-  padding: 18px 20px;
+  border: 3px solid #4a3a2a;
+  border-radius: 16px;
+  padding: 22px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
 }
 
 .package-card:hover {
-  border-color: #DAA520;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(218, 165, 32, 0.2);
+  border-color: #E8A820;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(232, 168, 32, 0.3);
 }
 
 .package-card.starter { border-left: 4px solid #C0C0C0; }
@@ -165,7 +168,7 @@ body {
 }
 
 .package-icon {
-  font-size: 36px;
+  font-size: 44px;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
 }
 
@@ -176,14 +179,14 @@ body {
 }
 
 .package-name {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 800;
   color: #FFD700;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .package-gold {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
   color: #ddd;
 }
@@ -194,9 +197,15 @@ body {
 }
 
 .package-bonus {
-  font-size: 11px;
+  font-size: 13px;
   color: #2ecc71;
-  font-weight: 700;
+  font-weight: 800;
+  background: rgba(46, 204, 113, 0.15);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: 6px;
+  padding: 2px 8px;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .package-action {
@@ -207,37 +216,47 @@ body {
 }
 
 .package-price {
-  font-size: 12px;
+  font-size: 15px;
   color: #aaa;
   font-weight: 700;
 }
 
 .buy-btn {
   background: linear-gradient(180deg, #DAA520 0%, #B8860B 100%);
-  border: 2px solid #FFD700;
-  border-radius: 10px;
+  border: 3px solid #FFD700;
+  border-radius: 12px;
   color: #1a1208;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
-  font-size: 15px;
-  padding: 10px 24px;
+  font-size: 17px;
+  padding: 12px 28px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   text-shadow: none;
   white-space: nowrap;
   text-decoration: none;
   display: inline-block;
   text-align: center;
+  box-shadow: 0 4px 0 #8B6508;
+  animation: buyBtnGlow 2s ease-in-out infinite;
+}
+
+@keyframes buyBtnGlow {
+  0%, 100% { box-shadow: 0 4px 0 #8B6508, 0 0 0 0 rgba(255, 215, 0, 0.2); }
+  50% { box-shadow: 0 4px 0 #8B6508, 0 0 16px 4px rgba(255, 215, 0, 0.3); }
 }
 
 .buy-btn:hover {
   background: linear-gradient(180deg, #FFD700 0%, #DAA520 100%);
-  transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #8B6508, 0 0 20px rgba(255, 215, 0, 0.6);
+  animation: none;
 }
 
 .buy-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #8B6508;
+  animation: none;
 }
 
 .claim-btn {
@@ -249,12 +268,19 @@ body {
 
 .claim-btn:hover {
   background: linear-gradient(180deg, #27ae60 0%, #1e8449 100%);
-  box-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
+  box-shadow: 0 6px 0 #1a7a3a, 0 0 20px rgba(46, 204, 113, 0.6);
+  animation: none;
+}
+
+.claim-btn:active {
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #1a7a3a;
+  animation: none;
 }
 
 @keyframes claimPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-  50% { box-shadow: 0 0 12px 4px rgba(46, 204, 113, 0.3); }
+  0%, 100% { box-shadow: 0 4px 0 #1a7a3a, 0 0 0 0 rgba(46, 204, 113, 0.4); }
+  50% { box-shadow: 0 4px 0 #1a7a3a, 0 0 16px 6px rgba(46, 204, 113, 0.4); }
 }
 
 /* Footer */
@@ -267,7 +293,7 @@ body {
 }
 
 .footer-hint {
-  font-size: 11px;
+  font-size: 13px;
   color: #666;
 }
 
@@ -281,31 +307,31 @@ body {
   top: 80px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 10px 24px;
-  border-radius: 10px;
+  padding: 14px 22px;
+  border-radius: 14px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
   z-index: 300;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
   animation: notifIn 0.3s ease-out;
 }
 
 .notif-success {
   background: linear-gradient(135deg, #27ae60, #1e8449);
   color: #fff;
-  border: 1px solid #2ecc71;
+  border: 3px solid #2ecc71;
 }
 
 .notif-error {
   background: linear-gradient(135deg, #c0392b, #922b21);
   color: #fff;
-  border: 1px solid #e74c3c;
+  border: 3px solid #e74c3c;
 }
 
 .notif-info {
-  background: linear-gradient(135deg, #B8860B, #8B6914);
+  background: linear-gradient(135deg, #D4980B, #A87714);
   color: #fff;
-  border: 1px solid #DAA520;
+  border: 3px solid #E8A820;
 }
 
 @keyframes notifIn {
@@ -314,17 +340,18 @@ body {
 }
 
 /* Scrollbar */
-.content::-webkit-scrollbar { width: 6px; }
-.content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
-.content::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 3px; }
+.content::-webkit-scrollbar { width: 10px; }
+.content::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 5px; }
+.content::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 5px; }
 
 /* Responsive */
 @media (max-width: 500px) {
-  .container { border-radius: 14px; }
-  .header { padding: 10px 14px; }
-  .title { font-size: 20px; }
-  .package-card { padding: 14px 16px; flex-wrap: wrap; gap: 12px; }
+  .container { border-radius: 16px; }
+  .header { padding: 12px 14px; }
+  .title { font-size: 22px; }
+  .package-card { padding: 18px 18px; flex-wrap: wrap; gap: 12px; }
   .package-action { width: 100%; flex-direction: row; justify-content: space-between; }
+  .buy-btn { font-size: 15px; padding: 10px 22px; }
 }
 </style>
 </head>

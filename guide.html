@@ -26,9 +26,9 @@
       color: #3a2a1a;
       width: 100%;
       max-width: 900px;
-      border-radius: 12px;
-      border: 3px solid #8B4513;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      border-radius: 22px;
+      border: 4px solid #D4880B;
+      box-shadow: 0 0 30px rgba(212,136,11,0.3), 0 20px 60px rgba(0,0,0,0.5);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -52,17 +52,17 @@
       flex-shrink: 0;
     }
 
-    .guide-sidebar::-webkit-scrollbar { width: 4px; }
-    .guide-sidebar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-    .guide-sidebar::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 2px; }
+    .guide-sidebar::-webkit-scrollbar { width: 10px; }
+    .guide-sidebar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 5px; }
+    .guide-sidebar::-webkit-scrollbar-thumb { background: #5a3a1a; border-radius: 5px; }
 
     .sidebar-link {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       color: #a89070;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       text-decoration: none;
       cursor: pointer;
@@ -82,8 +82,8 @@
     }
 
     .sidebar-icon {
-      font-size: 14px;
-      width: 20px;
+      font-size: 17px;
+      width: 22px;
       text-align: center;
     }
 
@@ -98,9 +98,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 24px;
-      background: linear-gradient(145deg, #5a4020 0%, #3a2810 100%);
-      border-bottom: 3px solid #8B4513;
+      padding: 16px 22px;
+      background: linear-gradient(145deg, #6a4820 0%, #4a3010 100%);
+      border-bottom: 3px solid #D4880B;
     }
 
     .header-title {
@@ -110,12 +110,12 @@
     }
 
     .header-icon {
-      font-size: 28px;
+      font-size: 34px;
     }
 
     .header-text {
       font-family: 'Luckiest Guy', cursive;
-      font-size: 22px;
+      font-size: 28px;
       color: #FFD700;
       text-shadow: 2px 2px 0 #8B4513;
     }
@@ -124,7 +124,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 13px;
+      font-size: 15px;
       color: #888;
     }
 
@@ -132,43 +132,50 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 16px;
+      padding: 10px 18px;
       background: linear-gradient(145deg, #c0392b, #a93226);
       border: 2px solid #e74c3c;
-      border-radius: 6px;
+      border-radius: 10px;
       color: #fff;
       font-family: 'Nunito', sans-serif;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 0 #8b0000;
     }
 
     .close-btn:hover {
       background: linear-gradient(145deg, #e74c3c, #c0392b);
-      transform: translateY(-1px);
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 0 6px 0 #8b0000, 0 0 12px rgba(231,76,60,0.4);
+    }
+
+    .close-btn:active {
+      transform: scale(0.97) translateY(2px);
+      box-shadow: 0 1px 0 #8b0000;
     }
 
     .key-hint {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 24px;
-      height: 24px;
-      padding: 0 6px;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
       background: #333;
-      border: 1px solid #555;
-      border-radius: 4px;
-      font-size: 11px;
+      border: 2px solid #555;
+      border-radius: 6px;
+      font-size: 13px;
       font-weight: 700;
       color: #fff;
-      box-shadow: 0 2px 0 #222;
+      box-shadow: 0 3px 0 #222;
     }
 
     /* Breadcrumb */
     .breadcrumb {
-      padding: 10px 20px;
-      font-size: 12px;
+      padding: 12px 20px;
+      font-size: 14px;
       color: #8a7a60;
       border-bottom: 1px solid rgba(139,69,19,0.15);
       background: rgba(139,69,19,0.04);
@@ -200,11 +207,12 @@
     /* Guide Sections */
     .guide-section {
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.7) 0%, rgba(245, 240, 230, 0.7) 100%);
-      border: 2px solid #c9a86c;
-      border-radius: 12px;
-      padding: 20px;
+      border: 3px solid #c9a86c;
+      border-radius: 14px;
+      padding: 24px;
       margin-bottom: 20px;
       display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .guide-section.active-page {
@@ -213,9 +221,9 @@
 
     .guide-section-title {
       font-family: 'Luckiest Guy', cursive;
-      font-size: 20px;
+      font-size: 24px;
       color: #FFD700;
-      margin-bottom: 15px;
+      margin-bottom: 18px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -229,7 +237,7 @@
     }
 
     .guide-text {
-      font-size: 14px;
+      font-size: 15px;
       line-height: 1.7;
       color: #3a2a1a;
       margin-bottom: 12px;
@@ -245,10 +253,11 @@
     }
 
     .guide-list li {
-      padding: 8px 0 8px 28px;
+      padding: 10px 0 10px 32px;
       position: relative;
       border-bottom: 1px solid rgba(139, 69, 19, 0.2);
       color: #3a2a1a;
+      font-size: 15px;
     }
 
     .guide-list li:last-child { border-bottom: none; }
@@ -257,11 +266,11 @@
       content: '';
       position: absolute;
       left: 0;
-      top: 12px;
-      width: 18px;
-      height: 18px;
+      top: 14px;
+      width: 20px;
+      height: 20px;
       background: linear-gradient(145deg, #c9a86c, #a0824a);
-      border-radius: 4px;
+      border-radius: 5px;
     }
 
     .guide-list.numbered li::before {
@@ -280,67 +289,73 @@
 
     .guide-tip {
       background: rgba(39, 174, 96, 0.15);
-      border: 2px solid #27ae60;
-      border-radius: 8px;
-      padding: 12px 15px;
+      border: 3px solid #27ae60;
+      border-radius: 14px;
+      padding: 14px 18px;
       margin: 15px 0;
       display: flex;
       align-items: flex-start;
       gap: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    .guide-tip-icon { font-size: 20px; flex-shrink: 0; }
-    .guide-tip-text { font-size: 13px; color: #2ecc71; }
+    .guide-tip-icon { font-size: 24px; flex-shrink: 0; }
+    .guide-tip-text { font-size: 15px; color: #2ecc71; }
 
     .guide-warning {
       background: rgba(243, 156, 18, 0.15);
-      border: 2px solid #f39c12;
-      border-radius: 8px;
-      padding: 12px 15px;
+      border: 3px solid #f39c12;
+      border-radius: 14px;
+      padding: 14px 18px;
       margin: 15px 0;
       display: flex;
       align-items: flex-start;
       gap: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    .guide-warning-icon { font-size: 20px; flex-shrink: 0; }
-    .guide-warning-text { font-size: 13px; color: #f39c12; }
+    .guide-warning-icon { font-size: 24px; flex-shrink: 0; }
+    .guide-warning-text { font-size: 15px; color: #f39c12; }
 
     .guide-table {
       width: 100%;
       border-collapse: collapse;
       margin: 15px 0;
-      font-size: 13px;
+      font-size: 15px;
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .guide-table th {
       background: linear-gradient(145deg, #8B4513, #6b3410);
       color: #fff;
-      padding: 10px 8px;
+      padding: 12px 10px;
       text-align: left;
       font-weight: 700;
+      font-size: 15px;
       border: 1px solid #5a4530;
     }
 
     .guide-table td {
-      padding: 8px;
+      padding: 10px;
       border: 1px solid #c9a86c;
       color: #3a2a1a;
     }
 
     .guide-table tr:nth-child(even) { background: rgba(139, 69, 19, 0.08); }
-    .guide-table .icon-col { text-align: center; font-size: 18px; width: 40px; }
+    .guide-table .icon-col { text-align: center; font-size: 22px; width: 44px; }
 
     .guide-subsection {
       margin: 15px 0;
-      padding: 15px;
+      padding: 18px;
       background: rgba(139, 69, 19, 0.08);
-      border-radius: 8px;
-      border-left: 3px solid #8B4513;
+      border-radius: 14px;
+      border-left: 4px solid #8B4513;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .guide-subsection-title {
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 700;
       color: #8B4513;
       margin-bottom: 10px;
@@ -350,12 +365,13 @@
       display: inline-block;
       background: #3a2a1a;
       color: #fff;
-      padding: 3px 8px;
-      border-radius: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
       font-family: monospace;
-      font-size: 12px;
+      font-size: 14px;
       margin: 0 2px;
-      border: 1px solid #5a4530;
+      border: 2px solid #5a4530;
+      box-shadow: 0 2px 0 #1a1008;
     }
 
     /* Cross-reference links */
@@ -384,28 +400,35 @@
     .page-nav-btn {
       display: flex;
       flex-direction: column;
-      padding: 12px 16px;
+      padding: 14px 18px;
       background: linear-gradient(145deg, rgba(255,255,255,0.7), rgba(245,240,230,0.7));
-      border: 2px solid #c9a86c;
-      border-radius: 8px;
+      border: 3px solid #c9a86c;
+      border-radius: 14px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-decoration: none;
       min-width: 140px;
       flex: 0 1 45%;
+      box-shadow: 0 4px 0 rgba(160,130,74,0.3);
     }
 
     .page-nav-btn:hover {
       border-color: #FFD700;
       background: rgba(255,215,0,0.08);
-      transform: translateY(-1px);
+      transform: scale(1.04) translateY(-2px);
+      box-shadow: 0 6px 0 rgba(160,130,74,0.3), 0 0 12px rgba(255,215,0,0.15);
+    }
+
+    .page-nav-btn:active {
+      transform: scale(0.97) translateY(2px);
+      box-shadow: 0 1px 0 rgba(160,130,74,0.3);
     }
 
     .page-nav-btn.prev { align-items: flex-start; }
     .page-nav-btn.next { align-items: flex-end; margin-left: auto; }
 
     .page-nav-dir {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
       color: #8B4513;
       text-transform: uppercase;
@@ -413,7 +436,7 @@
     }
 
     .page-nav-label {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 700;
       color: #3a2a1a;
       margin-top: 2px;
@@ -561,7 +584,7 @@
 
         <div class="guide-tip">
           <span class="guide-tip-icon">&#x1F4A1;</span>
-          <span class="guide-tip-text"><strong>Quick Tip:</strong> Press <span class="guide-key">I</span> to open your inventory and manage your farm.
+          <span class="guide-tip-text"><strong>Quick Tip:</strong> Press <span class="guide-key">E</span> to open your inventory and manage your farm.
           Press <span class="guide-key">Y</span> to open the <a class="xref" onclick="navigateTo('talents')">Talent Tree</a>.
           Press <span class="guide-key">G</span> to open the <a class="xref" onclick="navigateTo('rebirth')">Rebirth Leaderboard</a>.
           Press <span class="guide-key">V</span> to open the <a class="xref" onclick="navigateTo('gold-store')">Gold Store</a>.
@@ -1253,7 +1276,7 @@
           <div class="guide-subsection-title">Menu Controls</div>
           <table class="guide-table">
             <tr><th>Key</th><th>Action</th></tr>
-            <tr><td><span class="guide-key">I</span></td><td>Open/Close the inventory menu</td></tr>
+            <tr><td><span class="guide-key">E</span></td><td>Open/Close the inventory menu</td></tr>
             <tr><td><span class="guide-key">Y</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('talents')">talent tree</a></td></tr>
             <tr><td><span class="guide-key">G</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('rebirth')">rebirth leaderboard</a></td></tr>
             <tr><td><span class="guide-key">V</span></td><td>Open/Close the <a class="xref" onclick="navigateTo('gold-store')">gold store</a></td></tr>
@@ -1469,7 +1492,7 @@
     // Keyboard controls - ESC to close
     document.addEventListener('keydown', function(e) {
       var key = e.key.toLowerCase();
-      if (e.key === 'Escape' || key === 'l' || key === 'i' || key === 'y' || key === 'g' || key === 'v') {
+      if (e.key === 'Escape' || key === 'l' || key === 'e' || key === 'y' || key === 'g' || key === 'v') {
         e.preventDefault();
         closeGuide();
       }

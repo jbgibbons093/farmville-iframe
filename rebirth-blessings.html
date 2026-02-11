@@ -23,9 +23,9 @@ body {
   max-width: 750px;
   max-height: 94vh;
   background: linear-gradient(145deg, #1a0a2e 0%, #0d0518 100%);
-  border: 4px solid #6B3FA0;
-  border-radius: 20px;
-  box-shadow: 0 0 0 2px #3a1f5e, 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(107,63,160,0.3);
+  border: 4px solid #9B59F0;
+  border-radius: 22px;
+  box-shadow: 0 0 30px rgba(155,89,240,0.3), 0 20px 60px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -34,12 +34,12 @@ body {
 
 /* ── Header ── */
 .blessing-header {
-  background: linear-gradient(180deg, #4a1f8a 0%, #2d1060 100%);
-  padding: 12px 16px;
+  background: linear-gradient(180deg, #5a2fbf 0%, #3a1580 100%);
+  padding: 16px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 3px solid #7c4dba;
+  border-bottom: 3px solid #9B6EE8;
   flex-shrink: 0;
   gap: 8px;
 }
@@ -50,65 +50,65 @@ body {
   gap: 8px;
 }
 
-.header-icon { font-size: 22px; }
+.header-icon { font-size: 28px; }
 
 .header-title {
   font-family: 'Luckiest Guy', cursive;
-  font-size: 18px;
-  color: #c084fc;
+  font-size: 28px;
+  color: #d4a0ff;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   letter-spacing: 1px;
 }
 
 .shards-badge {
   background: linear-gradient(145deg, #1a0a2e 0%, #0d0518 100%);
-  border: 2px solid #a78bfa;
-  border-radius: 12px;
-  padding: 5px 12px;
+  border: 3px solid #c4a0ff;
+  border-radius: 14px;
+  padding: 8px 16px;
   font-weight: 700;
-  font-size: 13px;
-  color: #a78bfa;
-  text-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
+  font-size: 16px;
+  color: #c4a0ff;
+  text-shadow: 0 0 10px rgba(196, 160, 255, 0.5);
   white-space: nowrap;
 }
 
 .essence-badge {
   background: linear-gradient(145deg, #1a0a2e 0%, #0d0518 100%);
-  border: 2px solid #34d399;
-  border-radius: 12px;
-  padding: 5px 10px;
+  border: 3px solid #34d399;
+  border-radius: 14px;
+  padding: 8px 14px;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 15px;
   color: #34d399;
-  text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
   white-space: nowrap;
 }
 
 .respec-btn {
-  padding: 6px 12px;
+  padding: 10px 18px;
   border-radius: 10px;
   border: 2px solid #b22222;
   background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
   color: #fff;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 0 #8b0000;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 0 #8b0000;
   display: flex;
   align-items: center;
   gap: 5px;
   white-space: nowrap;
 }
 .respec-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 0 #8b0000;
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #8b0000, 0 0 16px rgba(231,76,60,0.4);
   background: linear-gradient(180deg, #ff5555 0%, #e74c3c 100%);
 }
 .respec-btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 0 0 #8b0000;
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #8b0000;
 }
 .respec-btn:disabled {
   background: rgba(255,255,255,0.08);
@@ -124,20 +124,22 @@ body {
   background: rgba(0,0,0,0.3);
   border: 2px solid rgba(255,255,255,0.2);
   color: #fff;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   flex-shrink: 0;
 }
 .close-btn:hover {
   background: rgba(192, 57, 43, 0.8);
   border-color: #e74c3c;
+  box-shadow: 0 0 12px rgba(231,76,60,0.4);
+  transform: scale(1.08);
 }
 
 /* ── Tree Tabs ── */
@@ -150,14 +152,14 @@ body {
 
 .tree-tab {
   flex: 1;
-  padding: 10px 6px;
+  padding: 12px 6px;
   text-align: center;
   cursor: pointer;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   color: #aaa;
   border-bottom: 3px solid transparent;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   background: none;
   border-top: none;
   border-left: none;
@@ -171,11 +173,11 @@ body {
   background: rgba(167, 139, 250, 0.12);
 }
 
-.tree-tab .tab-icon { font-size: 15px; display: block; margin-bottom: 2px; }
+.tree-tab .tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
 .tree-tab .tab-label { display: block; }
 .tree-tab .tab-points {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #888;
   margin-top: 1px;
 }
@@ -189,9 +191,9 @@ body {
   padding: 16px;
 }
 
-.tree-canvas-container::-webkit-scrollbar { width: 8px; height: 8px; }
-.tree-canvas-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
-.tree-canvas-container::-webkit-scrollbar-thumb { background: #3a1f5e; border-radius: 4px; }
+.tree-canvas-container::-webkit-scrollbar { width: 10px; height: 10px; }
+.tree-canvas-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 5px; }
+.tree-canvas-container::-webkit-scrollbar-thumb { background: #3a1f5e; border-radius: 5px; }
 .tree-canvas-container::-webkit-scrollbar-thumb:hover { background: #6B3FA0; }
 
 .tree-canvas {
@@ -228,31 +230,35 @@ body {
 /* ── Blessing Nodes ── */
 .talent-node {
   position: absolute;
-  width: 70px;
-  height: 70px;
+  width: 84px;
+  height: 84px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 2;
   transform: translate(-50%, -50%);
 }
 
+.talent-node:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
 .node-circle {
-  width: 56px;
-  height: 56px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   background: linear-gradient(145deg, #2a1548 0%, #1a0a2e 100%);
   border: 3px solid #4a3568;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 32px;
   transition: all 0.2s;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .talent-node.locked .node-circle {
@@ -290,8 +296,8 @@ body {
   background: #1a0a2e;
   border: 2px solid #4a3568;
   border-radius: 8px;
-  padding: 1px 5px;
-  font-size: 10px;
+  padding: 2px 6px;
+  font-size: 12px;
   font-weight: 800;
   color: #aaa;
 }
@@ -309,12 +315,12 @@ body {
 }
 
 .node-name {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: #aaa;
   text-align: center;
   margin-top: 4px;
-  max-width: 80px;
+  max-width: 90px;
   line-height: 1.1;
   text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
@@ -332,13 +338,13 @@ body {
 .tooltip {
   position: fixed;
   background: linear-gradient(145deg, #1a0a2e 0%, #0d0518 100%);
-  border: 2px solid #6B3FA0;
-  border-radius: 12px;
-  padding: 12px 14px;
-  max-width: 260px;
+  border: 3px solid #9B59F0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  max-width: 280px;
   z-index: 100;
   pointer-events: none;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.7), 0 0 16px rgba(155,89,240,0.2);
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -355,35 +361,35 @@ body {
 }
 
 .tooltip-icon {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .tooltip-title {
   font-weight: 800;
-  font-size: 14px;
-  color: #c084fc;
+  font-size: 17px;
+  color: #d4a0ff;
 }
 
 .tooltip-rank {
-  font-size: 11px;
+  font-size: 13px;
   color: #888;
   margin-bottom: 6px;
 }
 
 .tooltip-desc {
-  font-size: 12px;
+  font-size: 14px;
   color: #ccc;
   line-height: 1.4;
   margin-bottom: 8px;
 }
 
 .tooltip-prereq {
-  font-size: 11px;
+  font-size: 13px;
   color: #e74c3c;
-  padding: 6px 8px;
+  padding: 8px 10px;
   background: rgba(231, 76, 60, 0.1);
-  border: 1px solid rgba(231, 76, 60, 0.3);
-  border-radius: 6px;
+  border: 2px solid rgba(231, 76, 60, 0.3);
+  border-radius: 8px;
   margin-bottom: 6px;
 }
 
@@ -394,7 +400,7 @@ body {
 }
 
 .tooltip-tier {
-  font-size: 10px;
+  font-size: 12px;
   color: #888;
 }
 
@@ -402,7 +408,7 @@ body {
 .tier-label {
   position: absolute;
   left: 10px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   color: #4a3568;
   text-transform: uppercase;
@@ -438,38 +444,38 @@ body {
 
 .modal {
   background: linear-gradient(145deg, #1a0a2e 0%, #0d0518 100%);
-  border: 4px solid #6B3FA0;
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 340px;
+  border: 4px solid #9B59F0;
+  border-radius: 22px;
+  padding: 28px;
+  max-width: 380px;
   text-align: center;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 40px rgba(107,63,160,0.3);
+  box-shadow: 0 0 30px rgba(155,89,240,0.3), 0 20px 60px rgba(0,0,0,0.5);
 }
 
 .modal-icon {
-  font-size: 48px;
+  font-size: 56px;
   margin-bottom: 12px;
 }
 
 .modal-title {
   font-family: 'Luckiest Guy', cursive;
-  font-size: 24px;
-  color: #c084fc;
+  font-size: 28px;
+  color: #d4a0ff;
   margin-bottom: 12px;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .modal-text {
-  font-size: 14px;
+  font-size: 15px;
   color: #ccc;
   line-height: 1.5;
   margin-bottom: 16px;
 }
 
 .modal-cost {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
-  color: #a78bfa;
+  color: #c4a0ff;
   margin-bottom: 20px;
 }
 
@@ -484,30 +490,42 @@ body {
   border-radius: 10px;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .modal-btn.confirm {
   background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
   border: 2px solid #b22222;
   color: #fff;
-  box-shadow: 0 2px 0 #8b0000;
+  box-shadow: 0 4px 0 #8b0000;
 }
 .modal-btn.confirm:hover {
   background: linear-gradient(180deg, #ff5555 0%, #e74c3c 100%);
-  transform: translateY(-1px);
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #8b0000, 0 0 16px rgba(231,76,60,0.4);
+}
+.modal-btn.confirm:active {
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #8b0000;
 }
 
 .modal-btn.cancel {
   background: rgba(255,255,255,0.1);
   border: 2px solid #555;
   color: #aaa;
+  box-shadow: 0 4px 0 #333;
 }
 .modal-btn.cancel:hover {
   background: rgba(255,255,255,0.15);
   color: #fff;
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 0 #333;
+}
+.modal-btn.cancel:active {
+  transform: scale(0.97) translateY(2px);
+  box-shadow: 0 1px 0 #333;
 }
 
 /* ── Notifications ── */
@@ -524,22 +542,23 @@ body {
 }
 
 .notification {
-  padding: 10px 20px;
-  border-radius: 10px;
+  padding: 14px 22px;
+  border-radius: 14px;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 16px;
   animation: notifIn 0.3s ease, notifOut 0.3s ease 2.7s forwards;
   text-align: center;
   white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 .notification.success {
   background: linear-gradient(145deg, #7c3aed, #5b21b6);
-  border: 2px solid #a78bfa;
+  border: 3px solid #a78bfa;
   color: #fff;
 }
 .notification.error {
   background: linear-gradient(145deg, #c0392b, #96281b);
-  border: 2px solid #e74c3c;
+  border: 3px solid #e74c3c;
   color: #fff;
 }
 
@@ -554,12 +573,12 @@ body {
 
 /* ── Responsive ── */
 @media (max-width: 550px) {
-  .blessing-container { max-height: 96vh; border-radius: 14px; }
-  .blessing-header { padding: 10px 12px; }
-  .header-title { font-size: 15px; }
-  .node-circle { width: 48px; height: 48px; font-size: 22px; }
-  .talent-node { width: 60px; height: 60px; }
-  .node-name { font-size: 8px; max-width: 70px; }
+  .blessing-container { max-height: 96vh; border-radius: 16px; }
+  .blessing-header { padding: 12px 14px; }
+  .header-title { font-size: 20px; }
+  .node-circle { width: 56px; height: 56px; font-size: 26px; }
+  .talent-node { width: 72px; height: 72px; }
+  .node-name { font-size: 10px; max-width: 80px; }
 }
 </style>
 </head>
