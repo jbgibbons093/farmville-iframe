@@ -453,6 +453,17 @@
     // HUGHBERRY FARMS - GLOBAL HUD
     // ============================================
 
+    // Preload XP gain sound effect
+    var xpGainSound = new Audio('xp-gain.mp3');
+    xpGainSound.volume = 0.5;
+
+    function playXpSound() {
+      // Clone so overlapping plays don't cut each other off
+      var s = xpGainSound.cloneNode();
+      s.volume = 0.5;
+      s.play().catch(function() {});
+    }
+
     // Game state - all values come from Portals via Sync_Inventory
     var gold = 0;
     var xp = 0;
@@ -610,6 +621,7 @@
             '<span class="notif-icon">\u{2728}</span> +' + xpDelta + ' XP',
             'xp-gain', 3000
           );
+          playXpSound();
         }
       }
 
