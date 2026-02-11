@@ -30,13 +30,19 @@
     .close-btn:active { transform: scale(0.97) translateY(2px); box-shadow: 0 2px 0 #7a1f14; }
 
     .nav-tabs { display: flex; background: rgba(0,0,0,0.3); border-bottom: 2px solid #5a4030; }
-    .nav-tab { flex: 1; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.2s; border-right: 1px solid #3a2a1a; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .nav-tab { flex: 1; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.2s; border-right: 1px solid #3a2a1a; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
     .nav-tab:last-child { border-right: none; }
     .nav-tab:hover { background: rgba(139, 69, 19, 0.3); }
     .nav-tab.active { background: linear-gradient(180deg, #5a4020 0%, #3a2810 100%); border-bottom: 3px solid #FFD700; margin-bottom: -2px; }
     .nav-tab-icon { font-size: 24px; }
     .nav-tab-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #ccc; }
     .nav-tab.active .nav-tab-label { color: #FFD700; }
+
+    .tab-tutorial-arrow { display: none; position: absolute; top: -2px; right: 4px; font-size: 16px; color: #00ff88; animation: tabArrowBounce 1s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(0,255,136,0.6)); }
+    .nav-tab.has-tutorial .tab-tutorial-arrow { display: block; }
+    .nav-tab.has-tutorial { background: rgba(0, 255, 136, 0.08); }
+    .nav-tab.has-tutorial .nav-tab-label { color: #00ff88; }
+    @keyframes tabArrowBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
     .content-area { flex: 1; overflow-y: auto; padding: 22px; }
     .tab-content { display: none; animation: fadeInContent 0.3s ease; }
@@ -224,12 +230,12 @@
         <button class="close-btn" onclick="closeMenu()" title="Close (Tab)">&#x2715;</button>
       </div>
       <div class="nav-tabs">
-        <div class="nav-tab active" data-tab="dashboard"><span class="nav-tab-icon">&#x1F3E0;</span><span class="nav-tab-label">Home</span></div>
-        <div class="nav-tab" data-tab="crops"><span class="nav-tab-icon">&#x1F33E;</span><span class="nav-tab-label">Crops</span></div>
-        <div class="nav-tab" data-tab="inventory"><span class="nav-tab-icon">&#x1F392;</span><span class="nav-tab-label">Items</span></div>
-        <div class="nav-tab" data-tab="animals"><span class="nav-tab-icon">&#x1F404;</span><span class="nav-tab-label">Animals</span></div>
-        <div class="nav-tab" data-tab="xp"><span class="nav-tab-icon">&#x2B50;</span><span class="nav-tab-label">XP</span></div>
-        <div class="nav-tab" data-tab="unlocks"><span class="nav-tab-icon">&#x1F513;</span><span class="nav-tab-label">Unlocks</span></div>
+        <div class="nav-tab active" data-tab="dashboard"><span class="nav-tab-icon">&#x1F3E0;</span><span class="nav-tab-label">Home</span><span class="tab-tutorial-arrow">&#x2B07;</span></div>
+        <div class="nav-tab" data-tab="crops"><span class="nav-tab-icon">&#x1F33E;</span><span class="nav-tab-label">Crops</span><span class="tab-tutorial-arrow">&#x2B07;</span></div>
+        <div class="nav-tab" data-tab="inventory"><span class="nav-tab-icon">&#x1F392;</span><span class="nav-tab-label">Items</span><span class="tab-tutorial-arrow">&#x2B07;</span></div>
+        <div class="nav-tab" data-tab="animals"><span class="nav-tab-icon">&#x1F404;</span><span class="nav-tab-label">Animals</span><span class="tab-tutorial-arrow">&#x2B07;</span></div>
+        <div class="nav-tab" data-tab="xp"><span class="nav-tab-icon">&#x2B50;</span><span class="nav-tab-label">XP</span><span class="tab-tutorial-arrow">&#x2B07;</span></div>
+        <div class="nav-tab" data-tab="unlocks"><span class="nav-tab-icon">&#x1F513;</span><span class="nav-tab-label">Unlocks</span><span class="tab-tutorial-arrow">&#x2B07;</span></div>
       </div>
       <div class="content-area">
         <div class="tab-content active" id="tab-dashboard"></div>
@@ -1951,6 +1957,26 @@
       document.getElementById('tab-unlocks').innerHTML = html;
     }
 
+    function updateTabTutorials() {
+      // Clear all tutorial hints first
+      document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('has-tutorial'); });
+
+      var totalSeeds = gameState.inventory.seeds_wheat + gameState.inventory.seeds_carrot + gameState.inventory.seeds_corn + gameState.inventory.seeds_potato + gameState.inventory.seeds_tomato + gameState.inventory.seeds_pumpkin;
+      var anyPlanted = gameState.plots.some(function(p) { return p.state === 'growing' || p.state === 'ready'; });
+
+      // Tutorial: Show arrow on Crops tab when player has seeds but hasn't planted anything
+      if (totalSeeds > 0 && !anyPlanted) {
+        var cropsTab = document.querySelector('[data-tab="crops"]');
+        if (cropsTab) cropsTab.classList.add('has-tutorial');
+      }
+
+      // Tutorial: Show arrow on Animals tab when player has milk pail but hasn't collected any milk
+      if (gameState.equipment.milk_pail >= 1 && gameState.inventory.milk === 0 && gameState.level >= 2) {
+        var animalsTab = document.querySelector('[data-tab="animals"]');
+        if (animalsTab) animalsTab.classList.add('has-tutorial');
+      }
+    }
+
     function updateAllUI() {
       updateHeader();
       renderDashboard();
@@ -1959,6 +1985,7 @@
       renderAnimals();
       renderXP();
       renderUnlocks();
+      updateTabTutorials();
     }
 
     document.querySelectorAll('.nav-tab').forEach(tab => {

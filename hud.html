@@ -234,6 +234,31 @@
       50% { box-shadow: 0 5px 0 rgba(80,30,100,0.5), 0 0 25px rgba(204,102,255,0.6), 0 0 50px rgba(204,102,255,0.2); }
     }
 
+    /* Tutorial Notification (animals / crafting) */
+    .tutorial-notif {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(160deg, rgba(20, 50, 70, 0.95) 0%, rgba(10, 30, 50, 0.95) 100%);
+      border: 3px solid #5cb8ff;
+      border-radius: 18px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #88ddff;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.6), 0 0 10px rgba(92,184,255,0.4);
+      pointer-events: none;
+      box-shadow: 0 5px 0 rgba(30, 60, 90, 0.5), 0 0 20px rgba(92,184,255,0.15);
+      animation: tutorialPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes tutorialPulse {
+      0%, 100% { box-shadow: 0 5px 0 rgba(30,60,90,0.5), 0 0 10px rgba(92,184,255,0.3); }
+      50% { box-shadow: 0 5px 0 rgba(30,60,90,0.5), 0 0 25px rgba(92,184,255,0.6), 0 0 50px rgba(92,184,255,0.2); }
+    }
+
     /* First-Join Notification */
     .first-join-notif {
       display: flex;
@@ -409,6 +434,8 @@
 
     <div id="talent-notif" class="talent-notif" style="display:none"></div>
     <div id="rebirth-notif" class="rebirth-notif" style="display:none">&#x1F52E; You've reached Level 50! Press G to Rebirth! &#x1F52E;</div>
+    <div id="animal-tutorial-notif" class="tutorial-notif" style="display:none">&#x1F404; Press E and go to the Animals tab to start your cows! &#x1F404;</div>
+    <div id="craft-tutorial-notif" class="tutorial-notif" style="display:none">&#x2728; Visit the Crafting Table to craft your first item! &#x2728;</div>
     <div id="first-join-notif" class="first-join-notif" style="display:none">
       <span class="fj-icon">&#x1F381;</span>
       <span>Press E to open Inventory &amp; claim FREE seeds!</span>
@@ -461,6 +488,13 @@
     var level = 0;
     var unspentTalentPoints = 0;
     var hasStarterSeeds = 0;
+
+    // Tutorial tracking
+    var hasMilkPail = 0;
+    var milkCount = 0;
+    var hasRecipeFlour = 0;
+    var flourCount = 0;
+    var cropWheatCount = 0;
 
     // Previous values for delta detection
     var prevGold = -1;
@@ -674,6 +708,22 @@
       } else {
         rebirthNotif.style.display = 'none';
       }
+
+      // Tutorial: Visit barn when you have milk pail but haven't collected milk yet
+      var animalTutorial = document.getElementById('animal-tutorial-notif');
+      if (hasMilkPail >= 1 && milkCount === 0 && level >= 2) {
+        animalTutorial.style.display = 'flex';
+      } else {
+        animalTutorial.style.display = 'none';
+      }
+
+      // Tutorial: Visit crafting table when you have flour recipe + enough wheat but no flour yet
+      var craftTutorial = document.getElementById('craft-tutorial-notif');
+      if (hasRecipeFlour >= 1 && flourCount === 0 && cropWheatCount >= 3) {
+        craftTutorial.style.display = 'flex';
+      } else {
+        craftTutorial.style.display = 'none';
+      }
     }
 
     // ============================================
@@ -827,6 +877,12 @@
         if (data.xp !== undefined) xp = data.xp;
         if (data.level !== undefined) level = data.level;
         if (data.unspent_talent_points !== undefined) unspentTalentPoints = data.unspent_talent_points;
+        // Tutorial tracking
+        if (data.has_milk_pail !== undefined) hasMilkPail = data.has_milk_pail;
+        if (data.milk !== undefined) milkCount = data.milk;
+        if (data.has_recipe_flour !== undefined) hasRecipeFlour = data.has_recipe_flour;
+        if (data.flour !== undefined) flourCount = data.flour;
+        if (data.crop_wheat !== undefined) cropWheatCount = data.crop_wheat;
         updateHUD();
         console.log('[HUD] Updated - Gold:', gold, 'XP:', xp, 'Level:', level);
       }
