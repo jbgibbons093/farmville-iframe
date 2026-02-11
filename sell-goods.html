@@ -50,7 +50,7 @@
   </style>
 </head>
 <body>
-<script>var _uiPop=new Audio('ui-pop.mp3');_uiPop.preload='auto';_uiPop.volume=0.5;var _uiPopPlayed=false;</script>
+<script>var _uiPopCtx=null;var _uiPopBuf=null;var _uiPopPlayed=false;try{_uiPopCtx=new(window.AudioContext||window.webkitAudioContext)();fetch('ui-pop.mp3').then(function(r){return r.arrayBuffer()}).then(function(b){return _uiPopCtx.decodeAudioData(b)}).then(function(d){_uiPopBuf=d}).catch(function(){})}catch(e){}</script>
   <div class="overlay">
     <div class="container">
       <div class="header">
@@ -354,7 +354,7 @@
     let lastMessageId = '';
     let lastMessageTime = 0;
     function processMessage(msg, source) {
-      if(!_uiPopPlayed){_uiPopPlayed=true;_uiPop.play().catch(function(){});}
+      if(!_uiPopPlayed){_uiPopPlayed=true;try{if(_uiPopCtx&&_uiPopBuf){if(_uiPopCtx.state==='suspended')_uiPopCtx.resume();var _s=_uiPopCtx.createBufferSource();var _g=_uiPopCtx.createGain();_s.buffer=_uiPopBuf;_g.gain.value=0.5;_s.connect(_g);_g.connect(_uiPopCtx.destination);_s.start(0)}}catch(e){}}
       const now = Date.now();
       const msgId = msg + '_' + Math.floor(now / 100);
       if (msgId === lastMessageId && now - lastMessageTime < 200) return;
