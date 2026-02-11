@@ -522,8 +522,21 @@
     ];
 
     // ============================================
-    // NOTIFICATION SYSTEM
+    // NOTIFICATION SYSTEM (Debounced)
     // ============================================
+    //
+    // Staggered Portals tasks (e.g., Add_Crop_Wheat_1 x6) each fire their own
+    // Sync_Inventory. Without debouncing, each sync shows a separate notification
+    // ("+1 Wheat", "+1 Wheat", ...). Instead, we accumulate all deltas over a
+    // 1.5s window and then show ONE combined notification with final totals.
+
+    // Debounce state
+    var debounceTimer = null;
+    var DEBOUNCE_MS = 1500;
+    var pendingGold = 0;
+    var pendingXP = 0;
+    var pendingLevel = -1; // -1 means no level change pending
+    var pendingItems = {};  // key -> total delta
 
     function showHudNotification(html, type, duration) {
       var container = document.getElementById('hud-notifications');
@@ -542,6 +555,64 @@
       }, dur);
     }
 
+    function flushPendingNotifications() {
+      debounceTimer = null;
+
+      // Level up first (most exciting)
+      if (pendingLevel >= 0) {
+        showHudNotification(
+          '<span class="notif-icon">\u{2B50}</span> LEVEL UP! Now Lv.' + pendingLevel + '!',
+          'level-up', 5000
+        );
+      }
+
+      // Gold gain
+      if (pendingGold > 0) {
+        showHudNotification(
+          '<span class="notif-icon">\u{1FA99}</span> +' + pendingGold.toLocaleString() + ' Gold',
+          'gold-gain', 3500
+        );
+      }
+
+      // Item gains - group all into one notification
+      var itemGains = [];
+      var keys = Object.keys(pendingItems);
+      for (var k = 0; k < keys.length; k++) {
+        var key = keys[k];
+        if (pendingItems[key] > 0) {
+          var info = ITEM_INFO[key];
+          if (info) {
+            itemGains.push({ icon: info.icon, name: info.name, delta: pendingItems[key] });
+          }
+        }
+      }
+      if (itemGains.length > 0) {
+        var parts = [];
+        for (var g = 0; g < Math.min(itemGains.length, 3); g++) {
+          parts.push(itemGains[g].icon + ' +' + itemGains[g].delta + ' ' + itemGains[g].name);
+        }
+        if (itemGains.length > 3) parts.push('...');
+        showHudNotification(
+          '<span class="notif-icon">' + itemGains[0].icon + '</span> ' + parts.join('  '),
+          'item-gain', 4000
+        );
+      }
+
+      // XP gain (skip if level changed - XP resets on level up)
+      if (pendingXP > 0 && pendingLevel < 0) {
+        showHudNotification(
+          '<span class="notif-icon">\u{2728}</span> +' + pendingXP + ' XP',
+          'xp-gain', 3000
+        );
+      }
+
+      // Reset pending accumulators
+      pendingGold = 0;
+      pendingXP = 0;
+      pendingLevel = -1;
+      pendingItems = {};
+    }
+
     function checkDeltas(data) {
       if (firstSync) {
         // Store initial values, don't show notifications
@@ -555,71 +626,46 @@
         return;
       }
 
-      // Check level up first (most exciting)
+      // Accumulate level-up (keep highest level seen)
       if (data.level !== undefined && prevLevel >= 0 && data.level > prevLevel) {
-        showHudNotification(
-          '<span class="notif-icon">\u{2B50}</span> LEVEL UP! Now Lv.' + data.level + '!',
-          'level-up', 5000
-        );
+        pendingLevel = data.level;
       }
 
-      // Check gold gain
+      // Accumulate gold gain
       if (data.gold !== undefined && prevGold >= 0 && data.gold > prevGold) {
-        var goldDelta = data.gold - prevGold;
-        showHudNotification(
-          '<span class="notif-icon">\u{1FA99}</span> +' + goldDelta.toLocaleString() + ' Gold',
-          'gold-gain', 3500
-        );
+        pendingGold += (data.gold - prevGold);
       }
 
-      // Check item gains - group all item changes into one notification
-      var itemGains = [];
+      // Accumulate item gains
       TRACKED_KEYS.forEach(function(key) {
         if (data[key] !== undefined) {
           var prev = prevInventory[key] !== undefined ? prevInventory[key] : 0;
           if (data[key] > prev) {
             var delta = data[key] - prev;
-            var info = ITEM_INFO[key];
-            if (info) {
-              itemGains.push({ icon: info.icon, name: info.name, delta: delta });
-            }
+            pendingItems[key] = (pendingItems[key] || 0) + delta;
           }
         }
       });
 
-      if (itemGains.length > 0) {
-        // Build notification: show up to 3 items
-        var parts = [];
-        for (var g = 0; g < Math.min(itemGains.length, 3); g++) {
-          parts.push(itemGains[g].icon + ' +' + itemGains[g].delta + ' ' + itemGains[g].name);
-        }
-        if (itemGains.length > 3) parts.push('...');
-        showHudNotification(
-          '<span class="notif-icon">' + itemGains[0].icon + '</span> ' + parts.join('  '),
-          'item-gain', 4000
-        );
-      }
-
-      // Check XP gain (show after items so it appears below)
+      // Accumulate XP gain (only if level didn't change in this sync)
       if (data.xp !== undefined && prevXP >= 0) {
-        // XP can reset on level up, so only show gain if level didn't change
         var levelChanged = data.level !== undefined && prevLevel >= 0 && data.level !== prevLevel;
         if (!levelChanged && data.xp > prevXP) {
-          var xpDelta = data.xp - prevXP;
-          showHudNotification(
-            '<span class="notif-icon">\u{2728}</span> +' + xpDelta + ' XP',
-            'xp-gain', 3000
-          );
+          pendingXP += (data.xp - prevXP);
         }
       }
 
-      // Update previous values
+      // Update previous values IMMEDIATELY (not deferred)
       if (data.gold !== undefined) prevGold = data.gold;
       if (data.xp !== undefined) prevXP = data.xp;
       if (data.level !== undefined) prevLevel = data.level;
       TRACKED_KEYS.forEach(function(key) {
         if (data[key] !== undefined) prevInventory[key] = data[key];
       });
+
+      // Reset debounce timer - wait for more syncs before showing notification
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(flushPendingNotifications, DEBOUNCE_MS);
     }
 
     function checkFirstJoinNotif(data) {
