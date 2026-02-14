@@ -331,7 +331,6 @@
     }
 
     function closeIframe() {
-      if (typeof _refocusInterval !== 'undefined' && _refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound();
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();
@@ -876,21 +875,6 @@
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') { e.preventDefault(); closeIframe(); }
       });
-
-      // Refocus game keyboard — skip on interactive elements
-      function _refocusGame(e) {
-        if (e && e.target) {
-          var tag = e.target.tagName;
-          if (tag === 'BUTTON' || tag === 'SELECT' || tag === 'INPUT') return;
-          if (e.target.closest && e.target.closest('button, select')) return;
-        }
-        if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
-      }
-      document.addEventListener('click', _refocusGame);
-      document.addEventListener('mouseup', _refocusGame);
-      document.addEventListener('keydown', _refocusGame);
-      setTimeout(function() { _refocusGame(null); }, 300);
-      var _refocusInterval = setInterval(function() { _refocusGame(null); }, 2000);
 
       // Don't pre-initialize slots — wait for Sync_Inventory to know which are active
       // Just set up the refresh timer seed

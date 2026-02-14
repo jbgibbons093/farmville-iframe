@@ -122,7 +122,6 @@
     }
 
     function closeIframe() {
-      if (_refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound('click');
       console.log('[Hughberry SellGoods] Close requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
@@ -388,17 +387,6 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') { e.preventDefault(); closeIframe(); }
     });
-
-    // Continuously refocus game keyboard so WASD movement keeps working
-    function _refocusGame() {
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
-    }
-    document.addEventListener('click', _refocusGame);
-    document.addEventListener('mouseup', _refocusGame);
-    document.addEventListener('keydown', _refocusGame);
-    // Auto-refocus on load so movement works immediately
-    setTimeout(_refocusGame, 300);
-    var _refocusInterval = setInterval(_refocusGame, 2000);
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {

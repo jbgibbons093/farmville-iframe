@@ -1482,7 +1482,6 @@
     }
 
     function closeGuide() {
-      if (typeof _refocusInterval !== 'undefined' && _refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound();
       console.log('[Guide] Close guide requested');
       triggerTask('HUD');
@@ -1528,16 +1527,6 @@
         setTimeout(setupMessageListener, 100);
       }
     }
-
-    // Continuously refocus game keyboard so WASD movement keeps working
-    function _refocusGame() {
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
-    }
-    document.addEventListener('click', _refocusGame);
-    document.addEventListener('mouseup', _refocusGame);
-    document.addEventListener('keydown', _refocusGame);
-    setTimeout(_refocusGame, 300);
-    var _refocusInterval = setInterval(_refocusGame, 2000);
 
     document.addEventListener('DOMContentLoaded', function() {
       console.log('[Guide] Game Guide loaded');
