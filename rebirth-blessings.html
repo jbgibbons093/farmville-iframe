@@ -1417,6 +1417,7 @@ function notify(msg, type) {
 
 // Continuously refocus game keyboard so WASD movement keeps working
 function _refocusGame() {
+  if (document.hidden) return;
   if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
 }
 document.addEventListener('click', _refocusGame);
@@ -1424,6 +1425,10 @@ document.addEventListener('mouseup', _refocusGame);
 document.addEventListener('keydown', _refocusGame);
 setTimeout(_refocusGame, 300);
 var _refocusInterval = setInterval(_refocusGame, 2000);
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) { clearInterval(_refocusInterval); _refocusInterval = null; }
+  else if (!_refocusInterval) { _refocusInterval = setInterval(_refocusGame, 2000); }
+});
 
 // Initial render
 renderAll();
