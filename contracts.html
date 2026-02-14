@@ -336,7 +336,6 @@
     }
 
     function closeIframe() {
-      if (typeof _refocusInterval !== 'undefined' && _refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound();
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();
@@ -924,11 +923,6 @@
       document.addEventListener('mouseup', _refocusGame);
       document.addEventListener('keydown', _refocusGame);
       setTimeout(function() { _refocusGame(null); }, 300);
-      var _refocusInterval = setInterval(function() { _refocusGame(null); }, 2000);
-      document.addEventListener('visibilitychange', function() {
-        if (document.hidden) { clearInterval(_refocusInterval); _refocusInterval = null; }
-        else if (!_refocusInterval) { _refocusInterval = setInterval(function() { _refocusGame(null); }, 2000); }
-      });
 
       // Don't pre-initialize slots — wait for Sync_Inventory to know which are active
       // Just set up the refresh timer seed

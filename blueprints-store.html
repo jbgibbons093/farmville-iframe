@@ -273,7 +273,6 @@
     }
 
     function closeIframe() {
-      if (_refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound('click');
       console.log('[Hughberry Blueprints] Close requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
@@ -596,11 +595,6 @@
     document.addEventListener('mouseup', _refocusGame);
     document.addEventListener('keydown', _refocusGame);
     setTimeout(_refocusGame, 300);
-    var _refocusInterval = setInterval(_refocusGame, 2000);
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) { clearInterval(_refocusInterval); _refocusInterval = null; }
-      else if (!_refocusInterval) { _refocusInterval = setInterval(_refocusGame, 2000); }
-    });
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {
