@@ -8,7 +8,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Nunito', sans-serif; background: transparent; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 800px; max-height: 90vh; background: linear-gradient(145deg, #1a2f1f 0%, #0d1a10 100%); border: 5px solid #3dff7f; border-radius: 22px; box-shadow: 0 0 40px rgba(61, 255, 127, 0.35), 0 0 80px rgba(46, 204, 113, 0.15), inset 0 1px 0 rgba(255,255,255,0.05); display: flex; flex-direction: column; overflow: hidden; }
+    .container { width: 100%; max-width: 700px; max-height: 90vh; background: linear-gradient(145deg, #1a2f1f 0%, #0d1a10 100%); border: 5px solid #3dff7f; border-radius: 22px; box-shadow: 0 0 40px rgba(61, 255, 127, 0.35), 0 0 80px rgba(46, 204, 113, 0.15), inset 0 1px 0 rgba(255,255,255,0.05); display: flex; flex-direction: column; overflow: hidden; }
 
     .header { background: linear-gradient(180deg, #34d073 0%, #22a84e 50%, #1e8449 100%); padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid rgba(0,0,0,0.2); }
     .title { font-family: 'Luckiest Guy', cursive; font-size: 28px; color: #fff; text-shadow: 2px 2px 0 #145a32, 0 0 10px rgba(255,255,255,0.2); letter-spacing: 2px; }
@@ -20,39 +20,17 @@
     .close-btn:hover { background: #c0392b; border-color: #e74c3c; box-shadow: 0 0 14px rgba(231, 76, 60, 0.5); transform: scale(1.08); }
     .close-btn:active { transform: scale(0.95); }
 
-    .content { flex: 1; overflow: hidden; padding: 15px; display: flex; gap: 15px; }
+    .content { flex: 1; overflow: hidden; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
 
-    /* Two-column layout */
-    .left-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-    .right-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
-    .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(46, 204, 113, 0.2); border: 2px solid #27ae60; border-radius: 10px; margin-bottom: 10px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(46, 204, 113, 0.2); border: 2px solid #27ae60; border-radius: 10px; }
     .panel-title { font-size: 16px; font-weight: 800; color: #2ecc71; text-transform: uppercase; letter-spacing: 1px; }
     .panel-subtitle { font-size: 13px; color: #aaa; }
     .refresh-timer { display: flex; align-items: center; gap: 6px; font-size: 15px; color: #f39c12; font-weight: 800; text-shadow: 0 0 6px rgba(243, 156, 18, 0.3); }
 
-    /* Slots list (left panel) */
-    .slots-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
-
-    /* Available contracts list (right panel) */
-    .available-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 5px; }
-
-    /* Contract row (compact list item) */
-    .contract-row { display: flex; align-items: center; gap: 8px; background: linear-gradient(145deg, #2d4a3a 0%, #1a2f22 100%); border: 3px solid #3d6b4f; border-radius: 14px; padding: 10px 14px; cursor: grab; transition: all 0.2s; user-select: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-    .contract-row:hover { border-color: #3dff7f; background: linear-gradient(145deg, #3d5a4a 0%, #2a3f32 100%); box-shadow: 0 4px 16px rgba(61, 255, 127, 0.2); }
-    .contract-row.dragging { opacity: 0.5; cursor: grabbing; }
-    .contract-row .items { display: flex; gap: 6px; flex: 1; }
-    .contract-row .item { display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.35); padding: 4px 10px; border-radius: 6px; font-size: 14px; }
-    .contract-row .item-icon { font-size: 19px; }
-    .contract-row .item-qty { color: #fff; font-weight: 700; font-size: 14px; }
-    .contract-row .arrow { color: #888; font-size: 17px; font-weight: 800; }
-    .contract-row .rewards { display: flex; gap: 12px; font-size: 15px; font-weight: 800; }
-    .contract-row .reward-gold { color: #FFD700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.4); }
-    .contract-row .reward-xp { color: #b06cdb; text-shadow: 0 0 6px rgba(155, 89, 182, 0.3); }
+    .slots-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; margin-top: 10px; }
 
     /* Slot cards */
     .slot { background: linear-gradient(145deg, #1e3326 0%, #0f1a12 100%); border: 3px dashed #3d6b4f; border-radius: 14px; padding: 12px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-    .slot.drag-over { border-color: #3dff7f; border-style: solid; background: rgba(46, 204, 113, 0.12); box-shadow: 0 0 20px rgba(61, 255, 127, 0.2); }
     .slot.locked { opacity: 0.5; border-style: solid; }
     .slot.has-contract { border-style: solid; border-color: #27ae60; }
     .slot.active { border-color: #f39c12; box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2); }
@@ -62,8 +40,7 @@
     .slot-num { font-size: 13px; color: #888; font-weight: 700; }
     .slot-timer-inline { font-size: 16px; font-weight: 800; color: #f39c12; text-shadow: 0 0 8px rgba(243, 156, 18, 0.4); letter-spacing: 0.5px; }
     .slot-status { font-size: 11px; padding: 4px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-    .status-empty { background: #333; color: #888; }
-    .status-pending { background: #2980b9; color: #fff; box-shadow: 0 2px 6px rgba(41, 128, 185, 0.3); }
+    .status-available { background: #2980b9; color: #fff; box-shadow: 0 2px 6px rgba(41, 128, 185, 0.3); }
     .status-active { background: #f39c12; color: #000; box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3); }
     .status-cooldown { background: #555; color: #aaa; }
     .status-locked { background: #333; color: #666; }
@@ -91,9 +68,6 @@
     .btn-accept { background: linear-gradient(180deg, #34d073 0%, #1e8449 100%); border-color: #2ecc71; color: #fff; box-shadow: 0 4px 0 #166534; }
     .btn-accept:hover:not(:disabled) { transform: scale(1.08) translateY(-2px); box-shadow: 0 6px 0 #166534, 0 0 16px rgba(46, 204, 113, 0.5); }
     .btn-accept:active:not(:disabled) { transform: scale(0.97) translateY(2px); box-shadow: 0 1px 0 #166534; }
-    .btn-remove { background: linear-gradient(180deg, #8e9a9d 0%, #5d6d6d 100%); border-color: #95a5a6; color: #fff; box-shadow: 0 4px 0 #3d4d4d; }
-    .btn-remove:hover:not(:disabled) { background: linear-gradient(180deg, #c0392b 0%, #96281b 100%); border-color: #e74c3c; transform: scale(1.08) translateY(-2px); box-shadow: 0 6px 0 #6b1a11, 0 0 16px rgba(231, 76, 60, 0.4); }
-    .btn-remove:active:not(:disabled) { transform: scale(0.97) translateY(2px); box-shadow: 0 1px 0 #3d4d4d; }
     .btn-fill { background: linear-gradient(180deg, #f5ab1e 0%, #d68910 100%); border-color: #f1c40f; color: #000; box-shadow: 0 4px 0 #a06b0a; }
     .btn-fill:hover:not(:disabled) { transform: scale(1.08) translateY(-2px); box-shadow: 0 6px 0 #a06b0a, 0 0 16px rgba(241, 196, 15, 0.5); }
     .btn-fill:active:not(:disabled) { transform: scale(0.97) translateY(2px); box-shadow: 0 1px 0 #a06b0a; }
@@ -128,35 +102,25 @@
     </div>
 
     <div class="content">
-      <!-- Left Panel: Your Slots -->
-      <div class="left-panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Your Slots</div>
-            <div class="panel-subtitle"><span id="slots-unlocked">1</span> / 10 unlocked</div>
-          </div>
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Contracts Board</div>
+          <div class="panel-subtitle"><span id="slots-unlocked">1</span> / 10 slots unlocked</div>
         </div>
-        <div class="slots-list" id="slots-list"></div>
-      </div>
-
-      <!-- Right Panel: Available Contracts -->
-      <div class="right-panel">
-        <div class="panel-header">
-          <div class="panel-title">Available</div>
-          <div class="refresh-timer">
-            <span>&#x1F504;</span>
-            <span id="refresh-timer">2:00</span>
-          </div>
+        <div class="refresh-timer">
+          <span>&#x1F504;</span>
+          <span id="refresh-timer">2:00</span>
         </div>
-        <div class="available-list" id="available-list"></div>
       </div>
+      <div class="slots-list" id="slots-list"></div>
     </div>
   </div>
 
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     // ============================================
-    // HUGHBERRY FARMS - CONTRACTS BOARD v2
+    // HUGHBERRY FARMS - CONTRACTS BOARD v3
+    // Per-slot deterministic contracts with persistence
     // ============================================
 
     const REFRESH_MS = 2 * 60 * 1000; // 2 minutes
@@ -211,31 +175,32 @@
       xp: 0,
       inventory: {},
       talents: { contractor1: 0, contractor2: 0, contractor3: 0 },
-      rebirthBlessings: { quickContracts: 0, timeWarp: 0 }
+      rebirthBlessings: { quickContracts: 0, timeWarp: 0 },
+      contractDone: [0,0,0,0,0,0,0,0,0,0] // Contract_1_Done through Contract_10_Done
     };
 
-    // Available contracts pool
-    let availableContracts = [];
     let refreshEndTime = getRefreshWindow().endTime;
-    let lastWindowSeed = null; // Tracks which 2-min window we generated for
+    let lastWindowSeed = null;
 
-    // Player's 10 slots
+    // Player's 10 slots — state is derived from Contract_X_Done + deterministic seed
+    // States: 'available' (has a contract to accept), 'active' (accepted, fulfilling),
+    //         'cooldown' (fulfilled, waiting), 'locked' (talent not unlocked)
     let slots = [];
     for (let i = 0; i < 10; i++) {
       slots.push({
         id: i + 1,
-        state: 'empty', // empty, pending, active, cooldown
+        state: 'available',
         contract: null,
-        endTime: null // For active (fulfill deadline) or cooldown
+        endTime: null,
+        windowSeed: null // which 2-min window generated this slot's contract
       });
     }
 
     let actionPending = false;
     let notificationTimeout = null;
-    let draggedContractIndex = null;
 
     // ============================================
-    // SEEDED PRNG (mulberry32) - deterministic contracts per time window
+    // SEEDED PRNG (mulberry32) - deterministic contracts per slot per time window
     // ============================================
 
     function mulberry32(seed) {
@@ -255,6 +220,13 @@
       return { seed: windowIndex, endTime: windowEnd };
     }
 
+    // Generate a deterministic contract for a specific slot in a specific window
+    function getSlotContract(slotIndex, windowSeed) {
+      // Each slot gets its own RNG seeded by window + slot index
+      var rng = mulberry32(windowSeed * 997 + gameState.level * 31 + slotIndex * 7919);
+      return generateContract(gameState.level, rng);
+    }
+
     // ============================================
     // UTILITY FUNCTIONS
     // ============================================
@@ -272,14 +244,10 @@
       return 1 + t.contractor1 + t.contractor2 + t.contractor3;
     }
 
-    function getAvailableContractCount() {
-      return getUnlockedSlots() + 5;
-    }
-
     function getAvailableItems(level) {
       return Object.entries(ITEMS)
-        .filter(([key, item]) => item.unlockLevel <= level)
-        .map(([key, item]) => ({ key, ...item }));
+        .filter(function(entry) { return entry[1].unlockLevel <= level; })
+        .map(function(entry) { return { key: entry[0], name: entry[1].name, icon: entry[1].icon, value: entry[1].value, unlockLevel: entry[1].unlockLevel, deductTask: entry[1].deductTask }; });
     }
 
     function generateContract(level, rng) {
@@ -302,47 +270,35 @@
         const item = availableItems[idx];
         const maxQty = Math.max(2, Math.floor(100 / item.value));
         const qty = Math.max(1, Math.floor(rng() * maxQty) + 1);
-        selectedItems.push({ ...item, qty });
+        selectedItems.push({ key: item.key, name: item.name, icon: item.icon, value: item.value, deductTask: item.deductTask, qty: qty });
       }
 
-      const baseCost = selectedItems.reduce((sum, item) => sum + item.value * item.qty, 0);
+      const baseCost = selectedItems.reduce(function(sum, item) { return sum + item.value * item.qty; }, 0);
       const profitMult = 1.25 + (rng() * 0.5);
       const rawGold = baseCost * profitMult * tierConfig.goldMult;
       const goldReward = Math.max(25, Math.round(rawGold / 25) * 25);
       const xpReward = Math.floor(goldReward * 0.3 * tierConfig.xpMult);
 
-      return { items: selectedItems, goldReward, xpReward, tier };
+      return { items: selectedItems, goldReward: goldReward, xpReward: xpReward, tier: tier };
     }
 
-    function refreshAvailableContracts() {
+    // Refresh all available (non-active, non-cooldown) slots with new contracts
+    function refreshSlotContracts() {
       var win = getRefreshWindow();
       lastWindowSeed = win.seed;
       refreshEndTime = win.endTime;
 
-      // Seed combines window index + level so different levels get different contracts
-      var rng = mulberry32(win.seed * 997 + gameState.level * 31);
-      var count = getAvailableContractCount();
-      availableContracts = [];
-      for (var i = 0; i < count; i++) {
-        var contract = generateContract(gameState.level, rng);
-        if (contract) {
-          contract.id = win.seed + '_' + i; // Stable ID for dedup with slots
-          availableContracts.push(contract);
+      var unlockedCount = getUnlockedSlots();
+      for (var i = 0; i < 10; i++) {
+        var slot = slots[i];
+        // Only regenerate contracts for available slots (not active or cooldown)
+        if (i < unlockedCount && slot.state === 'available') {
+          slot.contract = getSlotContract(i, win.seed);
+          slot.windowSeed = win.seed;
         }
       }
 
-      // Filter out contracts already assigned to slots (in case of iframe reopen)
-      var slotIds = {};
-      slots.forEach(function(slot) {
-        if (slot.contract && slot.contract.id) slotIds[slot.contract.id] = true;
-      });
-      if (Object.keys(slotIds).length > 0) {
-        availableContracts = availableContracts.filter(function(c) {
-          return !slotIds[c.id];
-        });
-      }
-
-      console.log('[Contracts] Refreshed - seed:', win.seed, 'level:', gameState.level, 'count:', availableContracts.length, 'endTime:', new Date(win.endTime).toISOString());
+      console.log('[Contracts] Refreshed slot contracts - seed:', win.seed, 'level:', gameState.level);
       render();
     }
 
@@ -376,7 +332,7 @@
     }
 
     // ============================================
-    // SYNC INVENTORY PARSER (same as index.html)
+    // SYNC INVENTORY PARSER
     // ============================================
 
     const varMapping = {
@@ -415,19 +371,19 @@
       'Butter': { target: 'butter' },
       'Cake': { target: 'cake' },
       'Mead': { target: 'mead' },
-      // Equipment flags (2-word and 3-word) - skip
+      // Equipment flags - skip
       'Has_Beesuit': { target: '_skip' }, 'Has_Basket': { target: '_skip' },
       'Has_Milk_Pail': { target: '_skip' }, 'Has_Shearing_Kit': { target: '_skip' },
       'Has_Butcher_Knife': { target: '_skip' }, 'Has_Truffle_Spade': { target: '_skip' },
       'Has_Starter_Seeds': { target: '_skip' },
-      // Recipe flags (3-word and 4-word) - skip
+      // Recipe flags - skip
       'Has_Recipe_Flour': { target: '_skip' }, 'Has_Recipe_Bread': { target: '_skip' },
       'Has_Recipe_Cheese': { target: '_skip' }, 'Has_Recipe_Stew': { target: '_skip' },
       'Has_Recipe_Ragout': { target: '_skip' }, 'Has_Recipe_Pie': { target: '_skip' },
       'Has_Recipe_Blanket': { target: '_skip' }, 'Has_Recipe_Butter': { target: '_skip' },
       'Has_Recipe_Cake': { target: '_skip' }, 'Has_Recipe_Mead': { target: '_skip' },
       'Has_Recipe_Meat_Pie': { target: '_skip' },
-      // Talent variables (2-word) - skip
+      // Talent variables - skip (except contractors)
       'T_PlotRow2': { target: '_skip' }, 'T_GreenThumb': { target: '_skip' },
       'T_EagerPlanter': { target: '_skip' }, 'T_PlotRow3': { target: '_skip' },
       'T_BountifulHarvest': { target: '_skip' }, 'T_RapidGrowth': { target: '_skip' },
@@ -441,7 +397,7 @@
       'T_Artisan': { target: '_skip' }, 'T_SeasonedWorker': { target: '_skip' },
       'T_BonusPoint1': { target: '_skip' }, 'T_Prodigy': { target: '_skip' },
       'T_BonusPoint2': { target: '_skip' },
-      // Contractor talents (2-word) - these we need
+      // Contractor talents - these we need
       'T_Contractor1': { target: 't_contractor1' },
       'T_Contractor2': { target: 't_contractor2' },
       'T_Contractor3': { target: 't_contractor3' },
@@ -456,14 +412,15 @@
       'RT_NestEgg': { target: '_skip' }, 'RT_SeedVault': { target: '_skip' },
       'RT_Seasoned': { target: '_skip' }, 'RT_ToolShed': { target: '_skip' },
       'RT_RecipeTome': { target: '_skip' }, 'RT_QuickStart': { target: '_skip' },
-      // Other skips
+      // Other
       'Unspent_Talent_Points': { target: '_skip' },
       'Rebirth_Count': { target: '_skip' },
-      'Contract_1_Done': { target: '_skip' }, 'Contract_2_Done': { target: '_skip' },
-      'Contract_3_Done': { target: '_skip' }, 'Contract_4_Done': { target: '_skip' },
-      'Contract_5_Done': { target: '_skip' }, 'Contract_6_Done': { target: '_skip' },
-      'Contract_7_Done': { target: '_skip' }, 'Contract_8_Done': { target: '_skip' },
-      'Contract_9_Done': { target: '_skip' }, 'Contract_10_Done': { target: '_skip' }
+      // Contract done flags - we need these now!
+      'Contract_1_Done': { target: 'cd1' }, 'Contract_2_Done': { target: 'cd2' },
+      'Contract_3_Done': { target: 'cd3' }, 'Contract_4_Done': { target: 'cd4' },
+      'Contract_5_Done': { target: 'cd5' }, 'Contract_6_Done': { target: 'cd6' },
+      'Contract_7_Done': { target: 'cd7' }, 'Contract_8_Done': { target: 'cd8' },
+      'Contract_9_Done': { target: 'cd9' }, 'Contract_10_Done': { target: 'cd10' }
     };
 
     function parseSyncInventory(msg) {
@@ -486,7 +443,7 @@
           }
         }
 
-        // 3-word keys (Has_Milk_Pail, Unspent_Talent_Points, etc.)
+        // 3-word keys
         if (!matched && i + 3 < parts.length) {
           const k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
           if (varMapping[k3]) {
@@ -498,7 +455,7 @@
           }
         }
 
-        // 2-word keys (Crop_Wheat, Seeds_Wheat, T_Contractor1, etc.)
+        // 2-word keys
         if (!matched && i + 2 < parts.length) {
           const k2 = parts[i] + '_' + parts[i+1];
           if (varMapping[k2]) {
@@ -510,7 +467,7 @@
           }
         }
 
-        // 1-word keys (Gold, Milk, Flour, etc.)
+        // 1-word keys
         if (!matched && i + 1 < parts.length) {
           const k1 = parts[i];
           if (varMapping[k1]) {
@@ -525,7 +482,6 @@
         if (!matched) i++;
       }
 
-      console.log('[Contracts] Parsed - wheat:', data.wheat, 'milk:', data.milk, 'egg:', data.egg);
       return data;
     }
 
@@ -537,21 +493,15 @@
 
       console.log('[Contracts] Received Sync_Inventory');
       const data = parseSyncInventory(msg);
-      console.log('[Contracts] Parsed data:', data);
 
       gameState.gold = data.gold !== undefined ? data.gold : 0;
       gameState.level = data.level !== undefined ? data.level : 0;
       gameState.xp = data.xp !== undefined ? data.xp : 0;
 
-      // Map inventory items - key in ITEMS matches key in data now
+      // Map inventory items
       Object.keys(ITEMS).forEach(function(key) {
-        var val = data[key] !== undefined ? data[key] : 0;
-        gameState.inventory[key] = val;
-        if (key === 'milk' || key === 'egg' || key === 'wool') {
-          console.log('[Contracts] Mapping inventory:', key, '= data[' + key + '] =', data[key], '→', val);
-        }
+        gameState.inventory[key] = data[key] !== undefined ? data[key] : 0;
       });
-      console.log('[Contracts] Final inventory.milk:', gameState.inventory.milk, 'inventory.egg:', gameState.inventory.egg);
 
       gameState.talents.contractor1 = data.t_contractor1 !== undefined ? data.t_contractor1 : 0;
       gameState.talents.contractor2 = data.t_contractor2 !== undefined ? data.t_contractor2 : 0;
@@ -559,18 +509,67 @@
       gameState.rebirthBlessings.quickContracts = data.rt_quickcontracts !== undefined ? data.rt_quickcontracts : 0;
       gameState.rebirthBlessings.timeWarp = data.rt_timewarp !== undefined ? data.rt_timewarp : 0;
 
-      console.log('[Contracts] Inventory:', gameState.inventory);
+      // Parse Contract_X_Done flags
+      for (var ci = 0; ci < 10; ci++) {
+        var key = 'cd' + (ci + 1);
+        gameState.contractDone[ci] = data[key] !== undefined ? data[key] : 0;
+      }
 
-      // Generate contracts for current time window (seeded - same window = same contracts)
+      console.log('[Contracts] Contract done flags:', gameState.contractDone);
+
+      // Restore slots from Contract_X_Done flags
+      // If Contract_X_Done = 1, that slot is accepted/active with its deterministic contract
       var win = getRefreshWindow();
-      if (lastWindowSeed !== win.seed) {
-        console.log('[Contracts] Window changed (was:', lastWindowSeed, 'now:', win.seed, ') - regenerating contracts');
-        refreshAvailableContracts();
-      } else {
-        // Same window - just trim if talent respec reduced max
-        var maxAvailable = getAvailableContractCount();
-        if (availableContracts.length > maxAvailable) {
-          availableContracts = availableContracts.slice(0, maxAvailable);
+      var windowChanged = (lastWindowSeed !== win.seed);
+      lastWindowSeed = win.seed;
+      refreshEndTime = win.endTime;
+
+      var unlockedCount = getUnlockedSlots();
+      for (var si = 0; si < 10; si++) {
+        var slot = slots[si];
+
+        if (si >= unlockedCount) {
+          // Locked slot
+          slot.state = 'locked';
+          slot.contract = null;
+          slot.endTime = null;
+          continue;
+        }
+
+        if (gameState.contractDone[si] === 1) {
+          // This slot has an accepted contract — restore it
+          // Use the slot's stored window seed if we have one, otherwise current window
+          var contractSeed = slot.windowSeed || win.seed;
+          if (slot.state !== 'active' && slot.state !== 'cooldown') {
+            // Slot was available or new — mark as active
+            slot.state = 'active';
+            slot.contract = getSlotContract(si, contractSeed);
+            if (!slot.endTime) {
+              slot.endTime = Date.now() + FULFILL_MS;
+            }
+            if (!slot.windowSeed) {
+              slot.windowSeed = contractSeed;
+            }
+          }
+          // If already active/cooldown, keep current state (timers running)
+        } else if (gameState.contractDone[si] === 0) {
+          // Slot is NOT accepted — if it was active, Portals cleared it
+          if (slot.state === 'active') {
+            // Contract was cleared externally — go to cooldown
+            slot.state = 'cooldown';
+            slot.contract = null;
+            if (!slot.endTime) slot.endTime = Date.now() + getCooldownMs();
+          } else if (slot.state === 'cooldown') {
+            // Keep cooldown running
+          } else {
+            // Available — generate/refresh contract for this slot
+            slot.state = 'available';
+            if (!slot.contract || windowChanged) {
+              slot.contract = getSlotContract(si, win.seed);
+              slot.windowSeed = win.seed;
+            }
+            slot.endTime = null;
+          }
         }
       }
 
@@ -583,219 +582,92 @@
     }
 
     // ============================================
-    // DRAG AND DROP
-    // ============================================
-
-    function onDragStart(e, index) {
-      draggedContractIndex = index;
-      // Find the contract-row element (might be a child that was clicked)
-      var row = e.target.closest('.contract-row');
-      if (row) row.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function onDragEnd(e) {
-      draggedContractIndex = null;
-      var row = e.target.closest('.contract-row');
-      if (row) row.classList.remove('dragging');
-    }
-
-    function onSlotDragOver(e, slotIndex) {
-      e.preventDefault();
-      const slot = slots[slotIndex];
-      if (slot.state === 'empty' && slotIndex < getUnlockedSlots()) {
-        e.currentTarget.classList.add('drag-over');
-      }
-    }
-
-    function onSlotDragLeave(e) {
-      e.currentTarget.classList.remove('drag-over');
-    }
-
-    function onSlotDrop(e, slotIndex) {
-      e.preventDefault();
-      e.currentTarget.classList.remove('drag-over');
-
-      var slot = slots[slotIndex];
-      if (slot.state !== 'empty' || slotIndex >= getUnlockedSlots()) return;
-      if (draggedContractIndex === null) return;
-
-      var contract = availableContracts[draggedContractIndex];
-      if (!contract) return;
-
-      // Move contract to slot as pending
-      slot.state = 'pending';
-      slot.contract = contract;
-
-      // Remove from available
-      availableContracts.splice(draggedContractIndex, 1);
-      draggedContractIndex = null;
-
-      playSound();
-      saveState();
-      render();
-    }
-
-    // ============================================
     // SLOT ACTIONS
     // ============================================
 
     function acceptContract(slotIndex) {
       var slot = slots[slotIndex];
-      if (slot.state !== 'pending') return;
+      if (slot.state !== 'available' || !slot.contract) return;
 
       slot.state = 'active';
       slot.endTime = Date.now() + FULFILL_MS;
+      // windowSeed is already set from when contract was generated
+
+      // Tell Portals this slot is taken
+      triggerTask('Complete_Contract_' + (slotIndex + 1));
 
       playSound();
-      saveState();
-      render();
-    }
-
-    function removeContract(slotIndex) {
-      var slot = slots[slotIndex];
-      if (slot.state !== 'pending') return;
-
-      // Return contract to available pool
-      if (slot.contract) {
-        availableContracts.push(slot.contract);
-      }
-
-      slot.state = 'empty';
-      slot.contract = null;
-      slot.endTime = null;
-
-      playSound();
-      saveState();
       render();
     }
 
     function canFillContract(slot) {
-      if (!slot.contract || slot.state !== 'active' || actionPending) {
-        console.log('[Contracts] canFillContract FAIL - state:', slot.state, 'actionPending:', actionPending, 'contract:', !!slot.contract);
-        return false;
-      }
-      console.log('[Contracts] Checking contract items:', JSON.stringify(slot.contract.items));
-      const result = slot.contract.items.every(item => {
-        const owned = gameState.inventory[item.key] || 0;
-        console.log('[Contracts] Check item key="' + item.key + '" need:', item.qty, 'have:', owned, 'key in inventory:', item.key in gameState.inventory);
+      if (!slot.contract || slot.state !== 'active' || actionPending) return false;
+      return slot.contract.items.every(function(item) {
+        var owned = gameState.inventory[item.key] || 0;
         return owned >= item.qty;
       });
-      console.log('[Contracts] canFillContract result:', result);
-      return result;
     }
 
     function fillContract(slotIndex) {
-      const slot = slots[slotIndex];
+      var slot = slots[slotIndex];
       if (!canFillContract(slot)) return;
 
       actionPending = true;
       playSound();
 
-      const contract = slot.contract;
+      var contract = slot.contract;
 
       // Optimistically deduct items
-      contract.items.forEach(item => {
+      contract.items.forEach(function(item) {
         gameState.inventory[item.key] = (gameState.inventory[item.key] || 0) - item.qty;
       });
 
       // Build task list
-      const deductTasks = [];
-      contract.items.forEach(item => {
-        for (let i = 0; i < item.qty; i++) {
+      var deductTasks = [];
+      contract.items.forEach(function(item) {
+        for (var j = 0; j < item.qty; j++) {
           deductTasks.push(item.deductTask);
         }
       });
 
-      const goldTasks = getRewardTasks(contract.goldReward, 'Add_Gold_', [1000, 500, 250, 100, 50, 25]);
-      // Only use XP denominations that actually exist as Portals tasks
-      const xpTasks = getRewardTasks(contract.xpReward, 'Add_XP_', [500, 250, 100, 50, 25, 10]);
+      var goldTasks = getRewardTasks(contract.goldReward, 'Add_Gold_', [1000, 500, 250, 100, 50, 25]);
+      var xpTasks = getRewardTasks(contract.xpReward, 'Add_XP_', [500, 250, 100, 50, 25, 10]);
 
-      let delay = 0;
-      const STAGGER = 200;
+      var delay = 0;
+      var STAGGER = 200;
 
       deductTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
       goldTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
       xpTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
 
+      // Clear the contract done flag in Portals
+      setTimeout(function() { triggerTask('Clear_Contract_' + (slotIndex + 1)); }, delay);
+      delay += STAGGER;
+
       // Set slot to cooldown
       slot.state = 'cooldown';
       slot.contract = null;
       slot.endTime = Date.now() + getCooldownMs();
+      slot.windowSeed = null;
 
       notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
       render();
-      saveState();
 
-      // Calculate dynamic timeout based on actual task count
-      var totalTasks = deductTasks.length + goldTasks.length + xpTasks.length;
+      var totalTasks = deductTasks.length + goldTasks.length + xpTasks.length + 1;
       var unlockDelay = (totalTasks * STAGGER) + 500;
       setTimeout(function() { actionPending = false; render(); }, unlockDelay);
     }
 
     function getRewardTasks(amount, prefix, denominations) {
-      const tasks = [];
-      let remaining = amount;
-      for (const denom of denominations) {
-        while (remaining >= denom) {
-          tasks.push(prefix + denom);
-          remaining -= denom;
+      var tasks = [];
+      var remaining = amount;
+      for (var d = 0; d < denominations.length; d++) {
+        while (remaining >= denominations[d]) {
+          tasks.push(prefix + denominations[d]);
+          remaining -= denominations[d];
         }
       }
       return tasks;
-    }
-
-    // ============================================
-    // STATE PERSISTENCE
-    // Portals sandbox blocks localStorage/sessionStorage.
-    // Available contracts use seeded PRNG (no storage needed).
-    // Slot state persists via fallback: try localStorage, then window.name.
-    // ============================================
-
-    function _tryWrite(json) {
-      try { localStorage.setItem('hb_cs', json); return true; } catch(e) {}
-      try { window.name = json; return true; } catch(e) {}
-      return false;
-    }
-
-    function _tryRead() {
-      try { var v = localStorage.getItem('hb_cs'); if (v) return v; } catch(e) {}
-      try { if (window.name && window.name.charAt(0) === '{') return window.name; } catch(e) {}
-      return null;
-    }
-
-    function saveState() {
-      var data = {
-        slots: slots.map(function(s) {
-          return { state: s.state, contract: s.contract, endTime: s.endTime };
-        })
-      };
-      _tryWrite(JSON.stringify(data));
-    }
-
-    function loadSlotState() {
-      var json = _tryRead();
-      if (!json) { console.log('[Contracts] No saved slot state found'); return; }
-      try {
-        var data = JSON.parse(json);
-        if (!data.slots || !Array.isArray(data.slots)) return;
-        var now = Date.now();
-        var restored = 0;
-        data.slots.forEach(function(saved, i) {
-          if (i >= slots.length || !saved || !saved.state || saved.state === 'empty') return;
-          // Expire any timers that ran out while iframe was closed
-          if (saved.endTime && now >= saved.endTime) {
-            if (saved.state === 'active' || saved.state === 'cooldown') return;
-          }
-          slots[i].state = saved.state;
-          slots[i].contract = saved.contract || null;
-          slots[i].endTime = saved.endTime || null;
-          restored++;
-        });
-        console.log('[Contracts] Restored', restored, 'slot(s) from storage');
-      } catch(e) {
-        console.warn('[Contracts] loadSlotState parse error:', e.message);
-      }
     }
 
     // ============================================
@@ -810,14 +682,24 @@
     }
 
     function gameLoop() {
-      const now = Date.now();
+      var now = Date.now();
 
       // Check if we've entered a new 2-minute window
       var win = getRefreshWindow();
       if (lastWindowSeed !== null && lastWindowSeed !== win.seed) {
-        refreshAvailableContracts();
+        // New window — refresh available slots
+        lastWindowSeed = win.seed;
+        refreshEndTime = win.endTime;
+
+        var unlockedCount = getUnlockedSlots();
+        for (var i = 0; i < 10; i++) {
+          if (i < unlockedCount && slots[i].state === 'available') {
+            slots[i].contract = getSlotContract(i, win.seed);
+            slots[i].windowSeed = win.seed;
+          }
+        }
+        render();
       }
-      // Always keep refreshEndTime in sync with current window
       refreshEndTime = win.endTime;
 
       // Check slot timers
@@ -825,41 +707,42 @@
       slots.forEach(function(slot, i) {
         if (slot.endTime && now >= slot.endTime) {
           if (slot.state === 'active') {
-            // Contract expired - no cooldown, just reset to empty
-            slot.state = 'empty';
-            slot.contract = null;
+            // Contract expired — clear the done flag and reset
+            slot.state = 'available';
+            slot.contract = getSlotContract(i, win.seed);
+            slot.windowSeed = win.seed;
             slot.endTime = null;
+            // Clear the Portals flag
+            triggerTask('Clear_Contract_' + (i + 1));
             notify('Contract expired!', 'error');
             stateChanged = true;
           } else if (slot.state === 'cooldown') {
-            // Cooldown finished
-            slot.state = 'empty';
-            slot.contract = null;
+            // Cooldown finished — slot available again with fresh contract
+            slot.state = 'available';
+            slot.contract = getSlotContract(i, win.seed);
+            slot.windowSeed = win.seed;
             slot.endTime = null;
             stateChanged = true;
           }
         }
       });
 
-      if (stateChanged) {
-        saveState();
-        render();
-      }
-
+      if (stateChanged) render();
       updateTimers();
     }
 
     function updateTimers() {
-      const now = Date.now();
+      var now = Date.now();
 
       // Refresh timer
       if (refreshEndTime) {
-        document.getElementById('refresh-timer').textContent = formatTime(refreshEndTime - now);
+        var el = document.getElementById('refresh-timer');
+        if (el) el.textContent = formatTime(refreshEndTime - now);
       }
 
       // Slot timers
-      slots.forEach((slot, i) => {
-        const timerEl = document.getElementById('slot-timer-' + i);
+      slots.forEach(function(slot, i) {
+        var timerEl = document.getElementById('slot-timer-' + i);
         if (timerEl && slot.endTime) {
           timerEl.textContent = formatTime(slot.endTime - now);
         }
@@ -874,36 +757,7 @@
       document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
       document.getElementById('level-display').textContent = gameState.level;
       document.getElementById('slots-unlocked').textContent = getUnlockedSlots();
-
-      renderAvailableContracts();
       renderSlots();
-    }
-
-    function renderAvailableContracts() {
-      var container = document.getElementById('available-list');
-      var html = '';
-
-      availableContracts.forEach(function(contract, index) {
-        var itemsHtml = '';
-        contract.items.forEach(function(item) {
-          itemsHtml += '<div class="item"><span class="item-icon">' + item.icon + '</span><span class="item-qty">x' + item.qty + '</span></div>';
-        });
-
-        html += '<div class="contract-row" draggable="true" ondragstart="onDragStart(event, ' + index + ')" ondragend="onDragEnd(event)">' +
-          '<div class="items">' + itemsHtml + '</div>' +
-          '<span class="arrow">→</span>' +
-          '<div class="rewards">' +
-            '<span class="reward-gold">' + contract.goldReward + 'g</span>' +
-            '<span class="reward-xp">' + contract.xpReward + 'xp</span>' +
-          '</div>' +
-        '</div>';
-      });
-
-      if (availableContracts.length === 0) {
-        html = '<div style="color:#888;font-size:12px;text-align:center;padding:20px;">No contracts available</div>';
-      }
-
-      container.innerHTML = html;
     }
 
     function renderSlots() {
@@ -914,16 +768,14 @@
       slots.forEach(function(slot, i) {
         var isUnlocked = i < unlockedCount;
         var slotClass = 'slot' +
-          (slot.state === 'pending' || slot.state === 'active' ? ' has-contract' : '') +
-          (slot.state === 'active' ? ' active' : '') +
+          (slot.state === 'active' ? ' has-contract active' : '') +
+          (slot.state === 'available' && slot.contract ? ' has-contract' : '') +
           (slot.state === 'cooldown' ? ' cooldown' : '') +
           (!isUnlocked ? ' locked' : '');
 
-        html += '<div class="' + slotClass + '" ' +
-          (isUnlocked && slot.state === 'empty' ? 'ondragover="onSlotDragOver(event, ' + i + ')" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, ' + i + ')"' : '') +
-          '>';
+        html += '<div class="' + slotClass + '">';
 
-        // Header with slot number, timer (if active), and status
+        // Header
         html += '<div class="slot-header">';
         html += '<span class="slot-num">Slot ' + (i + 1) + '</span>';
         if (slot.state === 'active' && slot.endTime) {
@@ -931,8 +783,8 @@
         } else if (slot.state === 'cooldown' && slot.endTime) {
           html += '<span class="slot-timer-inline" id="slot-timer-' + i + '" style="color:#888;">' + formatTime(slot.endTime - Date.now()) + '</span>';
         }
-        html += '<span class="slot-status status-' + (isUnlocked ? slot.state : 'locked') + '">' +
-          (isUnlocked ? slot.state : 'Locked') + '</span>';
+        var statusLabel = isUnlocked ? slot.state : 'locked';
+        html += '<span class="slot-status status-' + statusLabel + '">' + statusLabel + '</span>';
         html += '</div>';
 
         html += '<div class="slot-content">';
@@ -941,15 +793,14 @@
           var req = i < 4 ? 'Contractor I' : (i < 7 ? 'Contractor II' : 'Contractor III');
           html += '<div class="slot-locked-text">&#x1F512;</div>' +
             '<div class="slot-locked-req">Unlock with ' + req + '</div>';
-        } else if (slot.state === 'empty') {
-          html += '<div class="slot-empty-text">Drag a contract here</div>';
-        } else if (slot.state === 'pending' && slot.contract) {
+        } else if (slot.state === 'available' && slot.contract) {
+          // Show the contract with Accept button
           html += renderSlotContract(slot, i, false);
           html += '<div class="slot-buttons">' +
             '<button class="btn btn-accept" onclick="acceptContract(' + i + ')">Accept</button>' +
-            '<button class="btn btn-remove" onclick="removeContract(' + i + ')">Remove</button>' +
           '</div>';
         } else if (slot.state === 'active' && slot.contract) {
+          // Show contract with progress and Fill button
           html += renderSlotContract(slot, i, true);
           var canFill = canFillContract(slot);
           html += '<div class="slot-buttons">' +
@@ -957,6 +808,8 @@
           '</div>';
         } else if (slot.state === 'cooldown') {
           html += '<div class="slot-empty-text" style="color:#888;">Cooldown...</div>';
+        } else {
+          html += '<div class="slot-empty-text">Waiting for contract...</div>';
         }
 
         html += '</div></div>';
@@ -993,14 +846,14 @@
 
     function notify(message, type) {
       if (notificationTimeout) clearTimeout(notificationTimeout);
-      const existing = document.querySelector('.notification');
+      var existing = document.querySelector('.notification');
       if (existing) existing.remove();
 
-      const div = document.createElement('div');
+      var div = document.createElement('div');
       div.className = 'notification ' + type;
       div.textContent = message;
       document.body.appendChild(div);
-      notificationTimeout = setTimeout(() => div.remove(), 3000);
+      notificationTimeout = setTimeout(function() { div.remove(); }, 3000);
     }
 
     var _clickSound = new Audio('click.mp3');
@@ -1034,7 +887,6 @@
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
         PortalsSdk.setMessageListener(function(msg) { processMessage(msg, 'SDK'); });
         console.log('[Contracts] SDK listener registered');
-        // Trigger sync now that SDK is ready
         setTimeout(function() { triggerTask('Sync_Inventory'); }, 100);
       } else {
         console.log('[Contracts] Waiting for SDK...');
@@ -1053,7 +905,6 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-      loadSlotState();
       setupMessageListener();
 
       // ESC to close
@@ -1061,17 +912,31 @@
         if (e.key === 'Escape') { e.preventDefault(); closeIframe(); }
       });
 
-      // Continuously refocus game keyboard so WASD movement keeps working
-      function _refocusGame() {
+      // Refocus game keyboard — skip on interactive elements
+      function _refocusGame(e) {
+        if (e && e.target) {
+          var tag = e.target.tagName;
+          if (tag === 'BUTTON' || tag === 'SELECT' || tag === 'INPUT') return;
+          if (e.target.closest && e.target.closest('button, select')) return;
+        }
         if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
       }
       document.addEventListener('click', _refocusGame);
       document.addEventListener('mouseup', _refocusGame);
       document.addEventListener('keydown', _refocusGame);
-      setTimeout(_refocusGame, 300);
-      var _refocusInterval = setInterval(_refocusGame, 2000);
+      setTimeout(function() { _refocusGame(null); }, 300);
+      var _refocusInterval = setInterval(function() { _refocusGame(null); }, 2000);
 
-      // Note: Sync_Inventory is triggered in setupMessageListener after SDK ready
+      // Generate initial contracts for current window
+      var win = getRefreshWindow();
+      lastWindowSeed = win.seed;
+      refreshEndTime = win.endTime;
+      for (var i = 0; i < 10; i++) {
+        slots[i].contract = getSlotContract(i, win.seed);
+        slots[i].windowSeed = win.seed;
+        slots[i].state = 'available';
+      }
+
       render();
       updateTimers();
       startGameLoop();
