@@ -715,17 +715,17 @@
         rebirthNotif.style.display = 'none';
       }
 
-      // Tutorial: Visit barn when you have milk pail but haven't collected milk yet (once per session)
+      // Tutorial: Visit barn — only for true beginners (level 2-3, has pail, never collected milk)
       var animalTutorial = document.getElementById('animal-tutorial-notif');
-      if (!_tutorialDismissed.animal && hasMilkPail >= 1 && milkCount === 0 && level >= 2) {
+      if (!_tutorialDismissed.animal && hasMilkPail >= 1 && milkCount === 0 && level >= 2 && level <= 3) {
         animalTutorial.style.display = 'flex';
         _tutorialDismissed.animal = true;
         setTimeout(function() { animalTutorial.style.display = 'none'; }, 8000);
       }
 
-      // Tutorial: Visit crafting table when you have flour recipe + enough wheat but no flour yet (once per session)
+      // Tutorial: Visit crafting table — only for beginners (level 4-6, has flour recipe, enough wheat, no flour yet)
       var craftTutorial = document.getElementById('craft-tutorial-notif');
-      if (!_tutorialDismissed.craft && hasRecipeFlour >= 1 && flourCount === 0 && cropWheatCount >= 3) {
+      if (!_tutorialDismissed.craft && hasRecipeFlour >= 1 && flourCount === 0 && cropWheatCount >= 3 && level <= 6) {
         craftTutorial.style.display = 'flex';
         _tutorialDismissed.craft = true;
         setTimeout(function() { craftTutorial.style.display = 'none'; }, 8000);

@@ -2042,14 +2042,16 @@
       var totalSeeds = gameState.inventory.seeds_wheat + gameState.inventory.seeds_carrot + gameState.inventory.seeds_corn + gameState.inventory.seeds_potato + gameState.inventory.seeds_tomato + gameState.inventory.seeds_pumpkin;
       var anyPlanted = gameState.plots.some(function(p) { return p.state === 'growing' || p.state === 'ready'; });
 
-      // Tutorial: Show arrow on Crops tab when player has seeds but hasn't planted anything (once per session)
-      if (!_tutorialDismissed.crops && totalSeeds > 0 && !anyPlanted) {
+      // Tutorial: Show arrow on Crops tab — only for true beginners (level 0-1, has seeds, nothing planted, no crops harvested)
+      var totalCrops = gameState.inventory.wheat + gameState.inventory.carrot + gameState.inventory.corn + gameState.inventory.potato + gameState.inventory.tomato + gameState.inventory.pumpkin;
+      if (!_tutorialDismissed.crops && gameState.level <= 1 && totalSeeds > 0 && !anyPlanted && totalCrops === 0) {
         var cropsTab = document.querySelector('[data-tab="crops"]');
         if (cropsTab) cropsTab.classList.add('has-tutorial');
       }
 
-      // Tutorial: Show arrow on Animals tab when player has milk pail but hasn't collected any milk (once per session)
-      if (!_tutorialDismissed.animals && gameState.equipment.milk_pail >= 1 && gameState.inventory.milk === 0 && gameState.level >= 2) {
+      // Tutorial: Show arrow on Animals tab — only for true beginners (level 2-3, has pail, never collected milk)
+      var anyAnimalStarted = gameState.animals.cows.some(function(a) { return a.state !== 'idle'; });
+      if (!_tutorialDismissed.animals && gameState.level >= 2 && gameState.level <= 3 && gameState.equipment.milk_pail >= 1 && gameState.inventory.milk === 0 && !anyAnimalStarted) {
         var animalsTab = document.querySelector('[data-tab="animals"]');
         if (animalsTab) animalsTab.classList.add('has-tutorial');
       }
