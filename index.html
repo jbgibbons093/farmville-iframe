@@ -1144,93 +1144,67 @@
 
     function plantAllEmpty() {
       _lastInteraction = Date.now();
-      console.log('[Hughberry] plantAllEmpty called');
-      console.log('[Hughberry] syncReceived:', syncReceived, 'plantingInProgress:', plantingInProgress);
-
-      // Guard against rapid clicks
-      if (plantingInProgress) {
-        console.log('[Hughberry] Planting already in progress, ignoring');
-        return;
-      }
-
-      // Removed syncReceived block - just warn but continue
+      if (plantingInProgress) return;
       if (!syncReceived) {
         console.log('[Hughberry] Warning: sync not received yet, proceeding anyway');
       }
 
-      const c = gameState.settings.priorityCrop;
-      const seedKey = `seeds_${c}`;
-      const availableSeeds = gameState.inventory[seedKey] || 0;
-      const crop = CONFIG.crops[c];
-      console.log('[Hughberry] priorityCrop:', c, 'seedKey:', seedKey, 'availableSeeds:', availableSeeds);
-
-      if (availableSeeds < 1) { notify('No ' + crop.name + ' seeds!', 'error'); console.log('[Hughberry] No seeds, returning'); return; }
-      if (gameState.level < crop.unlockLevel) { notify(`Unlock at Lv.${crop.unlockLevel}`, 'error'); console.log('[Hughberry] Level too low, returning'); return; }
-
-      // Find empty plots and plant up to availableSeeds
       const activePlots = getActivePlotCount();
-      console.log('[Hughberry] Finding empty plots, activePlots:', activePlots);
-      const emptyPlots = gameState.plots.map((p, i) => ({ plot: p, idx: i })).filter(x => x.plot.state === 'empty' && x.idx < activePlots);
-      const toPlant = Math.min(emptyPlots.length, availableSeeds);
-      console.log('[Hughberry] emptyPlots:', emptyPlots.length, 'toPlant:', toPlant);
+      let emptyPlots = gameState.plots.map((p, i) => ({ plot: p, idx: i })).filter(x => x.plot.state === 'empty' && x.idx < activePlots);
+      if (emptyPlots.length === 0) { notify('No empty plots!', 'error'); return; }
 
-      if (toPlant < 1) { notify('No empty plots!', 'error'); console.log('[Hughberry] No empty plots, returning'); return; }
+      // Build planting queue: priority crop first, then all other available seeds
+      const priorityCrop = gameState.settings.priorityCrop;
+      const cropOrder = [priorityCrop];
+      Object.keys(CONFIG.crops).forEach(function(c) {
+        if (c !== priorityCrop) cropOrder.push(c);
+      });
 
-      let planted = 0;
-      const plantXP = getPlantingXP(crop);
-      const cropName = crop.name;
+      const plantQueue = []; // { plot, idx, cropKey, cropConfig }
+      cropOrder.forEach(function(c) {
+        if (emptyPlots.length === 0) return;
+        const crop = CONFIG.crops[c];
+        if (!crop || gameState.level < crop.unlockLevel) return;
+        const seedKey = 'seeds_' + c;
+        let available = gameState.inventory[seedKey] || 0;
+        const toPlant = Math.min(emptyPlots.length, available);
+        for (let i = 0; i < toPlant; i++) {
+          plantQueue.push({ plot: emptyPlots[i].plot, idx: emptyPlots[i].idx, cropKey: c, crop: crop, seedKey: seedKey });
+        }
+        emptyPlots = emptyPlots.slice(toPlant);
+      });
 
-      console.log('[Hughberry] Starting plant loop for', toPlant, 'plots');
-      // Update local state FIRST for immediate UI feedback
-      for (let i = 0; i < toPlant; i++) {
-        const { plot, idx } = emptyPlots[i];
-        console.log('[Hughberry] Planting plot', idx + 1, 'with', c);
-        gameState.inventory[seedKey] = Math.max(0, (gameState.inventory[seedKey] || 0) - 1);
-        plot.state = 'growing';
-        plot.cropType = c;
-        plot.plantedAt = Date.now();
-        plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
-        planted++;
-      }
+      if (plantQueue.length === 0) { notify('No seeds available!', 'error'); return; }
 
-      console.log('[Hughberry] Planted', planted, 'crops, now rendering');
-      // Render immediately with updated local state
+      // Update local state for immediate UI feedback
+      let totalXP = 0;
+      plantQueue.forEach(function(item) {
+        gameState.inventory[item.seedKey] = Math.max(0, (gameState.inventory[item.seedKey] || 0) - 1);
+        item.plot.state = 'growing';
+        item.plot.cropType = item.cropKey;
+        item.plot.plantedAt = Date.now();
+        item.plot.readyAt = Date.now() + (getCropGrowTime(item.crop) * 1000);
+        totalXP += getPlantingXP(item.crop);
+      });
+
       saveGameQuiet();
-      console.log('[Hughberry] Calling renderCrops');
       renderCrops();
-      console.log('[Hughberry] Calling renderDashboard');
       renderDashboard();
-      console.log('[Hughberry] Render complete');
 
-      // Block rapid clicks while tasks are staggered
       plantingInProgress = true;
 
-      // Stagger Portals tasks 300ms apart to avoid task collisions
-      for (let i = 0; i < toPlant; i++) {
-        const plotIdx = emptyPlots[i].idx;
-        (function(idx, delay) {
-          setTimeout(function() {
-            triggerTask('Plant_Plot_' + (idx + 1));
-            triggerTask('Sub_Seeds_' + cropName + '_1');
-            console.log('[Hughberry] Sent Plant_Plot_' + (idx + 1) + ' + Sub_Seeds (delay: ' + delay + 'ms)');
-          }, delay);
-        })(plotIdx, i * 300);
-      }
+      // Stagger Portals tasks 300ms apart
+      plantQueue.forEach(function(item, i) {
+        setTimeout(function() {
+          triggerTask('Plant_Plot_' + (item.idx + 1));
+          triggerTask('Sub_Seeds_' + item.crop.name + '_1');
+        }, i * 300);
+      });
 
-      // Award total XP (staggered after all plant tasks)
-      const totalPlantXP = planted * plantXP;
-      setTimeout(function() {
-        awardXP(totalPlantXP);
-      }, toPlant * 300);
+      setTimeout(function() { awardXP(totalXP); }, plantQueue.length * 300);
+      setTimeout(function() { plantingInProgress = false; }, (plantQueue.length * 300) + 500);
 
-      // Clear planting lock after all tasks sent + buffer for Portals to process
-      setTimeout(function() {
-        plantingInProgress = false;
-        console.log('[Hughberry] Planting lock cleared');
-      }, (toPlant * 300) + 500);
-
-      notify('Planted ' + planted + ' crops! +' + totalPlantXP + ' XP', 'success');
-      console.log('[Hughberry] plantAllEmpty completed, tasks staggered');
+      notify('Planted ' + plantQueue.length + ' crops! +' + totalXP + ' XP', 'success');
     }
 
     // Equipment requirements for starting animal activities
