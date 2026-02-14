@@ -485,6 +485,7 @@
     }
 
     // Game state - all values come from Portals via Sync_Inventory
+    var _tutorialDismissed = {};
     var gold = 0;
     var xp = 0;
     var level = 0;
@@ -711,20 +712,20 @@
         rebirthNotif.style.display = 'none';
       }
 
-      // Tutorial: Visit barn when you have milk pail but haven't collected milk yet
+      // Tutorial: Visit barn when you have milk pail but haven't collected milk yet (once per session)
       var animalTutorial = document.getElementById('animal-tutorial-notif');
-      if (hasMilkPail >= 1 && milkCount === 0 && level >= 2) {
+      if (!_tutorialDismissed.animal && hasMilkPail >= 1 && milkCount === 0 && level >= 2) {
         animalTutorial.style.display = 'flex';
-      } else {
-        animalTutorial.style.display = 'none';
+        _tutorialDismissed.animal = true;
+        setTimeout(function() { animalTutorial.style.display = 'none'; }, 8000);
       }
 
-      // Tutorial: Visit crafting table when you have flour recipe + enough wheat but no flour yet
+      // Tutorial: Visit crafting table when you have flour recipe + enough wheat but no flour yet (once per session)
       var craftTutorial = document.getElementById('craft-tutorial-notif');
-      if (hasRecipeFlour >= 1 && flourCount === 0 && cropWheatCount >= 3) {
+      if (!_tutorialDismissed.craft && hasRecipeFlour >= 1 && flourCount === 0 && cropWheatCount >= 3) {
         craftTutorial.style.display = 'flex';
-      } else {
-        craftTutorial.style.display = 'none';
+        _tutorialDismissed.craft = true;
+        setTimeout(function() { craftTutorial.style.display = 'none'; }, 8000);
       }
     }
 
