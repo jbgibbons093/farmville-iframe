@@ -40,6 +40,7 @@
     .slot-num { font-size: 13px; color: #888; font-weight: 700; }
     .slot-timer-inline { font-size: 16px; font-weight: 800; color: #f39c12; text-shadow: 0 0 8px rgba(243, 156, 18, 0.4); letter-spacing: 0.5px; }
     .slot-status { font-size: 11px; padding: 4px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-loading { background: #555; color: #aaa; }
     .status-available { background: #2980b9; color: #fff; box-shadow: 0 2px 6px rgba(41, 128, 185, 0.3); }
     .status-active { background: #f39c12; color: #000; box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3); }
     .status-cooldown { background: #555; color: #aaa; }
@@ -181,15 +182,16 @@
 
     let refreshEndTime = getRefreshWindow().endTime;
     let lastWindowSeed = null;
+    let syncReceived = false; // Don't render slots until first Sync_Inventory
 
     // Player's 10 slots — state is derived from Contract_X_Done + deterministic seed
-    // States: 'available' (has a contract to accept), 'active' (accepted, fulfilling),
-    //         'cooldown' (fulfilled, waiting), 'locked' (talent not unlocked)
+    // States: 'loading' (waiting for sync), 'available' (has a contract to accept),
+    //         'active' (accepted, fulfilling), 'cooldown' (fulfilled, waiting), 'locked'
     let slots = [];
     for (let i = 0; i < 10; i++) {
       slots.push({
         id: i + 1,
-        state: 'available',
+        state: 'loading',
         contract: null,
         endTime: null,
         windowSeed: null // which 2-min window generated this slot's contract
@@ -529,7 +531,6 @@
         var slot = slots[si];
 
         if (si >= unlockedCount) {
-          // Locked slot
           slot.state = 'locked';
           slot.contract = null;
           slot.endTime = null;
@@ -537,34 +538,32 @@
         }
 
         if (gameState.contractDone[si] === 1) {
-          // This slot has an accepted contract — restore it
-          // Use the slot's stored window seed if we have one, otherwise current window
-          var contractSeed = slot.windowSeed || win.seed;
-          if (slot.state !== 'active' && slot.state !== 'cooldown') {
-            // Slot was available or new — mark as active
-            slot.state = 'active';
-            slot.contract = getSlotContract(si, contractSeed);
-            if (!slot.endTime) {
-              slot.endTime = Date.now() + FULFILL_MS;
-            }
-            if (!slot.windowSeed) {
-              slot.windowSeed = contractSeed;
-            }
-          }
-          // If already active/cooldown, keep current state (timers running)
-        } else if (gameState.contractDone[si] === 0) {
-          // Slot is NOT accepted — if it was active, Portals cleared it
+          // This slot has an accepted contract
           if (slot.state === 'active') {
-            // Contract was cleared externally — go to cooldown
+            // Already active in this session — keep timer running, don't touch
+          } else {
+            // First time seeing this slot as active (iframe just opened or state was loading/available)
+            slot.state = 'active';
+            var contractSeed = slot.windowSeed || win.seed;
+            slot.contract = getSlotContract(si, contractSeed);
+            slot.endTime = Date.now() + FULFILL_MS;
+            slot.windowSeed = contractSeed;
+          }
+        } else {
+          // Contract_X_Done = 0
+          if (slot.state === 'active') {
+            // Was active but Portals cleared it — go to cooldown
             slot.state = 'cooldown';
             slot.contract = null;
-            if (!slot.endTime) slot.endTime = Date.now() + getCooldownMs();
+            slot.endTime = Date.now() + getCooldownMs();
+            slot.windowSeed = null;
           } else if (slot.state === 'cooldown') {
             // Keep cooldown running
           } else {
-            // Available — generate/refresh contract for this slot
+            // Available or loading — show a contract to accept
+            var wasLoading = (slot.state === 'loading');
             slot.state = 'available';
-            if (!slot.contract || windowChanged) {
+            if (!slot.contract || wasLoading || windowChanged) {
               slot.contract = getSlotContract(si, win.seed);
               slot.windowSeed = win.seed;
             }
@@ -572,6 +571,8 @@
           }
         }
       }
+
+      syncReceived = true;
 
       // XP sound delta tracking
       if (_firstXPSync) { _firstXPSync = false; _prevXP = gameState.xp; _prevLevel = gameState.level; }
@@ -927,15 +928,11 @@
       setTimeout(function() { _refocusGame(null); }, 300);
       var _refocusInterval = setInterval(function() { _refocusGame(null); }, 2000);
 
-      // Generate initial contracts for current window
+      // Don't pre-initialize slots — wait for Sync_Inventory to know which are active
+      // Just set up the refresh timer seed
       var win = getRefreshWindow();
       lastWindowSeed = win.seed;
       refreshEndTime = win.endTime;
-      for (var i = 0; i < 10; i++) {
-        slots[i].contract = getSlotContract(i, win.seed);
-        slots[i].windowSeed = win.seed;
-        slots[i].state = 'available';
-      }
 
       render();
       updateTimers();
