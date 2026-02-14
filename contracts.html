@@ -126,7 +126,7 @@
 
     const REFRESH_MS = 2 * 60 * 1000; // 2 minutes
     const FULFILL_MS = 5 * 60 * 1000; // 5 minutes to fulfill
-    const BASE_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown after
+    const BASE_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes cooldown after
 
     function getCooldownMs() {
       var rb = gameState.rebirthBlessings;
@@ -276,7 +276,7 @@
       }
 
       const baseCost = selectedItems.reduce(function(sum, item) { return sum + item.value * item.qty; }, 0);
-      const profitMult = 1.25 + (rng() * 0.5);
+      const profitMult = 2.0 + (rng() * 2.0);
       const rawGold = baseCost * profitMult * tierConfig.goldMult;
       const goldReward = Math.max(25, Math.round(rawGold / 25) * 25);
       const xpReward = Math.floor(goldReward * 0.3 * tierConfig.xpMult);
