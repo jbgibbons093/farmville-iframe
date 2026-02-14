@@ -125,15 +125,9 @@
     // ============================================
 
     const REFRESH_MS = 2 * 60 * 1000; // 2 minutes
-    const FULFILL_MS = 5 * 60 * 1000; // 5 minutes to fulfill
-    const BASE_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes cooldown after
-
-    function getCooldownMs() {
-      var rb = gameState.rebirthBlessings;
-      var reduction = rb.quickContracts * 0.10 + rb.timeWarp * 0.05;
-      reduction = Math.min(0.9, reduction);
-      return Math.max(30000, Math.ceil(BASE_COOLDOWN_MS * (1 - reduction)));
-    }
+    // No fulfill timer — accepted contracts stay active until filled
+    // No cooldown timer — slot immediately gets a new contract after filling
+    // (Timers can't persist across iframe close/reopen since Portals blocks localStorage)
 
     // Items with their properties
     const ITEMS = {
@@ -186,7 +180,7 @@
 
     // Player's 10 slots — state is derived from Contract_X_Done + deterministic seed
     // States: 'loading' (waiting for sync), 'available' (has a contract to accept),
-    //         'active' (accepted, fulfilling), 'cooldown' (fulfilled, waiting), 'locked'
+    //         'active' (accepted, fulfilling), 'locked'
     let slots = [];
     for (let i = 0; i < 10; i++) {
       slots.push({
@@ -284,7 +278,7 @@
       return { items: selectedItems, goldReward: goldReward, xpReward: xpReward, tier: tier };
     }
 
-    // Refresh all available (non-active, non-cooldown) slots with new contracts
+    // Refresh all available (non-active) slots with new contracts
     function refreshSlotContracts() {
       var win = getRefreshWindow();
       lastWindowSeed = win.seed;
@@ -293,7 +287,7 @@
       var unlockedCount = getUnlockedSlots();
       for (var i = 0; i < 10; i++) {
         var slot = slots[i];
-        // Only regenerate contracts for available slots (not active or cooldown)
+        // Only regenerate contracts for available slots (not active)
         if (i < unlockedCount && slot.state === 'available') {
           slot.contract = getSlotContract(i, win.seed);
           slot.windowSeed = win.seed;
@@ -546,19 +540,17 @@
             slot.state = 'active';
             var contractSeed = slot.windowSeed || win.seed;
             slot.contract = getSlotContract(si, contractSeed);
-            slot.endTime = Date.now() + FULFILL_MS;
+            slot.endTime = null; // No timer — stays active until filled
             slot.windowSeed = contractSeed;
           }
         } else {
           // Contract_X_Done = 0
           if (slot.state === 'active') {
-            // Was active but Portals cleared it — go to cooldown
-            slot.state = 'cooldown';
-            slot.contract = null;
-            slot.endTime = Date.now() + getCooldownMs();
-            slot.windowSeed = null;
-          } else if (slot.state === 'cooldown') {
-            // Keep cooldown running
+            // Was active but Portals cleared it — go straight to available
+            slot.state = 'available';
+            slot.contract = getSlotContract(si, win.seed);
+            slot.windowSeed = win.seed;
+            slot.endTime = null;
           } else {
             // Available or loading — show a contract to accept
             var wasLoading = (slot.state === 'loading');
@@ -591,7 +583,7 @@
       if (slot.state !== 'available' || !slot.contract) return;
 
       slot.state = 'active';
-      slot.endTime = Date.now() + FULFILL_MS;
+      slot.endTime = null; // No timer — stays active until filled
       // windowSeed is already set from when contract was generated
 
       // Tell Portals this slot is taken
@@ -645,11 +637,12 @@
       setTimeout(function() { triggerTask('Clear_Contract_' + (slotIndex + 1)); }, delay);
       delay += STAGGER;
 
-      // Set slot to cooldown
-      slot.state = 'cooldown';
-      slot.contract = null;
-      slot.endTime = Date.now() + getCooldownMs();
-      slot.windowSeed = null;
+      // Slot goes straight to available with a new contract (no cooldown)
+      var win = getRefreshWindow();
+      slot.state = 'available';
+      slot.contract = getSlotContract(slotIndex, win.seed);
+      slot.windowSeed = win.seed;
+      slot.endTime = null;
 
       notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
       render();
@@ -703,32 +696,6 @@
       }
       refreshEndTime = win.endTime;
 
-      // Check slot timers
-      var stateChanged = false;
-      slots.forEach(function(slot, i) {
-        if (slot.endTime && now >= slot.endTime) {
-          if (slot.state === 'active') {
-            // Contract expired — clear the done flag and reset
-            slot.state = 'available';
-            slot.contract = getSlotContract(i, win.seed);
-            slot.windowSeed = win.seed;
-            slot.endTime = null;
-            // Clear the Portals flag
-            triggerTask('Clear_Contract_' + (i + 1));
-            notify('Contract expired!', 'error');
-            stateChanged = true;
-          } else if (slot.state === 'cooldown') {
-            // Cooldown finished — slot available again with fresh contract
-            slot.state = 'available';
-            slot.contract = getSlotContract(i, win.seed);
-            slot.windowSeed = win.seed;
-            slot.endTime = null;
-            stateChanged = true;
-          }
-        }
-      });
-
-      if (stateChanged) render();
       updateTimers();
     }
 
@@ -741,13 +708,6 @@
         if (el) el.textContent = formatTime(refreshEndTime - now);
       }
 
-      // Slot timers
-      slots.forEach(function(slot, i) {
-        var timerEl = document.getElementById('slot-timer-' + i);
-        if (timerEl && slot.endTime) {
-          timerEl.textContent = formatTime(slot.endTime - now);
-        }
-      });
     }
 
     // ============================================
@@ -771,7 +731,6 @@
         var slotClass = 'slot' +
           (slot.state === 'active' ? ' has-contract active' : '') +
           (slot.state === 'available' && slot.contract ? ' has-contract' : '') +
-          (slot.state === 'cooldown' ? ' cooldown' : '') +
           (!isUnlocked ? ' locked' : '');
 
         html += '<div class="' + slotClass + '">';
@@ -779,11 +738,6 @@
         // Header
         html += '<div class="slot-header">';
         html += '<span class="slot-num">Slot ' + (i + 1) + '</span>';
-        if (slot.state === 'active' && slot.endTime) {
-          html += '<span class="slot-timer-inline" id="slot-timer-' + i + '">' + formatTime(slot.endTime - Date.now()) + '</span>';
-        } else if (slot.state === 'cooldown' && slot.endTime) {
-          html += '<span class="slot-timer-inline" id="slot-timer-' + i + '" style="color:#888;">' + formatTime(slot.endTime - Date.now()) + '</span>';
-        }
         var statusLabel = isUnlocked ? slot.state : 'locked';
         html += '<span class="slot-status status-' + statusLabel + '">' + statusLabel + '</span>';
         html += '</div>';
@@ -807,8 +761,6 @@
           html += '<div class="slot-buttons">' +
             '<button class="btn btn-fill" ' + (canFill && !actionPending ? 'onclick="fillContract(' + i + ')"' : 'disabled') + '>Fill Order</button>' +
           '</div>';
-        } else if (slot.state === 'cooldown') {
-          html += '<div class="slot-empty-text" style="color:#888;">Cooldown...</div>';
         } else {
           html += '<div class="slot-empty-text">Waiting for contract...</div>';
         }
