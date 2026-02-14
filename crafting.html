@@ -15,32 +15,30 @@
     .container { width: 100%; max-width: 750px; max-height: 85vh; background: linear-gradient(145deg, #2d1f0f 0%, #1a1208 100%); border: 4px solid #A5581A; border-radius: 22px; box-shadow: 0 0 40px rgba(165, 88, 26, 0.55), 0 0 80px rgba(139, 69, 19, 0.25); display: flex; flex-direction: column; overflow: hidden; }
     .header { background: linear-gradient(180deg, #A5581A 0%, #7a3c0e 50%, #5a2d0a 100%); padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; }
     .title { font-family: 'Luckiest Guy', cursive; font-size: 28px; color: #FFD700; text-shadow: 2px 2px 0 #3a1a05, 0 0 10px rgba(255, 215, 0, 0.3); letter-spacing: 2px; }
-    .content { flex: 1; overflow-y: auto; padding: 20px; }
-    .section-title { font-size: 17px; color: #FFD700; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
-    .section-title::after { content: ''; flex: 1; height: 2px; background: linear-gradient(90deg, #5a4530, transparent); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; margin-bottom: 25px; }
-    .recipe { background: linear-gradient(145deg, rgba(50, 40, 25, 0.9) 0%, rgba(35, 28, 18, 0.9) 100%); border: 3px solid #4a3a2a; border-radius: 14px; padding: 15px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
-    .recipe:hover { border-color: #A5581A; box-shadow: 0 4px 12px rgba(165, 88, 26, 0.25); }
-    .recipe.craftable { border-color: #2ecc71; box-shadow: 0 0 14px rgba(46, 204, 113, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3); }
-    .recipe.locked { opacity: 0.6; border-color: #555; }
-    .recipe-locked-notice { background: rgba(231, 76, 60, 0.2); border: 1px solid #c0392b; color: #e74c3c; padding: 8px 12px; border-radius: 8px; font-size: 14px; margin-bottom: 12px; text-align: center; }
-    .recipe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .recipe-name { font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-    .recipe-icon { font-size: 42px; }
-    .recipe-value { text-align: right; }
-    .recipe-xp { font-size: 16px; font-weight: 700; color: #67b8f7; }
-    .ingredients { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-    .ingredient { background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 6px; border: 1px solid #4a3a2a; }
+    .content { flex: 1; overflow-y: auto; padding: 12px; }
+    .recipe-list { display: flex; flex-direction: column; gap: 10px; }
+    .recipe { background: linear-gradient(145deg, rgba(50, 40, 25, 0.95) 0%, rgba(35, 28, 18, 0.95) 100%); border: 4px solid #4a3a2a; border-radius: 16px; padding: 14px 16px; transition: all 0.2s; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4); display: flex; align-items: center; gap: 14px; }
+    .recipe.craftable { border-color: #2ecc71; box-shadow: 0 0 16px rgba(46, 204, 113, 0.35), 0 3px 8px rgba(0, 0, 0, 0.4); }
+    .recipe.locked { opacity: 0.5; border-color: #555; }
+    .recipe-icon { font-size: 48px; flex-shrink: 0; }
+    .recipe-info { flex: 1; min-width: 0; }
+    .recipe-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .recipe-name { font-size: 22px; font-weight: 800; color: #fff; }
+    .recipe-xp { font-size: 16px; font-weight: 700; color: #67b8f7; margin-left: auto; white-space: nowrap; }
+    .recipe-locked-notice { color: #e74c3c; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .ingredients { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ingredient { background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 10px; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 6px; border: 3px solid #4a3a2a; }
     .ingredient.has { border-color: #27ae60; color: #2ecc71; }
     .ingredient.missing { border-color: #c0392b; color: #e74c3c; }
-    .ingredient-icon { font-size: 20px; }
-    .craft-btn { width: 100%; background: linear-gradient(180deg, #5a4020 0%, #3a2810 100%); border: 2px solid #8B4513; color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 0 #2a1a08; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .craft-btn:hover:not(:disabled) { background: linear-gradient(180deg, #7a5a30 0%, #5a3820 100%); transform: scale(1.08) translateY(-2px); box-shadow: 0 6px 0 #2a1a08, 0 0 15px rgba(139, 69, 19, 0.4); }
-    .craft-btn:active:not(:disabled) { transform: scale(0.97) translateY(2px); box-shadow: 0 1px 0 #2a1a08; }
-    .craft-btn:disabled, .craft-btn.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
-    .craft-btn.ready { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); border-color: #2ecc71; box-shadow: 0 4px 0 #145a32; }
-    .craft-btn.ready:hover { box-shadow: 0 6px 0 #145a32, 0 0 20px rgba(46, 204, 113, 0.5); transform: scale(1.08) translateY(-2px); }
-    .craft-btn.ready:active { transform: scale(0.97) translateY(2px); box-shadow: 0 1px 0 #145a32; }
+    .ingredient-icon { font-size: 24px; }
+    .ingredient-name { text-transform: capitalize; }
+    .craft-btn { flex-shrink: 0; background: linear-gradient(180deg, #5a4020 0%, #3a2810 100%); border: 3px solid #8B4513; color: #fff; padding: 16px 22px; border-radius: 14px; font-size: 20px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #2a1a08; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+    .craft-btn:hover:not(:disabled) { background: linear-gradient(180deg, #7a5a30 0%, #5a3820 100%); transform: scale(1.06) translateY(-2px); box-shadow: 0 7px 0 #2a1a08, 0 0 15px rgba(139, 69, 19, 0.4); }
+    .craft-btn:active:not(:disabled) { transform: scale(0.97) translateY(3px); box-shadow: 0 1px 0 #2a1a08; }
+    .craft-btn:disabled, .craft-btn.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; font-size: 14px; padding: 16px 14px; }
+    .craft-btn.ready { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); border-color: #2ecc71; box-shadow: 0 5px 0 #145a32; }
+    .craft-btn.ready:hover { box-shadow: 0 7px 0 #145a32, 0 0 20px rgba(46, 204, 113, 0.5); transform: scale(1.06) translateY(-2px); }
+    .craft-btn.ready:active { transform: scale(0.97) translateY(3px); box-shadow: 0 1px 0 #145a32; }
 
     .close-btn { background: linear-gradient(180deg, #c0392b 0%, #96281b 100%); border: 2px solid #e74c3c; color: #fff; width: 40px; height: 40px; border-radius: 10px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
     .close-btn:hover { transform: scale(1.1); box-shadow: 0 0 16px rgba(231, 76, 60, 0.6); }
@@ -60,8 +58,7 @@
         <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
       </div>
       <div class="content">
-        <div class="section-title">Recipes</div>
-        <div class="grid" id="recipes-grid"></div>
+        <div class="recipe-list" id="recipes-grid"></div>
       </div>
     </div>
   </div>
@@ -250,30 +247,34 @@
           const icon = INGREDIENT_ICONS[ing] || '&#x1F4E6;';
           ingredientsHtml += '<span class="ingredient ' + (enough ? 'has' : 'missing') + '">' +
             '<span class="ingredient-icon">' + icon + '</span>' +
-            ing.replace('_', ' ') + ': ' + has + '/' + qty +
+            '<span class="ingredient-name">' + ing.replace('_', ' ') + '</span> ' +
+            has + '/' + qty +
           '</span>';
         }
 
-        let buttonText = '&#x2692;&#xFE0F; Craft';
-        if (!hasRecipe) buttonText = '&#x1F512; Recipe Required';
-        else if (!canCraft) buttonText = 'Missing Ingredients';
+        let buttonText = 'CRAFT';
+        var buttonClass = 'craft-btn';
+        if (!hasRecipe) { buttonText = 'LOCKED'; buttonClass += ' disabled'; }
+        else if (!canCraft) { buttonText = 'NEED ITEMS'; buttonClass += ' disabled'; }
+        else { buttonClass += ' ready'; }
 
         var buttonHtml;
         if (canCraft) {
-          buttonHtml = '<button class="craft-btn ready" onclick="craftItem(\'' + recipe.id + '\')">' + buttonText + '</button>';
+          buttonHtml = '<button class="' + buttonClass + '" onclick="craftItem(\'' + recipe.id + '\')">' + buttonText + '</button>';
         } else {
-          buttonHtml = '<button class="craft-btn disabled" disabled>' + buttonText + '</button>';
+          buttonHtml = '<button class="' + buttonClass + '" disabled>' + buttonText + '</button>';
         }
 
         html += '<div class="recipe ' + (canCraft ? 'craftable' : '') + ' ' + (!hasRecipe ? 'locked' : '') + '">' +
-          '<div class="recipe-header">' +
-            '<span class="recipe-name"><span class="recipe-icon">' + recipe.icon + '</span>' + recipe.name + '</span>' +
-            '<div class="recipe-value">' +
-              '<div class="recipe-xp">+' + getCraftingXP(recipe) + ' XP</div>' +
+          '<span class="recipe-icon">' + recipe.icon + '</span>' +
+          '<div class="recipe-info">' +
+            '<div class="recipe-top">' +
+              '<span class="recipe-name">' + recipe.name + '</span>' +
+              '<span class="recipe-xp">+' + getCraftingXP(recipe) + ' XP</span>' +
             '</div>' +
+            (!hasRecipe ? '<div class="recipe-locked-notice">Buy from Blueprint Store</div>' : '') +
+            '<div class="ingredients">' + ingredientsHtml + '</div>' +
           '</div>' +
-          (!hasRecipe ? '<div class="recipe-locked-notice">Buy this recipe from the Blueprint Store</div>' : '') +
-          '<div class="ingredients">' + ingredientsHtml + '</div>' +
           buttonHtml +
         '</div>';
       });
