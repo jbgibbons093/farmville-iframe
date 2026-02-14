@@ -673,22 +673,23 @@
       setTimeout(function() { triggerTask('Clear_Contract_' + (slotIndex + 1)); }, delay);
       delay += STAGGER;
 
-      // Slot goes straight to available with a new contract (no cooldown)
-      var win = getRefreshWindow();
-      slot.state = 'available';
-      _fillLock[slotIndex] = false;
-      slot.frozenContract = null;
-      slot.frozenLevel = null;
-      slot.contract = getSlotContract(slotIndex, win.seed);
-      slot.windowSeed = win.seed;
-      slot.endTime = null;
-
       notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
-      render();
 
+      // Keep slot in 'filling' state until ALL tasks have fired, THEN unlock
       var totalTasks = deductTasks.length + goldTasks.length + xpTasks.length + 1;
       var unlockDelay = (totalTasks * STAGGER) + 500;
-      setTimeout(function() { actionPending = false; render(); }, unlockDelay);
+      setTimeout(function() {
+        var win = getRefreshWindow();
+        slot.state = 'available';
+        slot.frozenContract = null;
+        slot.frozenLevel = null;
+        slot.contract = getSlotContract(slotIndex, win.seed);
+        slot.windowSeed = win.seed;
+        slot.endTime = null;
+        _fillLock[slotIndex] = false;
+        actionPending = false;
+        render();
+      }, unlockDelay);
     }
 
     function getRewardTasks(amount, prefix, denominations) {
