@@ -560,17 +560,7 @@
         } else {
           // Contract_X_Done = 0
           if (slot.state === 'active') {
-            // Grace period: if we just accepted locally, Portals may not have processed yet
-            var gracePeriod = slot.acceptedAt && (Date.now() - slot.acceptedAt < 10000);
-            if (gracePeriod) {
-              // Keep active — Portals hasn't caught up yet
-            } else {
-            // Was active but Portals cleared it — go straight to available
-            slot.state = 'available';
-            slot.contract = getSlotContract(si, win.seed);
-            slot.windowSeed = win.seed;
-            slot.endTime = null;
-            }
+            // Locally accepted — iframe is authority, keep active regardless of Portals flag
           } else {
             // Available or loading — show a contract to accept
             var wasLoading = (slot.state === 'loading');
