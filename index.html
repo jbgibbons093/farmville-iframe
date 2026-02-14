@@ -397,7 +397,6 @@
     }
 
     function closeMenu() {
-      if (_refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound('click');
       console.log('[Hughberry] Close menu requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
