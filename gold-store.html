@@ -400,7 +400,7 @@ body {
         <!-- Farmer's Bundle -->
         <div class="package-card bundle">
           <div class="package-info">
-            <span class="package-icon">&#x1F4B0;</span>
+            <span class="package-icon">&#x1FA99;</span>
             <div class="package-details">
               <div class="package-name">Farmer's Bundle</div>
               <div class="package-gold"><span>5,000</span> Gold</div>
@@ -695,6 +695,14 @@ document.addEventListener('visibilitychange', function() {
 window.addEventListener('focus', function() {
   triggerTask('Sync_Inventory');
 });
+
+// Continuously refocus game keyboard so WASD movement keeps working
+function _refocusGame() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+}
+document.addEventListener('click', _refocusGame);
+document.addEventListener('mouseup', _refocusGame);
+document.addEventListener('keydown', _refocusGame);
 
 console.log('[GoldStore] Gold Store loaded');
 </script>

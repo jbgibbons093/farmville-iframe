@@ -51,7 +51,7 @@
         <div class="title">SEED STORE</div>
         <div style="display: flex; align-items: center; gap: 10px;">
           <div class="gold-display">
-            <span class="gold-icon">&#x1F4B0;</span>
+            <span class="gold-icon">&#x1FA99;</span>
             <span class="gold-value" id="gold-display">0</span>
           </div>
           <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
@@ -151,7 +151,7 @@
       notify('Bought ' + qty + ' ' + seed.name + ' seeds!', 'purchase');
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; render(); }, 3000);
+      setTimeout(function() { actionPending = false; render(); }, 1500);
     }
 
     function render() {
@@ -307,6 +307,11 @@
     gameState.gold = 0;
     render();
     setupMessageListener();
+
+    // ESC to close
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { e.preventDefault(); closeIframe(); }
+    });
 
     // Continuously refocus game keyboard so WASD movement keeps working
     function _refocusGame() {

@@ -682,7 +682,7 @@ var BLESSING_TREES = {
     ],
     talents: [
       // Tier 1
-      { key: 'Windfall', name: 'Windfall', icon: '\u{1F4B0}', maxRank: 3,
+      { key: 'Windfall', name: 'Windfall', icon: '\u{1FA99}', maxRank: 3,
         desc: '+25 gold per level-up per rank', tier: 1, pos: { x: 25, y: 60 } },
       { key: 'GreenFingers', name: 'Green Fingers', icon: '\u{1F33F}', maxRank: 3,
         desc: '+2 planting & harvest XP per rank', tier: 1, pos: { x: 50, y: 60 } },
@@ -712,7 +712,7 @@ var BLESSING_TREES = {
     ],
     talents: [
       // Tier 1
-      { key: 'NestEgg', name: 'Nest Egg', icon: '\u{1F4B0}', maxRank: 3,
+      { key: 'NestEgg', name: 'Nest Egg', icon: '\u{1FA99}', maxRank: 3,
         desc: 'Start each run with rank*100*Rebirth gold', tier: 1, pos: { x: 25, y: 60 } },
       { key: 'SeedVault', name: 'Seed Vault', icon: '\u{1F331}', maxRank: 3,
         desc: 'Start each run with rank*10*Rebirth wheat seeds', tier: 1, pos: { x: 50, y: 60 } },
@@ -1413,6 +1413,14 @@ function notify(msg, type) {
   container.appendChild(notif);
   setTimeout(function() { if (notif.parentNode) notif.remove(); }, 3000);
 }
+
+// Continuously refocus game keyboard so WASD movement keeps working
+function _refocusGame() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+}
+document.addEventListener('click', _refocusGame);
+document.addEventListener('mouseup', _refocusGame);
+document.addEventListener('keydown', _refocusGame);
 
 // Initial render
 renderAll();

@@ -35,7 +35,7 @@
         <div class="title">DECORATIONS</div>
         <div style="display: flex; align-items: center; gap: 10px;">
           <div class="gold-display">
-            <span class="gold-icon">&#x1F4B0;</span>
+            <span class="gold-icon">&#x1FA99;</span>
             <span class="gold-value" id="gold-display">0</span>
           </div>
           <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
@@ -49,7 +49,7 @@
         </div>
       </div>
       <div class="footer">
-        <div class="footer-hint">Click X to close</div>
+        <div class="footer-hint">Press ESC to close</div>
       </div>
     </div>
   </div>
@@ -172,6 +172,19 @@
       else if (event.data && event.data.portalsMessage) processMessage(event.data.portalsMessage, 'postMessage-portals');
       else if (event.data && event.data.message && typeof event.data.message === 'string') processMessage(event.data.message, 'postMessage-message');
     });
+
+    // ESC to close
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { e.preventDefault(); closeIframe(); }
+    });
+
+    // Continuously refocus game keyboard so WASD movement keeps working
+    function _refocusGame() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+    }
+    document.addEventListener('click', _refocusGame);
+    document.addEventListener('mouseup', _refocusGame);
+    document.addEventListener('keydown', _refocusGame);
 
     // Initialize
     gameState.gold = 0;

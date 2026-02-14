@@ -866,6 +866,7 @@ var RESPEC_COSTS = [
 var talentState = {};
 var playerLevel = 0;
 var playerGold = 0;
+var playerXP = 0;
 var unspentTalentPoints = 0;
 var activeTree = 'farming';
 var actionPending = false;
@@ -1129,6 +1130,7 @@ function processMessage(msg, source) {
   handlePortalsMessage(msg);
 }
 
+var _prevXP = -1, _prevLevel = -1, _firstXPSync = true;
 function handlePortalsMessage(msg) {
   if (typeof msg !== 'string') return;
   if (msg.indexOf('Sync_Inventory') === 0) {
@@ -1138,6 +1140,8 @@ function handlePortalsMessage(msg) {
       return;
     }
     parseAndSyncInventory(msg);
+    if (_firstXPSync) { _firstXPSync = false; _prevXP = playerXP; _prevLevel = playerLevel; }
+    else { if (playerLevel === _prevLevel && playerXP > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = playerXP; _prevLevel = playerLevel; }
     renderAll();
   }
 }
@@ -1214,6 +1218,11 @@ function parseAndSyncInventory(msg) {
       playerLevel = isNaN(l) ? 0 : l;
       i += 2; continue;
     }
+    if (parts[i] === 'XP' && i + 1 < parts.length) {
+      var xv = parseInt(parts[i + 1]);
+      playerXP = isNaN(xv) ? 0 : xv;
+      i += 2; continue;
+    }
     if (parts[i] === 'playerName' && i + 1 < parts.length) { i += 2; continue; }
     i++;
   }
@@ -1244,6 +1253,14 @@ window.addEventListener('message', function(event) {
 
 setupMessageListener();
 setTimeout(function() { triggerTask('Sync_Inventory'); }, 500);
+
+// Continuously refocus game keyboard so WASD movement keeps working
+function _refocusGame() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+}
+document.addEventListener('click', _refocusGame);
+document.addEventListener('mouseup', _refocusGame);
+document.addEventListener('keydown', _refocusGame);
 
 // ── Visibility/Focus Handlers ──
 document.addEventListener('visibilitychange', function() {
@@ -1525,7 +1542,7 @@ function hideTooltip() {
 // ── Sound Effects ──
 var _mp3Sounds = {};
 (function() {
-  var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3' };
+  var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', xp: 'xp-gain.mp3' };
   for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click' || k === 'talent') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
 })();
 var _audioCtx = null;

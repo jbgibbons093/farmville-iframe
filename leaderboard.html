@@ -1061,6 +1061,14 @@ window.addEventListener('message', function(event) {
 
 setupMessageListener();
 
+// Continuously refocus game keyboard so WASD movement keeps working
+function _refocusGame() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+}
+document.addEventListener('click', _refocusGame);
+document.addEventListener('mouseup', _refocusGame);
+document.addEventListener('keydown', _refocusGame);
+
 // Request sync + fetch leaderboard on load
 setTimeout(function() {
   triggerTask('Sync_Inventory');

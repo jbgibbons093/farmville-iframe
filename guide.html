@@ -813,7 +813,7 @@
               <th>Purpose</th>
             </tr>
             <tr><td class="icon-col">&#x1F331;</td><td>Seed Store</td><td>Buy seeds for all <a class="xref" onclick="navigateTo('crops')">crop types</a>. Higher-level crops cost more but sell for more too!</td></tr>
-            <tr><td class="icon-col">&#x1F4B0;</td><td>Sell Goods</td><td>Sell your crops, animal products, and <a class="xref" onclick="navigateTo('crafting')">crafted items</a> for gold.</td></tr>
+            <tr><td class="icon-col">&#x1FA99;</td><td>Sell Goods</td><td>Sell your crops, animal products, and <a class="xref" onclick="navigateTo('crafting')">crafted items</a> for gold.</td></tr>
             <tr><td class="icon-col">&#x1F4DC;</td><td>Blueprint Store</td><td>Two tabs: <em>Harvesting Tools</em> (<a class="xref" onclick="navigateTo('equipment')">equipment</a> for animals) and <em>Cooking Recipes</em> (<a class="xref" onclick="navigateTo('crafting')">crafting</a> recipes).</td></tr>
             <tr><td class="icon-col">&#x2692;&#xFE0F;</td><td>Crafting Table</td><td>Located in the <em>crafting area</em>. Craft items using your ingredients and purchased recipes.</td></tr>
             <tr><td class="icon-col">&#x1F4CB;</td><td>Contracts Stall</td><td>View and accept <a class="xref" onclick="navigateTo('contracts')">contracts</a> for bonus gold and XP rewards.</td></tr>
@@ -1527,6 +1527,14 @@
         setTimeout(setupMessageListener, 100);
       }
     }
+
+    // Continuously refocus game keyboard so WASD movement keeps working
+    function _refocusGame() {
+      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+    }
+    document.addEventListener('click', _refocusGame);
+    document.addEventListener('mouseup', _refocusGame);
+    document.addEventListener('keydown', _refocusGame);
 
     document.addEventListener('DOMContentLoaded', function() {
       console.log('[Guide] Game Guide loaded');

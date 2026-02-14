@@ -116,7 +116,7 @@
       <div class="title">CONTRACTS</div>
       <div class="header-stats">
         <div class="stat-box">
-          <span class="stat-icon">&#x1F4B0;</span>
+          <span class="stat-icon">&#x1FA99;</span>
           <span class="stat-value" id="gold-display">0</span>
         </div>
         <div class="stat-box">
@@ -699,24 +699,37 @@
     // STATE PERSISTENCE
     // ============================================
 
+    // Use localStorage with sessionStorage fallback for sandboxed iframes
+    var _storage = null;
+    (function() {
+      try { localStorage.setItem('_test', '1'); localStorage.removeItem('_test'); _storage = localStorage; console.log('[Contracts] Using localStorage'); }
+      catch(e) {
+        try { sessionStorage.setItem('_test', '1'); sessionStorage.removeItem('_test'); _storage = sessionStorage; console.log('[Contracts] localStorage blocked, using sessionStorage'); }
+        catch(e2) { console.warn('[Contracts] No storage available - contract state will not persist'); }
+      }
+    })();
+
     function saveState() {
+      if (!_storage) return;
       try {
         var state = {
           slots: slots,
           availableContracts: availableContracts,
           refreshEndTime: refreshEndTime
         };
-        localStorage.setItem('hughberry_contracts', JSON.stringify(state));
+        _storage.setItem('hughberry_contracts', JSON.stringify(state));
       } catch (e) {
-        // localStorage not available in sandboxed iframe
+        console.warn('[Contracts] saveState failed:', e.message);
       }
     }
 
     function loadState() {
+      if (!_storage) return;
       try {
-        var saved = localStorage.getItem('hughberry_contracts');
+        var saved = _storage.getItem('hughberry_contracts');
         if (saved) {
           var state = JSON.parse(saved);
+          console.log('[Contracts] Loaded saved state with', state.slots ? state.slots.filter(function(s){return s && s.state !== 'empty'}).length : 0, 'active slots');
           if (state.slots && Array.isArray(state.slots)) {
             state.slots.forEach(function(savedSlot, i) {
               if (i < slots.length && savedSlot) {
@@ -734,7 +747,7 @@
           }
         }
       } catch (e) {
-        // localStorage not available or parse error
+        console.warn('[Contracts] loadState failed:', e.message);
       }
     }
 
@@ -992,6 +1005,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       loadState();
       setupMessageListener();
+
+      // ESC to close
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { e.preventDefault(); closeIframe(); }
+      });
 
       // Continuously refocus game keyboard so WASD movement keeps working
       function _refocusGame() {
