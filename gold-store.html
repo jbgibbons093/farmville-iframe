@@ -468,6 +468,7 @@ function triggerTask(taskName, targetState) {
 }
 
 function closeIframe() {
+  if (typeof _refocusInterval !== 'undefined' && _refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
   console.log('[GoldStore] Close requested');
   if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
     PortalsSdk.closeIframe();
@@ -673,6 +674,16 @@ document.addEventListener('visibilitychange', function() {
 window.addEventListener('focus', function() {
   triggerTask('Sync_Inventory');
 });
+
+// Continuously refocus game keyboard so WASD movement keeps working
+function _refocusGame() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
+}
+document.addEventListener('click', _refocusGame);
+document.addEventListener('mouseup', _refocusGame);
+document.addEventListener('keydown', _refocusGame);
+setTimeout(_refocusGame, 300);
+var _refocusInterval = setInterval(_refocusGame, 2000);
 
 console.log('[GoldStore] Gold Store loaded');
 </script>
