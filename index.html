@@ -1118,6 +1118,7 @@
     }
 
     function plantAllEmpty() {
+      _lastInteraction = Date.now();
       console.log('[Hughberry] plantAllEmpty called');
       console.log('[Hughberry] syncReceived:', syncReceived, 'plantingInProgress:', plantingInProgress);
 
@@ -1218,6 +1219,7 @@
     };
 
     function startAnimalActivity(animalType, id) {
+      _lastInteraction = Date.now();
       if (!syncReceived) {
         notify('Syncing with server... try again!', 'error');
         triggerTask('Sync_Inventory');
@@ -1645,6 +1647,7 @@
     }
 
     function plantFromSelect(id) {
+      _lastInteraction = Date.now();
       const s = document.getElementById(`sel-${id}`);
       if (s && s.value) {
         plantCrop(id, s.value);
@@ -1696,6 +1699,7 @@
     }
 
     function startAllAnimals(type) {
+      _lastInteraction = Date.now();
       if (!syncReceived) {
         notify('Syncing with server... try again!', 'error');
         triggerTask('Sync_Inventory');
@@ -2011,13 +2015,26 @@
       }
     }
 
+    var _lastInteraction = 0; // timestamp of last button click
     function updateAllUI() {
       updateHeader();
-      renderDashboard();
-      renderCrops();
-      renderInventory();
-      renderAnimals();
-      renderXP();
+      var now = Date.now();
+      var recentClick = (now - _lastInteraction) < 1500;
+      // If user clicked a button recently, skip full innerHTML re-renders
+      // for animals/crops to avoid destroying buttons mid-click.
+      // The game loop lightweight updaters will keep timers current.
+      if (!recentClick) {
+        renderDashboard();
+        renderCrops();
+        renderInventory();
+        renderAnimals();
+        renderXP();
+      } else {
+        // Still update header + non-interactive tabs
+        renderDashboard();
+        renderInventory();
+        renderXP();
+      }
       renderUnlocks();
       updateTabTutorials();
     }
