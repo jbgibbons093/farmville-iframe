@@ -326,6 +326,7 @@
     }
 
     function closeIframe() {
+      if (typeof _refocusInterval !== 'undefined' && _refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound();
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
         PortalsSdk.closeIframe();
@@ -1009,7 +1010,7 @@
       document.addEventListener('mouseup', _refocusGame);
       document.addEventListener('keydown', _refocusGame);
       setTimeout(_refocusGame, 300);
-      setInterval(_refocusGame, 2000);
+      var _refocusInterval = setInterval(_refocusGame, 2000);
 
       // Note: Sync_Inventory is triggered in setupMessageListener after SDK ready
       render();

@@ -1482,6 +1482,7 @@
     }
 
     function closeGuide() {
+      if (typeof _refocusInterval !== 'undefined' && _refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound();
       console.log('[Guide] Close guide requested');
       triggerTask('HUD');
@@ -1536,7 +1537,7 @@
     document.addEventListener('mouseup', _refocusGame);
     document.addEventListener('keydown', _refocusGame);
     setTimeout(_refocusGame, 300);
-    setInterval(_refocusGame, 2000);
+    var _refocusInterval = setInterval(_refocusGame, 2000);
 
     document.addEventListener('DOMContentLoaded', function() {
       console.log('[Guide] Game Guide loaded');

@@ -126,6 +126,7 @@
     }
 
     function closeIframe() {
+      if (_refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
       playSound('click');
       console.log('[Hughberry SellGoods] Close requested');
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
@@ -401,7 +402,7 @@
     document.addEventListener('keydown', _refocusGame);
     // Auto-refocus on load so movement works immediately
     setTimeout(_refocusGame, 300);
-    setInterval(_refocusGame, 2000);
+    var _refocusInterval = setInterval(_refocusGame, 2000);
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {

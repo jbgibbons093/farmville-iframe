@@ -1096,6 +1096,7 @@ function triggerTask(taskName, targetState) {
 }
 
 function closeIframe() {
+  if (typeof _refocusInterval !== 'undefined' && _refocusInterval) { clearInterval(_refocusInterval); _refocusInterval = null; }
   playSound('click');
   console.log('[Talents] Close requested');
   if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
@@ -1262,7 +1263,7 @@ document.addEventListener('click', _refocusGame);
 document.addEventListener('mouseup', _refocusGame);
 document.addEventListener('keydown', _refocusGame);
 setTimeout(_refocusGame, 300);
-setInterval(_refocusGame, 2000);
+var _refocusInterval = setInterval(_refocusGame, 2000);
 
 // ── Visibility/Focus Handlers ──
 document.addEventListener('visibilitychange', function() {
