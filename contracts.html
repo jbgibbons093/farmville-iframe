@@ -209,10 +209,19 @@
       };
     }
 
+    function getEffectiveRefreshMs() {
+      // QuickContracts: -10% per rank (max 3), TimeWarp: -5% per rank (max 2)
+      var qc = gameState.rebirthBlessings.quickContracts || 0;
+      var tw = gameState.rebirthBlessings.timeWarp || 0;
+      var reduction = 1 - (qc * 0.10) - (tw * 0.05);
+      return Math.max(5000, Math.floor(REFRESH_MS * reduction));
+    }
+
     function getRefreshWindow() {
+      var ms = getEffectiveRefreshMs();
       var now = Date.now();
-      var windowIndex = Math.floor(now / REFRESH_MS);
-      var windowEnd = (windowIndex + 1) * REFRESH_MS;
+      var windowIndex = Math.floor(now / ms);
+      var windowEnd = (windowIndex + 1) * ms;
       return { seed: windowIndex, endTime: windowEnd };
     }
 
