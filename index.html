@@ -1995,6 +1995,7 @@
       document.getElementById('tab-unlocks').innerHTML = html;
     }
 
+    var _tutorialDismissed = {};
     function updateTabTutorials() {
       // Clear all tutorial hints first
       document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('has-tutorial'); });
@@ -2002,14 +2003,14 @@
       var totalSeeds = gameState.inventory.seeds_wheat + gameState.inventory.seeds_carrot + gameState.inventory.seeds_corn + gameState.inventory.seeds_potato + gameState.inventory.seeds_tomato + gameState.inventory.seeds_pumpkin;
       var anyPlanted = gameState.plots.some(function(p) { return p.state === 'growing' || p.state === 'ready'; });
 
-      // Tutorial: Show arrow on Crops tab when player has seeds but hasn't planted anything
-      if (totalSeeds > 0 && !anyPlanted) {
+      // Tutorial: Show arrow on Crops tab when player has seeds but hasn't planted anything (once per session)
+      if (!_tutorialDismissed.crops && totalSeeds > 0 && !anyPlanted) {
         var cropsTab = document.querySelector('[data-tab="crops"]');
         if (cropsTab) cropsTab.classList.add('has-tutorial');
       }
 
-      // Tutorial: Show arrow on Animals tab when player has milk pail but hasn't collected any milk
-      if (gameState.equipment.milk_pail >= 1 && gameState.inventory.milk === 0 && gameState.level >= 2) {
+      // Tutorial: Show arrow on Animals tab when player has milk pail but hasn't collected any milk (once per session)
+      if (!_tutorialDismissed.animals && gameState.equipment.milk_pail >= 1 && gameState.inventory.milk === 0 && gameState.level >= 2) {
         var animalsTab = document.querySelector('[data-tab="animals"]');
         if (animalsTab) animalsTab.classList.add('has-tutorial');
       }
@@ -2047,6 +2048,8 @@
         tab.classList.add('active');
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
         const n = tab.dataset.tab;
+        _tutorialDismissed[n] = true;
+        tab.classList.remove('has-tutorial');
         if (n === 'dashboard') renderDashboard();
         else if (n === 'crops') renderCrops();
         else if (n === 'inventory') renderInventory();
