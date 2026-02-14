@@ -1838,7 +1838,7 @@
         const cardClass = animal.state === 'ready' ? 'ready' : '';
         const hint = animal.state === 'ready' ? `<div class="plot-hint">Go to ${config.name.toLowerCase()} & press X</div>` : '';
 
-        return `<div class="animal-card ${cardClass}">
+        return `<div class="animal-card ${cardClass}" data-animal-type="${type}" data-animal-id="${id}">
           <div class="animal-icon">${config.icon}</div>
           <div class="animal-name">${config.name} ${id}</div>
           <div class="animal-status ${statusClass}">${statusText}</div>
@@ -1881,6 +1881,33 @@
       });
 
       document.getElementById('tab-animals').innerHTML = html;
+    }
+
+    function updateAnimalTimers() {
+      const animalTypes = [
+        { type: 'cow', array: gameState.animals.cows },
+        { type: 'chicken', array: gameState.animals.chickens },
+        { type: 'sheep', array: gameState.animals.sheep },
+        { type: 'goat', array: gameState.animals.goats },
+        { type: 'pig', array: gameState.animals.pigs },
+        { type: 'beehive', array: gameState.animals.beehives }
+      ];
+      animalTypes.forEach(({ type, array }) => {
+        const activeSlots = getActiveAnimalSlots(type);
+        array.forEach((animal, i) => {
+          if (i >= activeSlots) return;
+          if (animal.state === 'producing' && animal.readyAt) {
+            const card = document.querySelector(`.animal-card[data-animal-type="${type}"][data-animal-id="${i + 1}"]`);
+            if (card) {
+              const statusEl = card.querySelector('.animal-status');
+              if (statusEl) {
+                const rem = Math.max(0, Math.ceil((animal.readyAt - Date.now()) / 1000));
+                statusEl.textContent = formatTime(rem);
+              }
+            }
+          }
+        });
+      });
     }
 
     function renderXP() {
@@ -2138,7 +2165,7 @@
         if (dashboardDirty || needsRender) { renderDashboard(); dashboardDirty = false; }
       }
       else if (activeTab === 'crops') { if (needsRender) renderCrops(); else updateCropTimers(); }
-      else if (activeTab === 'animals') renderAnimals();
+      else if (activeTab === 'animals') { if (needsRender) renderAnimals(); else updateAnimalTimers(); }
     }
 
     let pendingAnimalTasks = { cow: 0, sheep: 0, goat: 0, pig: 0, chicken: 0, beehive: 0 };
