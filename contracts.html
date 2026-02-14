@@ -124,7 +124,7 @@
     // Per-slot deterministic contracts with persistence
     // ============================================
 
-    const REFRESH_MS = 20 * 1000; // 20 seconds
+    const REFRESH_MS = 2 * 60 * 1000; // 2 minutes
     // No fulfill timer — accepted contracts stay active until filled
     // No cooldown timer — slot immediately gets a new contract after filling
     // (Timers can't persist across iframe close/reopen since Portals blocks localStorage)
