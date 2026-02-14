@@ -547,7 +547,9 @@
           continue;
         }
 
-        if (slot.state === 'active' && slot.frozenContract) {
+        if (slot.state === 'filling') {
+          // Currently being fulfilled — don't touch
+        } else if (slot.state === 'active' && slot.frozenContract) {
           // Slot is locally accepted with a frozen contract — NEVER touch it
           // Doesn't matter what Contract_X_Done says
         } else if (gameState.contractDone[si] === 1) {
@@ -627,11 +629,19 @@
       });
     }
 
+    var _fillLock = {};
     function fillContract(slotIndex) {
+      if (_fillLock[slotIndex]) return;
       var slot = slots[slotIndex];
       if (!canFillContract(slot)) return;
 
+      _fillLock[slotIndex] = true;
       actionPending = true;
+
+      // Immediately change state so no further clicks can process
+      slot.state = 'filling';
+      render();
+
       playSound();
 
       var contract = getActiveContract(slot);
@@ -666,6 +676,7 @@
       // Slot goes straight to available with a new contract (no cooldown)
       var win = getRefreshWindow();
       slot.state = 'available';
+      _fillLock[slotIndex] = false;
       slot.frozenContract = null;
       slot.frozenLevel = null;
       slot.contract = getSlotContract(slotIndex, win.seed);
@@ -782,6 +793,9 @@
           html += '<div class="slot-buttons">' +
             '<button class="btn btn-accept" onclick="acceptContract(' + i + ')">Accept</button>' +
           '</div>';
+        } else if (slot.state === 'filling') {
+          // Briefly shown while fill tasks are firing
+          html += '<div class="slot-empty-text" style="color:#f39c12;font-weight:800;">Filling order...</div>';
         } else if (slot.state === 'active' && getActiveContract(slot)) {
           // Show contract with progress and Fill button
           html += renderSlotContract(slot, i, true);
