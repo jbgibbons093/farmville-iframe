@@ -699,37 +699,25 @@
     // STATE PERSISTENCE
     // ============================================
 
-    // Use localStorage with sessionStorage fallback for sandboxed iframes
-    var _storage = null;
-    (function() {
-      try { localStorage.setItem('_test', '1'); localStorage.removeItem('_test'); _storage = localStorage; console.log('[Contracts] Using localStorage'); }
-      catch(e) {
-        try { sessionStorage.setItem('_test', '1'); sessionStorage.removeItem('_test'); _storage = sessionStorage; console.log('[Contracts] localStorage blocked, using sessionStorage'); }
-        catch(e2) { console.warn('[Contracts] No storage available - contract state will not persist'); }
-      }
-    })();
-
     function saveState() {
-      if (!_storage) return;
       try {
         var state = {
           slots: slots,
           availableContracts: availableContracts,
           refreshEndTime: refreshEndTime
         };
-        _storage.setItem('hughberry_contracts', JSON.stringify(state));
+        localStorage.setItem('hughberry_contracts', JSON.stringify(state));
       } catch (e) {
         console.warn('[Contracts] saveState failed:', e.message);
       }
     }
 
     function loadState() {
-      if (!_storage) return;
       try {
-        var saved = _storage.getItem('hughberry_contracts');
+        var saved = localStorage.getItem('hughberry_contracts');
         if (saved) {
           var state = JSON.parse(saved);
-          console.log('[Contracts] Loaded saved state with', state.slots ? state.slots.filter(function(s){return s && s.state !== 'empty'}).length : 0, 'active slots');
+          console.log('[Contracts] Restored state -', state.slots ? state.slots.filter(function(s){return s && s.state !== 'empty'}).length : 0, 'active slots,', (state.availableContracts || []).length, 'available contracts');
           if (state.slots && Array.isArray(state.slots)) {
             state.slots.forEach(function(savedSlot, i) {
               if (i < slots.length && savedSlot) {
@@ -745,6 +733,8 @@
           if (state.refreshEndTime) {
             refreshEndTime = state.refreshEndTime;
           }
+        } else {
+          console.log('[Contracts] No saved state found');
         }
       } catch (e) {
         console.warn('[Contracts] loadState failed:', e.message);
