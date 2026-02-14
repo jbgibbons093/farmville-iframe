@@ -191,8 +191,10 @@
         id: i + 1,
         state: 'loading',
         contract: null,
+        frozenContract: null, // Deep copy frozen on accept — NEVER regenerated
         endTime: null,
-        windowSeed: null // which 2-min window generated this slot's contract
+        windowSeed: null, // which 2-min window generated this slot's contract
+        frozenLevel: null // level when contract was accepted — used for restore
       });
     }
 
@@ -230,9 +232,9 @@
     }
 
     // Generate a deterministic contract for a specific slot in a specific window
+    // NOTE: level is NOT part of the seed — level changes must not alter existing contracts
     function getSlotContract(slotIndex, windowSeed) {
-      // Each slot gets its own RNG seeded by window + slot index
-      var rng = mulberry32(windowSeed * 997 + gameState.level * 31 + slotIndex * 7919);
+      var rng = mulberry32(windowSeed * 997 + slotIndex * 7919);
       return generateContract(gameState.level, rng);
     }
 
@@ -545,22 +547,28 @@
           continue;
         }
 
-        if (gameState.contractDone[si] === 1) {
-          // This slot has an accepted contract
-          if (slot.state === 'active') {
-            // Already active in this session — keep timer running, don't touch
+        if (slot.state === 'active' && slot.frozenContract) {
+          // Slot is locally accepted with a frozen contract — NEVER touch it
+          // Doesn't matter what Contract_X_Done says
+        } else if (gameState.contractDone[si] === 1) {
+          // Portals says this slot is accepted but we don't have local state
+          // (iframe was reopened) — restore with frozen data if available
+          slot.state = 'active';
+          if (slot.frozenContract) {
+            slot.contract = slot.frozenContract;
           } else {
-            // First time seeing this slot as active (iframe just opened or state was loading/available)
-            slot.state = 'active';
+            // Best effort: regenerate (won't match original if level changed)
             var contractSeed = slot.windowSeed || win.seed;
             slot.contract = getSlotContract(si, contractSeed);
-            slot.endTime = null; // No timer — stays active until filled
+            slot.frozenContract = JSON.parse(JSON.stringify(slot.contract));
             slot.windowSeed = contractSeed;
           }
+          slot.endTime = null;
         } else {
-          // Contract_X_Done = 0
+          // Contract_X_Done = 0 and not locally active
           if (slot.state === 'active') {
-            // Locally accepted — iframe is authority, keep active regardless of Portals flag
+            // Edge case: was active but frozenContract is null (shouldn't happen)
+            // Keep active to be safe
           } else {
             // Available or loading — show a contract to accept
             var wasLoading = (slot.state === 'loading');
@@ -593,9 +601,10 @@
       if (slot.state !== 'available' || !slot.contract) return;
 
       slot.state = 'active';
-      slot.endTime = null; // No timer — stays active until filled
-      slot.acceptedAt = Date.now(); // Grace period for Portals sync lag
-      // windowSeed is already set from when contract was generated
+      slot.endTime = null;
+      // Freeze a deep copy of the contract — this copy is NEVER regenerated
+      slot.frozenContract = JSON.parse(JSON.stringify(slot.contract));
+      slot.frozenLevel = gameState.level;
 
       // Tell Portals this slot is taken
       triggerTask('Complete_Contract_' + (slotIndex + 1));
@@ -604,9 +613,15 @@
       render();
     }
 
+    function getActiveContract(slot) {
+      // Always use frozenContract for active slots
+      return (slot.state === 'active' && slot.frozenContract) ? slot.frozenContract : slot.contract;
+    }
+
     function canFillContract(slot) {
-      if (!slot.contract || slot.state !== 'active' || actionPending) return false;
-      return slot.contract.items.every(function(item) {
+      var contract = getActiveContract(slot);
+      if (!contract || slot.state !== 'active' || actionPending) return false;
+      return contract.items.every(function(item) {
         var owned = gameState.inventory[item.key] || 0;
         return owned >= item.qty;
       });
@@ -619,7 +634,7 @@
       actionPending = true;
       playSound();
 
-      var contract = slot.contract;
+      var contract = getActiveContract(slot);
 
       // Optimistically deduct items
       contract.items.forEach(function(item) {
@@ -651,6 +666,8 @@
       // Slot goes straight to available with a new contract (no cooldown)
       var win = getRefreshWindow();
       slot.state = 'available';
+      slot.frozenContract = null;
+      slot.frozenLevel = null;
       slot.contract = getSlotContract(slotIndex, win.seed);
       slot.windowSeed = win.seed;
       slot.endTime = null;
@@ -765,7 +782,7 @@
           html += '<div class="slot-buttons">' +
             '<button class="btn btn-accept" onclick="acceptContract(' + i + ')">Accept</button>' +
           '</div>';
-        } else if (slot.state === 'active' && slot.contract) {
+        } else if (slot.state === 'active' && getActiveContract(slot)) {
           // Show contract with progress and Fill button
           html += renderSlotContract(slot, i, true);
           var canFill = canFillContract(slot);
@@ -783,9 +800,10 @@
     }
 
     function renderSlotContract(slot, slotIndex, showProgress) {
+      var contract = getActiveContract(slot);
       var html = '<div class="slot-contract">';
       html += '<div class="items">';
-      slot.contract.items.forEach(function(item) {
+      contract.items.forEach(function(item) {
         var owned = gameState.inventory[item.key] || 0;
         var hasEnough = owned >= item.qty;
         html += '<div class="item">' +
@@ -798,8 +816,8 @@
       });
       html += '</div>';
       html += '<div class="rewards">' +
-        '<span class="reward-gold">' + slot.contract.goldReward + 'g</span>' +
-        '<span class="reward-xp">' + slot.contract.xpReward + ' XP</span>' +
+        '<span class="reward-gold">' + contract.goldReward + 'g</span>' +
+        '<span class="reward-xp">' + contract.xpReward + ' XP</span>' +
       '</div>';
       html += '</div>';
       return html;
