@@ -216,7 +216,7 @@
 
     // Available contracts pool
     let availableContracts = [];
-    let refreshEndTime = null;
+    let refreshEndTime = getRefreshWindow().endTime;
     let lastWindowSeed = null; // Tracks which 2-min window we generated for
 
     // Player's 10 slots
