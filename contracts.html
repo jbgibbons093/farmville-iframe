@@ -232,6 +232,7 @@
     let actionPending = false;
     let notificationTimeout = null;
     let draggedContractIndex = null;
+    let stateLoaded = false; // True if loadState() found saved data
 
     // ============================================
     // UTILITY FUNCTIONS
@@ -519,12 +520,24 @@
 
       console.log('[Contracts] Inventory:', gameState.inventory);
 
-      // Refresh contracts if empty, too many for current talents, or level changed (rebirth)
+      // Refresh contracts only when truly needed
       var maxAvailable = getAvailableContractCount();
-      console.log('[Contracts] Sync check - availableContracts:', availableContracts.length, 'maxAvailable:', maxAvailable, 'slots active:', slots.filter(function(s){return s.state !== 'empty'}).length);
-      if (availableContracts.length === 0 || availableContracts.length > maxAvailable) {
-        console.log('[Contracts] Refreshing available contracts (was', availableContracts.length, ', max', maxAvailable, ')');
+      var totalContracts = availableContracts.length + slots.filter(function(s){ return s.state === 'pending' || s.state === 'active'; }).length;
+      console.log('[Contracts] Sync check - available:', availableContracts.length, 'inSlots:', totalContracts - availableContracts.length, 'total:', totalContracts, 'maxAvailable:', maxAvailable, 'stateLoaded:', stateLoaded);
+
+      if (!stateLoaded && availableContracts.length === 0 && totalContracts === 0) {
+        // First load with no saved state - generate initial contracts
+        console.log('[Contracts] First load, no saved state - generating initial contracts');
         refreshAvailableContracts();
+      } else if (refreshEndTime && Date.now() >= refreshEndTime) {
+        // Refresh timer already expired while iframe was closed
+        console.log('[Contracts] Refresh timer expired while closed - refreshing');
+        refreshAvailableContracts();
+      } else if (availableContracts.length > maxAvailable) {
+        // Too many contracts (talent respec reduced slots)
+        console.log('[Contracts] Trimming available contracts from', availableContracts.length, 'to', maxAvailable);
+        availableContracts = availableContracts.slice(0, maxAvailable);
+        saveState();
       }
 
       // XP sound delta tracking
@@ -742,6 +755,7 @@
           if (state.refreshEndTime) {
             refreshEndTime = state.refreshEndTime;
           }
+          stateLoaded = true;
         } else {
           console.log('[Contracts] No saved state found in localStorage');
         }
@@ -1003,6 +1017,17 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       loadState();
+
+      // Process any slot timers that expired while iframe was closed
+      var now = Date.now();
+      slots.forEach(function(slot) {
+        if (slot.endTime && now >= slot.endTime) {
+          slot.state = 'empty';
+          slot.contract = null;
+          slot.endTime = null;
+        }
+      });
+
       setupMessageListener();
 
       // ESC to close
