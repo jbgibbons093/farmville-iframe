@@ -746,14 +746,56 @@
     }
 
     // ============================================
-    // STATE PERSISTENCE (no-op: localStorage blocked in Portals sandbox)
-    // Available contracts use seeded PRNG tied to 2-minute time windows,
-    // so they regenerate deterministically without storage.
-    // Slot state (pending/active/cooldown) resets on iframe close.
+    // STATE PERSISTENCE
+    // Portals sandbox blocks localStorage/sessionStorage.
+    // Available contracts use seeded PRNG (no storage needed).
+    // Slot state persists via fallback: try localStorage, then window.name.
     // ============================================
 
+    function _tryWrite(json) {
+      try { localStorage.setItem('hb_cs', json); return true; } catch(e) {}
+      try { window.name = json; return true; } catch(e) {}
+      return false;
+    }
+
+    function _tryRead() {
+      try { var v = localStorage.getItem('hb_cs'); if (v) return v; } catch(e) {}
+      try { if (window.name && window.name.charAt(0) === '{') return window.name; } catch(e) {}
+      return null;
+    }
+
     function saveState() {
-      // No-op: Portals iframe sandbox blocks localStorage
+      var data = {
+        slots: slots.map(function(s) {
+          return { state: s.state, contract: s.contract, endTime: s.endTime };
+        })
+      };
+      _tryWrite(JSON.stringify(data));
+    }
+
+    function loadSlotState() {
+      var json = _tryRead();
+      if (!json) { console.log('[Contracts] No saved slot state found'); return; }
+      try {
+        var data = JSON.parse(json);
+        if (!data.slots || !Array.isArray(data.slots)) return;
+        var now = Date.now();
+        var restored = 0;
+        data.slots.forEach(function(saved, i) {
+          if (i >= slots.length || !saved || !saved.state || saved.state === 'empty') return;
+          // Expire any timers that ran out while iframe was closed
+          if (saved.endTime && now >= saved.endTime) {
+            if (saved.state === 'active' || saved.state === 'cooldown') return;
+          }
+          slots[i].state = saved.state;
+          slots[i].contract = saved.contract || null;
+          slots[i].endTime = saved.endTime || null;
+          restored++;
+        });
+        console.log('[Contracts] Restored', restored, 'slot(s) from storage');
+      } catch(e) {
+        console.warn('[Contracts] loadSlotState parse error:', e.message);
+      }
     }
 
     // ============================================
@@ -1011,6 +1053,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+      loadSlotState();
       setupMessageListener();
 
       // ESC to close
