@@ -289,7 +289,7 @@
 
       const baseCost = selectedItems.reduce(function(sum, item) { return sum + item.value * item.qty; }, 0);
       var qcBonus = (gameState.rebirthBlessings.quickContracts || 0) * 0.5;
-      const profitMult = (2.0 + qcBonus) + (rng() * (2.0 + qcBonus));
+      const profitMult = (1.25 + qcBonus) + (rng() * 0.5);
       const rawGold = baseCost * profitMult * tierConfig.goldMult;
       const goldReward = Math.max(25, Math.round(rawGold / 25) * 25);
       const xpReward = Math.floor(goldReward * 0.3 * tierConfig.xpMult);
