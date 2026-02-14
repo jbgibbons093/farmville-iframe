@@ -55,7 +55,8 @@
     .slot-contract .items { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
     .slot-contract .item { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.45); padding: 10px 16px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); flex: 1; min-width: 120px; }
     .slot-contract .item-icon { font-size: 28px; }
-    .slot-contract .item-qty { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
+    .slot-contract .item-name { font-size: 16px; font-weight: 700; color: #ccc; }
+    .slot-contract .item-qty { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; margin-left: auto; }
     .slot-contract .item-qty.has-enough { color: #2ecc71; }
     .slot-contract .item-qty.not-enough { color: #e74c3c; }
 
@@ -789,6 +790,7 @@
         var hasEnough = owned >= item.qty;
         html += '<div class="item">' +
           '<span class="item-icon">' + item.icon + '</span>' +
+          '<span class="item-name">' + item.name + '</span>' +
           '<span class="item-qty ' + (showProgress ? (hasEnough ? 'has-enough' : 'not-enough') : '') + '">' +
             (showProgress ? owned + '/' : 'x') + item.qty +
           '</span>' +
