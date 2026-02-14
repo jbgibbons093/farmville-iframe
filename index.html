@@ -1720,37 +1720,43 @@
       notify(`Auto-restart animals ${gameState.settings.autoRestartAnimals ? 'ON' : 'OFF'}`, 'success');
     }
 
-    function startAllAnimals(type) {
+    function startAllAnimalsGlobal() {
       _lastInteraction = Date.now();
       if (!syncReceived) {
         notify('Syncing with server... try again!', 'error');
         triggerTask('Sync_Inventory');
         return;
       }
-      const animalArrays = { cow: gameState.animals.cows, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, chicken: gameState.animals.chickens, beehive: gameState.animals.beehives };
-      const animals = animalArrays[type];
-      const config = CONFIG.animals[type];
-      if (!animals || !config) return;
-      if (gameState.level < config.unlockLevel) return;
-      const reqEquip = ANIMAL_EQUIPMENT[type];
-      if (reqEquip && !gameState.equipment[reqEquip.id]) return;
-
-      const activeSlots = getActiveAnimalSlots(type);
-      let started = 0;
-      animals.forEach((animal, i) => {
-        if (i < activeSlots && animal.state === 'idle') {
-          const cooldown = getAnimalCooldown(config, reqEquip?.id);
-          animal.state = 'producing';
-          animal.readyAt = Date.now() + (cooldown * 1000);
-          animal.notified = false;
-          started++;
-        }
+      const types = [
+        { type: 'cow', animals: gameState.animals.cows },
+        { type: 'chicken', animals: gameState.animals.chickens },
+        { type: 'sheep', animals: gameState.animals.sheep },
+        { type: 'goat', animals: gameState.animals.goats },
+        { type: 'pig', animals: gameState.animals.pigs },
+        { type: 'beehive', animals: gameState.animals.beehives }
+      ];
+      let totalStarted = 0;
+      let totalXP = 0;
+      types.forEach(({ type, animals }) => {
+        const config = CONFIG.animals[type];
+        if (gameState.level < config.unlockLevel) return;
+        const reqEquip = ANIMAL_EQUIPMENT[type];
+        if (reqEquip && !gameState.equipment[reqEquip.id]) return;
+        const activeSlots = getActiveAnimalSlots(type);
+        animals.forEach((animal, i) => {
+          if (i < activeSlots && animal.state === 'idle') {
+            const cooldown = getAnimalCooldown(config, reqEquip?.id);
+            animal.state = 'producing';
+            animal.readyAt = Date.now() + (cooldown * 1000);
+            animal.notified = false;
+            totalStarted++;
+            totalXP += getAnimalStartXP(config);
+          }
+        });
       });
-
-      if (started > 0) {
-        const animalXP = getAnimalStartXP(config) * started;
-        awardXP(animalXP);
-        notify(`Started ${started} ${config.name}${started > 1 ? 's' : ''}! +${animalXP} XP`, 'success');
+      if (totalStarted > 0) {
+        awardXP(totalXP);
+        notify(`Started ${totalStarted} animal${totalStarted > 1 ? 's' : ''}! +${totalXP} XP`, 'success');
         saveGameQuiet();
         renderAnimals();
       }
@@ -1863,7 +1869,17 @@
         </div>`;
       }
 
-      let html = `<div class="animals-header"><div class="section-title">&#x1F404; Animal Management</div><div class="animals-controls"><div class="control-group"><span class="control-label">Auto-Restart</span><div class="toggle-switch ${gameState.settings.autoRestartAnimals ? 'on' : ''}" onclick="toggleAutoRestartAnimals()"></div></div></div></div>`;
+      const anyIdle = ['cow','chicken','sheep','goat','pig','beehive'].some(type => {
+        const config = CONFIG.animals[type];
+        if (gameState.level < config.unlockLevel) return false;
+        const reqEquip = ANIMAL_EQUIPMENT[type];
+        if (reqEquip && !gameState.equipment[reqEquip.id]) return false;
+        const arrays = { cow: gameState.animals.cows, chicken: gameState.animals.chickens, sheep: gameState.animals.sheep, goat: gameState.animals.goats, pig: gameState.animals.pigs, beehive: gameState.animals.beehives };
+        const activeSlots = getActiveAnimalSlots(type);
+        return arrays[type].some((a, i) => i < activeSlots && a.state === 'idle');
+      });
+      const globalStartBtn = anyIdle ? `<button class="animal-start-all-btn" onclick="startAllAnimalsGlobal()">&#x25B6; Start All</button>` : '';
+      let html = `<div class="animals-header"><div class="section-title">&#x1F404; Animal Management</div><div class="animals-controls">${globalStartBtn}<div class="control-group"><span class="control-label">Auto-Restart</span><div class="toggle-switch ${gameState.settings.autoRestartAnimals ? 'on' : ''}" onclick="toggleAutoRestartAnimals()"></div></div></div></div>`;
       const animalTypes = [
         { type: 'cow', array: gameState.animals.cows, config: CONFIG.animals.cow, title: 'Cows (Milk)' },
         { type: 'chicken', array: gameState.animals.chickens, config: CONFIG.animals.chicken, title: 'Chickens (Egg)' },
@@ -1878,9 +1894,7 @@
         const activeSlots = getActiveAnimalSlots(type);
         const reqEquip = ANIMAL_EQUIPMENT[type];
         const hasEquipment = !reqEquip || gameState.equipment[reqEquip.id];
-        const hasIdleAnimals = unlocked && hasEquipment && array.some((a, i) => i < activeSlots && a.state === 'idle');
-        const startAllBtn = hasIdleAnimals ? `<button class="animal-start-all-btn" onclick="startAllAnimals('${type}')">&#x25B6; Start All</button>` : '';
-        html += `<div class="animals-section"><div class="section-title-row"><span>${config.icon} ${title} ${!unlocked ? `(Lv.${config.unlockLevel})` : ''} <span style="font-size:11px;color:#888">(${activeSlots}/${config.count} slots)</span></span>${startAllBtn}</div><div class="animals-grid">`;
+        html += `<div class="animals-section"><div class="section-title-row"><span>${config.icon} ${title} ${!unlocked ? `(Lv.${config.unlockLevel})` : ''} <span style="font-size:11px;color:#888">(${activeSlots}/${config.count} slots)</span></span></div><div class="animals-grid">`;
         array.forEach((a, i) => {
           if (i < activeSlots) {
             html += renderAnimalCard(a, i, type, config);
