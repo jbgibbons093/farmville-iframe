@@ -1008,6 +1008,8 @@
       document.addEventListener('click', _refocusGame);
       document.addEventListener('mouseup', _refocusGame);
       document.addEventListener('keydown', _refocusGame);
+      setTimeout(_refocusGame, 300);
+      setInterval(_refocusGame, 2000);
 
       // Note: Sync_Inventory is triggered in setupMessageListener after SDK ready
       render();

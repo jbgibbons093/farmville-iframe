@@ -399,6 +399,9 @@
     document.addEventListener('click', _refocusGame);
     document.addEventListener('mouseup', _refocusGame);
     document.addEventListener('keydown', _refocusGame);
+    // Auto-refocus on load so movement works immediately
+    setTimeout(_refocusGame, 300);
+    setInterval(_refocusGame, 2000);
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {
