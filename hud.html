@@ -35,249 +35,144 @@
     }
 
     /* ═══ MAIN HUD BAR ═══ */
-    .hud-container {
+    .hud-bar {
       display: inline-flex;
       align-items: center;
-      gap: 0;
-      padding: 0;
-      background: none;
+      gap: 20px;
+      padding: 10px 24px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 4px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
       pointer-events: none;
       margin-top: 8px;
+      backdrop-filter: blur(4px);
     }
 
-    /* ── Logo Pill ── */
-    .logo-pill {
-      background: #8B4513;
-      border: 5px solid #000;
-      border-radius: 18px;
-      padding: 8px 18px;
-      font-family: 'Luckiest Guy', cursive;
-      text-align: center;
-      line-height: 1.15;
-      box-shadow: 4px 4px 0 #000;
-      margin-right: -4px;
-      z-index: 2;
-    }
-
-    .logo-hughberry {
-      display: block;
-      color: #FFD700;
-      font-size: 15px;
-      letter-spacing: 3px;
-      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
-    }
-
-    .logo-farms {
-      display: block;
-      color: #fff;
-      font-size: 20px;
-      letter-spacing: 5px;
-      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
-    }
-
-    /* ── Stats Strip ── */
-    .stats-row {
-      display: flex;
-      align-items: stretch;
-      gap: 0;
-      background: #3a2210;
-      border: 5px solid #000;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 4px 4px 0 #000;
-    }
-
-    /* ── Individual Stat Cells ── */
-    .stat-cell {
+    /* ── Stat Groups ── */
+    .stat {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      border-right: 4px solid #000;
-    }
-
-    .stat-cell:last-child {
-      border-right: none;
-    }
-
-    /* Gold cell */
-    .stat-cell.gold-cell {
-      background: #b8860b;
-    }
-
-    /* Level cell */
-    .stat-cell.level-cell {
-      background: #2874a6;
-    }
-
-    /* XP cell */
-    .stat-cell.xp-cell {
-      background: #1e8449;
+      gap: 8px;
     }
 
     .stat-icon {
-      font-size: 30px;
-      filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5));
-    }
-
-    .stat-icon.icon-star {
-      animation: starBob 3s ease-in-out infinite;
-    }
-
-    .stat-icon.icon-coin {
-      animation: coinBounce 2s ease-in-out infinite;
-    }
-
-    .stat-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: rgba(255,255,255,0.7);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 800;
-      line-height: 1;
+      font-size: 26px;
+      filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.8));
     }
 
     .stat-value {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 900;
-      color: #fff;
+      color: #FFD700;
       text-shadow: 2px 2px 0 #000;
       line-height: 1;
     }
 
-    /* ── XP Bar ── */
-    .xp-bar-container {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 180px;
+    .stat-value.level-val {
+      color: #fff;
     }
 
-    .xp-bar-label {
+    .stat-divider {
+      width: 2px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 1px;
+    }
+
+    /* ── XP Bar ── */
+    .xp-group {
       display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      color: #fff;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .xp-label {
+      font-size: 14px;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.6);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 800;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 0 #000;
     }
 
     .xp-bar {
-      height: 20px;
-      background: rgba(0,0,0,0.35);
-      border-radius: 12px;
-      border: 3px solid #000;
+      width: 160px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
       overflow: hidden;
     }
 
     .xp-bar-fill {
       height: 100%;
-      background: #5dff8a;
-      border-radius: 9px;
+      background: #FFD700;
+      border-radius: 8px;
       transition: width 0.5s ease;
     }
 
+    .xp-text {
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.5);
+      text-shadow: 1px 1px 0 #000;
+      white-space: nowrap;
+    }
+
     /* ═══ BELOW-HUD NOTIFICATIONS ═══ */
-    .talent-notif {
+    .hud-notif-below {
       display: flex;
       align-items: center;
       justify-content: center;
       margin-top: 10px;
-      padding: 12px 28px;
-      background: #f39c12;
-      border: 5px solid #000;
-      border-radius: 18px;
-      font-size: 18px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 2px 2px 0 #000;
-      pointer-events: none;
-      box-shadow: 4px 4px 0 #000;
-      animation: notifBounce 2s ease-in-out infinite;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .rebirth-notif {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 10px;
-      padding: 12px 28px;
-      background: #8e44ad;
-      border: 5px solid #000;
-      border-radius: 18px;
-      font-size: 18px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 2px 2px 0 #000;
-      pointer-events: none;
-      box-shadow: 4px 4px 0 #000;
-      animation: notifBounce 1.5s ease-in-out infinite;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .tutorial-notif {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-      padding: 12px 28px;
-      background: #2980b9;
-      border: 5px solid #000;
-      border-radius: 18px;
+      padding: 10px 24px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 3px solid rgba(255, 215, 0, 0.4);
+      border-radius: 14px;
       font-size: 17px;
       font-weight: 900;
-      color: #fff;
-      text-shadow: 2px 2px 0 #000;
+      color: #FFD700;
+      text-shadow: 1px 1px 0 #000;
       pointer-events: none;
-      box-shadow: 4px 4px 0 #000;
       animation: notifBounce 2s ease-in-out infinite;
       text-transform: uppercase;
       letter-spacing: 1px;
+      backdrop-filter: blur(4px);
     }
 
     .first-join-notif {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       margin-top: 10px;
-      padding: 12px 28px;
-      background: #27ae60;
-      border: 5px solid #000;
-      border-radius: 18px;
-      font-size: 18px;
+      padding: 10px 24px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 3px solid rgba(255, 215, 0, 0.4);
+      border-radius: 14px;
+      font-size: 17px;
       font-weight: 900;
-      color: #fff;
-      text-shadow: 2px 2px 0 #000;
+      color: #FFD700;
+      text-shadow: 1px 1px 0 #000;
       pointer-events: none;
-      box-shadow: 4px 4px 0 #000;
       animation: notifBounce 1.5s ease-in-out infinite;
       text-transform: uppercase;
       letter-spacing: 1px;
+      backdrop-filter: blur(4px);
     }
 
     .first-join-notif .fj-icon {
-      font-size: 26px;
+      font-size: 22px;
     }
 
     /* ═══ FLOATING TOAST NOTIFICATIONS (top-right) ═══ */
     .hud-notifications {
       position: fixed;
-      top: 80px;
+      top: 70px;
       right: 16px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       pointer-events: none;
       z-index: 1000;
     }
@@ -286,41 +181,34 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 22px;
-      border-radius: 16px;
-      border: 5px solid #000;
-      box-shadow: 4px 4px 0 #000;
-      font-size: 18px;
+      padding: 10px 20px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      font-size: 17px;
       font-weight: 900;
       color: #fff;
-      text-shadow: 2px 2px 0 #000;
+      text-shadow: 1px 1px 0 #000;
       pointer-events: none;
       animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       white-space: nowrap;
       text-transform: uppercase;
       letter-spacing: 1px;
+      backdrop-filter: blur(4px);
     }
 
-    .hud-notif.item-gain {
-      background: #27ae60;
-    }
-
-    .hud-notif.xp-gain {
-      background: #e67e22;
-    }
-
-    .hud-notif.gold-gain {
-      background: #b8860b;
-    }
-
+    .hud-notif.item-gain { color: #5dff8a; border-color: rgba(93, 255, 138, 0.3); }
+    .hud-notif.xp-gain { color: #FFD700; border-color: rgba(255, 215, 0, 0.3); }
+    .hud-notif.gold-gain { color: #FFD700; border-color: rgba(255, 215, 0, 0.3); }
     .hud-notif.level-up {
-      background: #2980b9;
-      font-size: 22px;
+      color: #FFD700;
+      border-color: rgba(255, 215, 0, 0.5);
+      font-size: 20px;
       animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, levelUpFlash 0.6s ease-in-out 3;
     }
 
     .hud-notif .notif-icon {
-      font-size: 26px;
+      font-size: 22px;
     }
 
     .hud-notif.fade-out {
@@ -328,20 +216,9 @@
     }
 
     /* ═══ ANIMATIONS ═══ */
-    @keyframes coinBounce {
-      0%, 100% { transform: translateY(0) scale(1); }
-      25% { transform: translateY(-4px) scale(1.15); }
-      50% { transform: translateY(0) scale(1); }
-    }
-
-    @keyframes starBob {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.15) rotate(10deg); }
-    }
-
     @keyframes notifBounce {
-      0%, 100% { transform: translateY(0); box-shadow: 4px 4px 0 #000; }
-      50% { transform: translateY(-3px); box-shadow: 4px 7px 0 #000; }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
     }
 
     @keyframes notifSlideIn {
@@ -356,59 +233,43 @@
 
     @keyframes levelUpFlash {
       0%, 100% { filter: brightness(1); }
-      50% { filter: brightness(1.4); }
+      50% { filter: brightness(1.5); }
     }
   </style>
 </head>
 <body>
   <div class="hud-wrapper">
-    <div class="hud-container">
-      <!-- Logo Pill -->
-      <div class="logo-pill">
-        <span class="logo-hughberry">HUGHBERRY</span>
-        <span class="logo-farms">FARMS</span>
+    <div class="hud-bar">
+      <!-- Gold -->
+      <div class="stat">
+        <span class="stat-icon">&#x1FA99;</span>
+        <span class="stat-value" id="gold-value">0</span>
       </div>
 
-      <!-- Stats Strip -->
-      <div class="stats-row">
-        <!-- Gold -->
-        <div class="stat-cell gold-cell">
-          <span class="stat-icon icon-coin">&#x1FA99;</span>
-          <div class="stat-info">
-            <span class="stat-label">Gold</span>
-            <span class="stat-value" id="gold-value">0</span>
-          </div>
-        </div>
+      <div class="stat-divider"></div>
 
-        <!-- Level -->
-        <div class="stat-cell level-cell">
-          <span class="stat-icon icon-star">&#x2B50;</span>
-          <div class="stat-info">
-            <span class="stat-label">Level</span>
-            <span class="stat-value" id="level-value">0</span>
-          </div>
-        </div>
+      <!-- Level -->
+      <div class="stat">
+        <span class="stat-icon">&#x2B50;</span>
+        <span class="stat-value level-val">Lv.<span id="level-value">0</span></span>
+      </div>
 
-        <!-- XP -->
-        <div class="stat-cell xp-cell">
-          <span class="stat-icon">&#x2728;</span>
-          <div class="xp-bar-container">
-            <div class="xp-bar-label">
-              <span>XP</span>
-              <span id="xp-text">0 / 100</span>
-            </div>
-            <div class="xp-bar">
-              <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
-            </div>
-          </div>
+      <div class="stat-divider"></div>
+
+      <!-- XP -->
+      <div class="xp-group">
+        <span class="xp-label">XP</span>
+        <div class="xp-bar">
+          <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
         </div>
+        <span class="xp-text" id="xp-text">0 / 100</span>
       </div>
     </div>
 
-    <div id="talent-notif" class="talent-notif" style="display:none"></div>
-    <div id="rebirth-notif" class="rebirth-notif" style="display:none">&#x1F52E; You've reached Level 50! Press L to Rebirth! &#x1F52E;</div>
-    <div id="animal-tutorial-notif" class="tutorial-notif" style="display:none">&#x1F404; Press E and go to the Animals tab to start your cows! &#x1F404;</div>
-    <div id="craft-tutorial-notif" class="tutorial-notif" style="display:none">&#x2728; Visit the Crafting Table to craft your first item! &#x2728;</div>
+    <div id="talent-notif" class="hud-notif-below" style="display:none"></div>
+    <div id="rebirth-notif" class="hud-notif-below" style="display:none">&#x1F52E; You've reached Level 50! Press G to Rebirth! &#x1F52E;</div>
+    <div id="animal-tutorial-notif" class="hud-notif-below" style="display:none">&#x1F404; Press E and go to the Animals tab to start your cows! &#x1F404;</div>
+    <div id="craft-tutorial-notif" class="hud-notif-below" style="display:none">&#x2728; Visit the Crafting Table to craft your first item! &#x2728;</div>
     <div id="first-join-notif" class="first-join-notif" style="display:none">
       <span class="fj-icon">&#x1F381;</span>
       <span>Press E to open Inventory &amp; claim FREE seeds!</span>
