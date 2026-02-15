@@ -34,106 +34,134 @@
       width: 100%;
     }
 
+    /* ═══ MAIN HUD BAR ═══ */
     .hud-container {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      background: #fff;
-      border-radius: 20px;
-      border: 5px solid #000;
+      gap: 0;
+      padding: 0;
+      background: none;
       pointer-events: none;
-      margin-top: 4px;
-      box-shadow: 6px 6px 0 #000;
+      margin-top: 8px;
     }
 
-    /* Logo — compact inline, not its own row */
-    .logo-section {
+    /* ── Logo Pill ── */
+    .logo-pill {
+      background: #8B4513;
+      border: 5px solid #000;
+      border-radius: 18px;
+      padding: 8px 18px;
       font-family: 'Luckiest Guy', cursive;
-      font-size: 16px;
-      line-height: 1.1;
-      letter-spacing: 2px;
       text-align: center;
+      line-height: 1.15;
+      box-shadow: 4px 4px 0 #000;
+      margin-right: -4px;
+      z-index: 2;
     }
 
     .logo-hughberry {
-      color: #e67e22;
-      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
       display: block;
+      color: #FFD700;
+      font-size: 15px;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
     }
 
     .logo-farms {
-      color: #2ecc71;
-      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
       display: block;
+      color: #fff;
+      font-size: 20px;
+      letter-spacing: 5px;
+      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
     }
 
-    /* Stats Row — single horizontal line */
+    /* ── Stats Strip ── */
     .stats-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      background: #3a2210;
+      border: 5px solid #000;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 4px 4px 0 #000;
+    }
+
+    /* ── Individual Stat Cells ── */
+    .stat-cell {
       display: flex;
       align-items: center;
       gap: 10px;
+      padding: 10px 20px;
+      border-right: 4px solid #000;
     }
 
-    /* Level pill — bright blue */
-    .stat-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #3498db;
-      padding: 8px 16px;
-      border-radius: 14px;
-      border: 4px solid #000;
-      box-shadow: 3px 3px 0 #000;
+    .stat-cell:last-child {
+      border-right: none;
+    }
+
+    /* Gold cell */
+    .stat-cell.gold-cell {
+      background: #b8860b;
+    }
+
+    /* Level cell */
+    .stat-cell.level-cell {
+      background: #2874a6;
+    }
+
+    /* XP cell */
+    .stat-cell.xp-cell {
+      background: #1e8449;
     }
 
     .stat-icon {
-      font-size: 24px;
+      font-size: 30px;
+      filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.5));
     }
 
-    .icon-star { }
-    .icon-bolt { }
+    .stat-icon.icon-star {
+      animation: starBob 3s ease-in-out infinite;
+    }
+
+    .stat-icon.icon-coin {
+      animation: coinBounce 2s ease-in-out infinite;
+    }
 
     .stat-info {
       display: flex;
       flex-direction: column;
-      gap: 0;
     }
 
     .stat-label {
-      font-size: 10px;
-      color: #fff;
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
       font-weight: 800;
-      opacity: 0.85;
-    }
-
-    .stat-value {
-      font-size: 22px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
       line-height: 1;
     }
 
-    .stat-value.level {
+    .stat-value {
+      font-size: 28px;
+      font-weight: 900;
       color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      text-shadow: 2px 2px 0 #000;
+      line-height: 1;
     }
 
-    /* XP Bar — green pill */
+    /* ── XP Bar ── */
     .xp-bar-container {
       display: flex;
       flex-direction: column;
-      gap: 3px;
-      min-width: 150px;
+      gap: 4px;
+      min-width: 180px;
     }
 
     .xp-bar-label {
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
+      font-size: 13px;
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 1.5px;
@@ -141,157 +169,115 @@
     }
 
     .xp-bar {
-      height: 16px;
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
+      height: 20px;
+      background: rgba(0,0,0,0.35);
+      border-radius: 12px;
       border: 3px solid #000;
       overflow: hidden;
     }
 
     .xp-bar-fill {
       height: 100%;
-      background: #fff;
-      border-radius: 7px;
+      background: #5dff8a;
+      border-radius: 9px;
       transition: width 0.5s ease;
     }
 
-    /* Gold display — bright gold pill */
-    .gold-display {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #f1c40f;
-      padding: 8px 16px;
-      border-radius: 14px;
-      border: 4px solid #000;
-      box-shadow: 3px 3px 0 #000;
-    }
-
-    .gold-icon {
-      font-size: 24px;
-      animation: coinBounce 2s ease-in-out infinite;
-    }
-
-    .gold-value {
-      font-size: 22px;
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-    }
-
-    /* XP box — green */
-    .stat-box.xp-box {
-      background: #2ecc71;
-    }
-
-    /* Talent Notification */
+    /* ═══ BELOW-HUD NOTIFICATIONS ═══ */
     .talent-notif {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 8px;
-      padding: 12px 24px;
+      margin-top: 10px;
+      padding: 12px 28px;
       background: #f39c12;
-      border: 4px solid #000;
-      border-radius: 16px;
-      font-size: 17px;
+      border: 5px solid #000;
+      border-radius: 18px;
+      font-size: 18px;
       font-weight: 900;
       color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      text-shadow: 2px 2px 0 #000;
       pointer-events: none;
       box-shadow: 4px 4px 0 #000;
-      animation: talentPulse 2s ease-in-out infinite;
+      animation: notifBounce 2s ease-in-out infinite;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
-    /* Rebirth Ready Notification */
     .rebirth-notif {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 8px;
-      padding: 12px 24px;
-      background: #9b59b6;
-      border: 4px solid #000;
-      border-radius: 16px;
-      font-size: 17px;
+      margin-top: 10px;
+      padding: 12px 28px;
+      background: #8e44ad;
+      border: 5px solid #000;
+      border-radius: 18px;
+      font-size: 18px;
       font-weight: 900;
       color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      text-shadow: 2px 2px 0 #000;
       pointer-events: none;
       box-shadow: 4px 4px 0 #000;
-      animation: rebirthPulse 1.5s ease-in-out infinite;
+      animation: notifBounce 1.5s ease-in-out infinite;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
-    @keyframes rebirthPulse {
-      0%, 100% { box-shadow: 4px 4px 0 #000; }
-      50% { box-shadow: 4px 4px 0 #000, 0 0 20px rgba(155,89,182,0.6); }
-    }
-
-    /* Tutorial Notification (animals / crafting) */
     .tutorial-notif {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-top: 8px;
-      padding: 12px 24px;
-      background: #3498db;
-      border: 4px solid #000;
-      border-radius: 16px;
-      font-size: 16px;
+      margin-top: 10px;
+      padding: 12px 28px;
+      background: #2980b9;
+      border: 5px solid #000;
+      border-radius: 18px;
+      font-size: 17px;
       font-weight: 900;
       color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      text-shadow: 2px 2px 0 #000;
       pointer-events: none;
       box-shadow: 4px 4px 0 #000;
-      animation: tutorialPulse 2s ease-in-out infinite;
+      animation: notifBounce 2s ease-in-out infinite;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
-    @keyframes tutorialPulse {
-      0%, 100% { box-shadow: 4px 4px 0 #000; }
-      50% { box-shadow: 4px 4px 0 #000, 0 0 20px rgba(52,152,219,0.5); }
-    }
-
-    /* First-Join Notification */
     .first-join-notif {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin-top: 8px;
-      padding: 12px 24px;
-      background: #2ecc71;
-      border: 4px solid #000;
-      border-radius: 16px;
-      font-size: 17px;
+      margin-top: 10px;
+      padding: 12px 28px;
+      background: #27ae60;
+      border: 5px solid #000;
+      border-radius: 18px;
+      font-size: 18px;
       font-weight: 900;
       color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      text-shadow: 2px 2px 0 #000;
       pointer-events: none;
       box-shadow: 4px 4px 0 #000;
-      animation: firstJoinPulse 1.5s ease-in-out infinite;
+      animation: notifBounce 1.5s ease-in-out infinite;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
     .first-join-notif .fj-icon {
-      font-size: 24px;
+      font-size: 26px;
     }
 
-    /* HUD Notifications Container */
+    /* ═══ FLOATING TOAST NOTIFICATIONS (top-right) ═══ */
     .hud-notifications {
       position: fixed;
       top: 80px;
       right: 16px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       pointer-events: none;
       z-index: 1000;
     }
@@ -300,14 +286,14 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 20px;
-      border-radius: 14px;
-      border: 4px solid #000;
-      box-shadow: 3px 3px 0 #000;
-      font-size: 16px;
+      padding: 12px 22px;
+      border-radius: 16px;
+      border: 5px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      font-size: 18px;
       font-weight: 900;
       color: #fff;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      text-shadow: 2px 2px 0 #000;
       pointer-events: none;
       animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
       white-space: nowrap;
@@ -316,7 +302,7 @@
     }
 
     .hud-notif.item-gain {
-      background: #2ecc71;
+      background: #27ae60;
     }
 
     .hud-notif.xp-gain {
@@ -324,12 +310,12 @@
     }
 
     .hud-notif.gold-gain {
-      background: #f1c40f;
+      background: #b8860b;
     }
 
     .hud-notif.level-up {
-      background: #3498db;
-      font-size: 20px;
+      background: #2980b9;
+      font-size: 22px;
       animation: notifSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, levelUpFlash 0.6s ease-in-out 3;
     }
 
@@ -341,48 +327,21 @@
       animation: notifFadeOut 0.5s ease forwards;
     }
 
-    /* Animations */
-    @keyframes shimmerGold {
-      0%, 100% { text-shadow: 1px 1px 2px rgba(0,0,0,0.5), 0 0 4px rgba(255,215,0,0.2); }
-      50% { text-shadow: 1px 1px 2px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.5); }
-    }
-
-    @keyframes shimmerBlue {
-      0%, 100% { text-shadow: 0 0 4px rgba(92,184,255,0.2); }
-      50% { text-shadow: 0 0 14px rgba(92,184,255,0.5); }
-    }
-
-    @keyframes xpShine {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
+    /* ═══ ANIMATIONS ═══ */
     @keyframes coinBounce {
       0%, 100% { transform: translateY(0) scale(1); }
-      25% { transform: translateY(-3px) scale(1.1); }
+      25% { transform: translateY(-4px) scale(1.15); }
       50% { transform: translateY(0) scale(1); }
     }
 
-    @keyframes starPulse {
-      0%, 100% { transform: scale(1); filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7)); }
-      50% { transform: scale(1.2); filter: drop-shadow(0 0 8px rgba(255,215,0,0.6)); }
+    @keyframes starBob {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.15) rotate(10deg); }
     }
 
-    @keyframes boltFlicker {
-      0%, 100% { transform: scale(1); filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7)); }
-      30% { transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(255,200,50,0.8)); }
-      40% { transform: scale(1); filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.7)); }
-      50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(255,200,50,0.6)); }
-    }
-
-    @keyframes talentPulse {
-      0%, 100% { box-shadow: 4px 4px 0 #000; }
-      50% { box-shadow: 4px 4px 0 #000, 0 0 20px rgba(255, 215, 0, 0.5); }
-    }
-
-    @keyframes firstJoinPulse {
-      0%, 100% { box-shadow: 4px 4px 0 #000; }
-      50% { box-shadow: 4px 4px 0 #000, 0 0 20px rgba(46, 204, 113, 0.5); }
+    @keyframes notifBounce {
+      0%, 100% { transform: translateY(0); box-shadow: 4px 4px 0 #000; }
+      50% { transform: translateY(-3px); box-shadow: 4px 7px 0 #000; }
     }
 
     @keyframes notifSlideIn {
@@ -404,29 +363,35 @@
 <body>
   <div class="hud-wrapper">
     <div class="hud-container">
-      <!-- Logo (compact) -->
-      <div class="logo-section">
+      <!-- Logo Pill -->
+      <div class="logo-pill">
         <span class="logo-hughberry">HUGHBERRY</span>
         <span class="logo-farms">FARMS</span>
       </div>
 
-      <!-- Stats (single row) -->
+      <!-- Stats Strip -->
       <div class="stats-row">
-        <div class="gold-display">
-          <span class="gold-icon">&#x1FA99;</span>
-          <span class="gold-value" id="gold-value">0</span>
-        </div>
-
-        <div class="stat-box">
-          <span class="stat-icon icon-star">&#x2B50;</span>
+        <!-- Gold -->
+        <div class="stat-cell gold-cell">
+          <span class="stat-icon icon-coin">&#x1FA99;</span>
           <div class="stat-info">
-            <span class="stat-label">Level</span>
-            <span class="stat-value level" id="level-value">0</span>
+            <span class="stat-label">Gold</span>
+            <span class="stat-value" id="gold-value">0</span>
           </div>
         </div>
 
-        <div class="stat-box xp-box">
-          <span class="stat-icon icon-bolt">&#x2728;</span>
+        <!-- Level -->
+        <div class="stat-cell level-cell">
+          <span class="stat-icon icon-star">&#x2B50;</span>
+          <div class="stat-info">
+            <span class="stat-label">Level</span>
+            <span class="stat-value" id="level-value">0</span>
+          </div>
+        </div>
+
+        <!-- XP -->
+        <div class="stat-cell xp-cell">
+          <span class="stat-icon">&#x2728;</span>
           <div class="xp-bar-container">
             <div class="xp-bar-label">
               <span>XP</span>
