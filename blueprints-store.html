@@ -609,7 +609,6 @@
       if (typeof PortalsSdk !== 'undefined' && PortalsSdk.focusGameKeyboard) PortalsSdk.focusGameKeyboard();
     }
     document.addEventListener('click', _refocusGame);
-    document.addEventListener('mouseup', _refocusGame);
     document.addEventListener('keydown', _refocusGame);
     setTimeout(_refocusGame, 300);
 
