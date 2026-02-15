@@ -12,12 +12,12 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Nunito', sans-serif; min-height: 100vh; color: #fff; overflow: hidden; }
     .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 10px; }
-    .container { width: 95vw; max-width: 950px; max-height: 92vh; background: #1a0a00; border: 6px solid #000; border-radius: 28px; box-shadow: 8px 8px 0 #000, 0 0 60px rgba(255, 140, 0, 0.25); display: flex; flex-direction: column; overflow: hidden; }
+    .container { width: 95vw; max-width: 950px; max-height: 92vh; background: #2a1400; border: 6px solid #000; border-radius: 28px; box-shadow: 8px 8px 0 #000, 0 0 60px rgba(255, 140, 0, 0.25); display: flex; flex-direction: column; overflow: hidden; }
     .header { background: #e67e22; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid #000; }
     .title { font-family: 'Luckiest Guy', cursive; font-size: 38px; color: #fff; text-shadow: 3px 3px 0 #000, -1px -1px 0 #000; letter-spacing: 3px; text-transform: uppercase; }
     .content { flex: 1; overflow-y: auto; padding: 14px; }
     .recipe-list { display: flex; flex-direction: column; gap: 10px; }
-    .recipe { background: #0d0600; border: 5px solid #e67e22; border-radius: 18px; padding: 14px 16px; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 14px; }
+    .recipe { background: #1a0f08; border: 5px solid #e67e22; border-radius: 18px; padding: 14px 16px; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 14px; }
     .recipe.craftable { border-color: #2ecc71; box-shadow: 4px 4px 0 #000, 0 0 20px rgba(46, 204, 113, 0.3); }
     .recipe:hover { transform: translateY(-2px); box-shadow: 6px 8px 0 #000; }
     .recipe.locked { opacity: 0.4; border-color: #444; }
@@ -43,10 +43,10 @@
 
     .close-btn { background: #ff4444; border: 4px solid #000; color: #fff; width: 48px; height: 48px; border-radius: 14px; font-size: 24px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 3px 3px 0 #000; }
     .close-btn:hover { transform: scale(1.15) rotate(-5deg); box-shadow: 5px 5px 0 #000; background: #ff6666; }
-    .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #000; border: 5px solid #e67e22; border-radius: 18px; padding: 16px 28px; font-size: 20px; font-weight: 900; color: #ffaa44; box-shadow: 6px 6px 0 rgba(0,0,0,0.5); animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #1a0f08; border: 5px solid #e67e22; border-radius: 18px; padding: 16px 28px; font-size: 20px; font-weight: 900; color: #ffaa44; box-shadow: 6px 6px 0 rgba(0,0,0,0.5); animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
     @keyframes popIn { from { transform: translateX(-50%) scale(0.5); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
     ::-webkit-scrollbar { width: 12px; }
-    ::-webkit-scrollbar-track { background: #0a0500; }
+    ::-webkit-scrollbar-track { background: #1a0f08; }
     ::-webkit-scrollbar-thumb { background: #e67e22; border-radius: 6px; border: 3px solid #000; }
   </style>
 </head>
