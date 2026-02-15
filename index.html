@@ -1828,6 +1828,33 @@
       });
       html += '</div></div>';
 
+      // Recipes section
+      var RECIPE_LIST = [
+        { id: 'recipe_flour', name: 'Flour', icon: '&#x1F35E;' },
+        { id: 'recipe_butter', name: 'Butter', icon: '&#x1F9C8;' },
+        { id: 'recipe_cheese', name: 'Cheese', icon: '&#x1F9C0;' },
+        { id: 'recipe_bread', name: 'Bread', icon: '&#x1F956;' },
+        { id: 'recipe_blanket', name: 'Blanket', icon: '&#x1F9E3;' },
+        { id: 'recipe_stew', name: 'Stew', icon: '&#x1F372;' },
+        { id: 'recipe_ragout', name: 'Ragout', icon: '&#x1F356;' },
+        { id: 'recipe_mead', name: 'Mead', icon: '&#x1F37A;' },
+        { id: 'recipe_pie', name: 'Pie', icon: '&#x1F967;' },
+        { id: 'recipe_meat_pie', name: 'Meat Pie', icon: '&#x1F969;' },
+        { id: 'recipe_cake', name: 'Cake', icon: '&#x1F370;' }
+      ];
+      html += '<div class="inventory-section"><div class="section-title">&#x1F4DC; Recipes</div><div class="equip-grid">';
+      RECIPE_LIST.forEach(function(r) {
+        var owned = gameState.recipes[r.id] === true;
+        html += '<div class="equip-item ' + (owned ? 'owned' : 'not-owned') + '">' +
+          '<span class="equip-icon">' + r.icon + '</span>' +
+          '<div class="equip-info">' +
+            '<div class="equip-name">' + r.name + '</div>' +
+            '<div class="equip-status ' + (owned ? 'owned' : 'locked') + '">' + (owned ? 'Learned' : 'Not learned') + '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div></div>';
+
       // Inventory sections
       sections.forEach(s => {
         html += '<div class="inventory-section"><div class="section-title">' + s.title + '</div><div class="inventory-grid">';
