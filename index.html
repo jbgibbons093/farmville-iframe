@@ -102,6 +102,7 @@
     .plot-card.ready { border-color: #FFD700; box-shadow: 3px 3px 0 #000; animation: pulseGold 2s infinite; }
     @keyframes pulseGold { 0%, 100% { box-shadow: 3px 3px 0 #000, 0 0 10px rgba(255,215,0,0.4); } 50% { box-shadow: 3px 3px 0 #000, 0 0 20px rgba(255,215,0,0.7); } }
     @keyframes pulseGreen { 0%, 100% { box-shadow: 3px 3px 0 #000, 0 0 15px rgba(46, 204, 113, 0.4); } 50% { box-shadow: 3px 3px 0 #000, 0 0 25px rgba(46, 204, 113, 0.7); } }
+    @keyframes pulsePurple { 0%, 100% { box-shadow: 4px 4px 0 #000, 0 0 15px rgba(155, 89, 182, 0.4); } 50% { box-shadow: 4px 4px 0 #000, 0 0 25px rgba(155, 89, 182, 0.7); } }
     @keyframes shimmerGold { 0%,100% { text-shadow: 1px 1px 2px rgba(0,0,0,0.5), 0 0 4px rgba(255,215,0,0.2); } 50% { text-shadow: 1px 1px 2px rgba(0,0,0,0.5), 0 0 14px rgba(255,215,0,0.5); } }
     .plot-number { position: absolute; top: 3px; left: 5px; font-size: 9px; color: #555; font-weight: 900; }
     .plot-icon { font-size: 32px; margin: 4px 0; }
@@ -118,13 +119,24 @@
 
     /* Inventory */
     .inventory-section { margin-bottom: 20px; }
-    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
-    .inv-item { background: #221a10; border: 3px solid #3a2a18; border-radius: 14px; padding: 10px 6px; text-align: center; transition: all 0.2s; box-shadow: 3px 3px 0 #000; }
+    .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+    .inv-item { background: #221a10; border: 4px solid #3a2a18; border-radius: 16px; padding: 14px 8px; text-align: center; transition: all 0.2s; box-shadow: 3px 3px 0 #000; }
     .inv-item:hover { border-color: #8B4513; transform: translateY(-3px); box-shadow: 5px 5px 0 #000; }
-    .inv-item.zero { opacity: 0.4; }
-    .inv-icon { font-size: 24px; margin-bottom: 4px; }
-    .inv-name { font-size: 9px; color: #888; margin-bottom: 2px; font-weight: 700; text-transform: uppercase; }
-    .inv-qty { font-size: 14px; font-weight: 900; color: #FFD700; }
+    .inv-item.zero { opacity: 0.35; }
+    .inv-item.has-some { border-color: #5a4a28; }
+    .inv-icon { font-size: 36px; margin-bottom: 6px; }
+    .inv-name { font-size: 12px; color: #aaa; margin-bottom: 4px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .inv-qty { font-size: 20px; font-weight: 900; color: #FFD700; text-shadow: 1px 1px 0 #000; }
+    .equip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .equip-item { background: #221a10; border: 4px solid #3a2a18; border-radius: 16px; padding: 14px 10px; display: flex; align-items: center; gap: 10px; box-shadow: 3px 3px 0 #000; }
+    .equip-item.owned { border-color: #2ecc71; }
+    .equip-item.not-owned { opacity: 0.35; border-color: #333; }
+    .equip-icon { font-size: 32px; }
+    .equip-info { flex: 1; }
+    .equip-name { font-size: 13px; font-weight: 900; text-transform: uppercase; }
+    .equip-status { font-size: 11px; font-weight: 700; }
+    .equip-status.owned { color: #2ecc71; }
+    .equip-status.locked { color: #888; }
 
     /* Animals */
     .animals-section { margin-bottom: 20px; }
@@ -249,23 +261,25 @@
         <div class="tab-content" id="tab-xp"></div>
         <div class="tab-content" id="tab-unlocks"></div>
         <div class="tab-content" id="tab-controls">
-          <div style="padding: 10px 0;">
-            <div style="font-family: 'Luckiest Guy', cursive; font-size: 22px; color: #f39c12; margin-bottom: 14px; text-shadow: 1px 1px 0 rgba(0,0,0,0.3);">Menu Controls</div>
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-              <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);"><th style="text-align: left; padding: 8px 12px; color: #aaa; font-size: 13px;">KEY</th><th style="text-align: left; padding: 8px 12px; color: #aaa; font-size: 13px;">ACTION</th></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">E</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Open Inventory</td></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">Y</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Open Talent Tree</td></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">L</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Open Leaderboard</td></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">V</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Open Gold Store</td></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">G</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Open Game Guide</td></tr>
+          <div class="section-title">&#x1F3AE; Menu Controls</div>
+          <div class="guide-section" style="padding: 0; overflow: hidden;">
+            <table class="guide-table" style="margin: 0;">
+              <tr><th>KEY</th><th>ACTION</th></tr>
+              <tr><td class="icon-col"><span class="guide-key">E</span></td><td>Open Inventory</td></tr>
+              <tr><td class="icon-col"><span class="guide-key">Y</span></td><td>Open Talent Tree</td></tr>
+              <tr><td class="icon-col"><span class="guide-key">L</span></td><td>Open Leaderboard</td></tr>
+              <tr><td class="icon-col"><span class="guide-key">V</span></td><td>Open Gold Store</td></tr>
+              <tr><td class="icon-col"><span class="guide-key">G</span></td><td>Open Game Guide</td></tr>
             </table>
-            <div style="font-family: 'Luckiest Guy', cursive; font-size: 22px; color: #f39c12; margin-bottom: 14px; text-shadow: 1px 1px 0 rgba(0,0,0,0.3);">3D World Controls</div>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);"><th style="text-align: left; padding: 8px 12px; color: #aaa; font-size: 13px;">KEY</th><th style="text-align: left; padding: 8px 12px; color: #aaa; font-size: 13px;">ACTION</th></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">W A S D</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Move Around the Farm</td></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">Space</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Jump</td></tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">Walk Through</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Collect Crops, Products &amp; Interact</td></tr>
-              <tr><td style="padding: 10px 12px;"><span style="background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 15px;">Mouse</span></td><td style="padding: 10px 12px; font-size: 15px; font-weight: 600;">Look Around</td></tr>
+          </div>
+          <div class="section-title" style="margin-top: 20px;">&#x1F30D; 3D World Controls</div>
+          <div class="guide-section" style="padding: 0; overflow: hidden;">
+            <table class="guide-table" style="margin: 0;">
+              <tr><th>KEY</th><th>ACTION</th></tr>
+              <tr><td class="icon-col"><span class="guide-key">W A S D</span></td><td>Move Around the Farm</td></tr>
+              <tr><td class="icon-col"><span class="guide-key">Space</span></td><td>Jump</td></tr>
+              <tr><td class="icon-col"><span class="guide-key">Walk Through</span></td><td>Collect Crops, Products &amp; Interact</td></tr>
+              <tr><td class="icon-col"><span class="guide-key">Mouse</span></td><td>Look Around</td></tr>
             </table>
           </div>
         </div>
@@ -369,7 +383,6 @@
       rebirthShards: 0,
       mysticEssence: 0,
       claimedStarterSeeds: false,
-      xpHistory: { planting: 0, harvesting: 0, animals: 0, crafting: 0, selling: 0 },
       inventory: {
         wheat: 0, carrot: 0, corn: 0, potato: 0, tomato: 0, pumpkin: 0,
         seeds_wheat: 0, seeds_carrot: 0, seeds_corn: 0, seeds_potato: 0, seeds_tomato: 0, seeds_pumpkin: 0,
@@ -1217,6 +1230,15 @@
       beehive: { id: 'beesuit', name: 'Bee Suit' }
     };
 
+    const ANIMAL_LOCATIONS = {
+      cow: 'Cow Pastures',
+      chicken: 'Chicken Coop',
+      sheep: 'Sheep & Goat Fields',
+      goat: 'Sheep & Goat Fields',
+      pig: 'Pig Pen',
+      beehive: 'Apiary'
+    };
+
     function startAnimalActivity(animalType, id) {
       _lastInteraction = Date.now();
       if (!syncReceived) {
@@ -1582,7 +1604,7 @@
           ${(function() {
             const tp = Math.max(0, gameState.unspentTalentPoints);
             const hasPoints = tp > 0;
-            return `<div class="dashboard-card${hasPoints ? ' highlight' : ''}" style="${hasPoints ? 'border-color: #7c4dba; box-shadow: 0 0 20px rgba(107, 63, 160, 0.4); animation: pulseGreen 2s infinite;' : ''}">
+            return `<div class="dashboard-card${hasPoints ? ' highlight' : ''}" style="${hasPoints ? 'border-color: #9b59b6; animation: pulsePurple 2s infinite;' : ''}">
             <div class="card-header"><span class="card-icon">&#x1F33F;</span><div class="card-title" style="${hasPoints ? 'color: #b388ff;' : ''}">Talent Points</div></div>
             <div class="quick-stats">
               <div class="quick-stat"><span class="quick-stat-icon">&#x2728;</span><div><div class="quick-stat-value" style="${hasPoints ? 'color: #b388ff;' : ''}">${tp}</div><div class="quick-stat-label">Unspent</div></div></div>
@@ -1607,7 +1629,7 @@
             <div class="card-header"><span class="card-icon">&#x1F381;</span><div class="card-title" style="color: #2ecc71;">Free Starter Seeds!</div></div>
             <div style="text-align: center; padding: 10px 0;">
               <p style="font-size: 13px; color: #ccc; margin-bottom: 12px;">New farmer? Claim your free wheat seeds to get started!</p>
-              <button onclick="claimStarterSeeds()" style="background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); border: 2px solid #58d68d; color: #fff; padding: 12px 24px; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 #1e8449; transition: all 0.2s;">
+              <button onclick="claimStarterSeeds()" style="background: #2ecc71; border: 4px solid #000; color: #fff; padding: 14px 28px; border-radius: 14px; font-size: 18px; font-weight: 900; cursor: pointer; box-shadow: 4px 4px 0 #000; text-transform: uppercase; letter-spacing: 1px; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);">
                 &#x1F33E; Claim 5 Wheat Seeds
               </button>
             </div>
@@ -1741,7 +1763,7 @@
 
     function renderInventory() {
       const sections = [
-        { title: 'Crops', items: [
+        { title: '&#x1F33E; Crops', items: [
           { key: 'wheat', name: 'Wheat', icon: '&#x1F33E;' },
           { key: 'carrot', name: 'Carrot', icon: '&#x1F955;' },
           { key: 'corn', name: 'Corn', icon: '&#x1F33D;' },
@@ -1749,15 +1771,15 @@
           { key: 'tomato', name: 'Tomato', icon: '&#x1F345;' },
           { key: 'pumpkin', name: 'Pumpkin', icon: '&#x1F383;' }
         ]},
-        { title: 'Seeds', items: [
-          { key: 'seeds_wheat', name: 'Wheat', icon: '&#x1F331;' },
-          { key: 'seeds_carrot', name: 'Carrot', icon: '&#x1F331;' },
-          { key: 'seeds_corn', name: 'Corn', icon: '&#x1F331;' },
-          { key: 'seeds_potato', name: 'Potato', icon: '&#x1F331;' },
-          { key: 'seeds_tomato', name: 'Tomato', icon: '&#x1F331;' },
-          { key: 'seeds_pumpkin', name: 'Pumpkin', icon: '&#x1F331;' }
+        { title: '&#x1F331; Seeds', items: [
+          { key: 'seeds_wheat', name: 'Wheat', icon: '&#x1F33E;' },
+          { key: 'seeds_carrot', name: 'Carrot', icon: '&#x1F955;' },
+          { key: 'seeds_corn', name: 'Corn', icon: '&#x1F33D;' },
+          { key: 'seeds_potato', name: 'Potato', icon: '&#x1F954;' },
+          { key: 'seeds_tomato', name: 'Tomato', icon: '&#x1F345;' },
+          { key: 'seeds_pumpkin', name: 'Pumpkin', icon: '&#x1F383;' }
         ]},
-        { title: 'Animal Products', items: [
+        { title: '&#x1F95B; Animal Products', items: [
           { key: 'milk', name: 'Milk', icon: '&#x1F95B;' },
           { key: 'wool', name: 'Wool', icon: '&#x1F9F6;' },
           { key: 'goat_meat', name: 'Goat Meat', icon: '&#x1F356;' },
@@ -1765,7 +1787,7 @@
           { key: 'egg', name: 'Egg', icon: '&#x1F95A;' },
           { key: 'honey', name: 'Honey', icon: '&#x1F36F;' }
         ]},
-        { title: 'Crafted Items', items: [
+        { title: '&#x1F373; Crafted Items', items: [
           { key: 'flour', name: 'Flour', icon: '&#x1F35E;' },
           { key: 'bread', name: 'Bread', icon: '&#x1F956;' },
           { key: 'cheese', name: 'Cheese', icon: '&#x1F9C0;' },
@@ -1779,9 +1801,46 @@
           { key: 'mead', name: 'Mead', icon: '&#x1F37A;' }
         ]}
       ];
+
+      const EQUIP_LIST = [
+        { id: 'milk_pail', name: 'Milk Pail', icon: '&#x1F9EA;', desc: 'Collect milk from cows' },
+        { id: 'basket', name: 'Egg Basket', icon: '&#x1F9FA;', desc: 'Collect eggs from chickens' },
+        { id: 'shearing_kit', name: 'Shearing Kit', icon: '&#x2702;&#xFE0F;', desc: 'Collect wool from sheep' },
+        { id: 'butcher_knife', name: 'Butcher Knife', icon: '&#x1F52A;', desc: 'Collect meat from goats' },
+        { id: 'beesuit', name: 'Bee Suit', icon: '&#x1F41D;', desc: 'Collect honey from beehives' },
+        { id: 'truffle_spade', name: 'Truffle Spade', icon: '&#x1FAA8;', desc: 'Collect truffles from pigs' }
+      ];
+
       let html = '';
+
+      // Equipment section
+      html += '<div class="inventory-section"><div class="section-title">&#x1F6E0;&#xFE0F; Equipment</div><div class="equip-grid">';
+      EQUIP_LIST.forEach(function(eq) {
+        const tier = gameState.equipment[eq.id] || 0;
+        const owned = tier > 0;
+        html += '<div class="equip-item ' + (owned ? 'owned' : 'not-owned') + '">' +
+          '<span class="equip-icon">' + eq.icon + '</span>' +
+          '<div class="equip-info">' +
+            '<div class="equip-name">' + eq.name + '</div>' +
+            '<div class="equip-status ' + (owned ? 'owned' : 'locked') + '">' + (owned ? (tier > 1 ? 'Tier ' + tier : 'Owned') : 'Not owned') + '</div>' +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div></div>';
+
+      // Inventory sections
       sections.forEach(s => {
-        html += `<div class="inventory-section"><div class="section-title">${s.title}</div><div class="inventory-grid">${s.items.map(i => `<div class="inv-item ${gameState.inventory[i.key] === 0 ? 'zero' : ''}"><div class="inv-icon">${i.icon}</div><div class="inv-name">${i.name}</div><div class="inv-qty">${gameState.inventory[i.key] || 0}</div></div>`).join('')}</div></div>`;
+        html += '<div class="inventory-section"><div class="section-title">' + s.title + '</div><div class="inventory-grid">';
+        s.items.forEach(function(item) {
+          const qty = gameState.inventory[item.key] || 0;
+          const cls = qty === 0 ? 'zero' : 'has-some';
+          html += '<div class="inv-item ' + cls + '">' +
+            '<div class="inv-icon">' + item.icon + '</div>' +
+            '<div class="inv-name">' + item.name + '</div>' +
+            '<div class="inv-qty">' + qty + '</div>' +
+          '</div>';
+        });
+        html += '</div></div>';
       });
       document.getElementById('tab-inventory').innerHTML = html;
     }
@@ -1829,13 +1888,14 @@
         } else {
           statusText = 'Ready!';
           statusClass = 'ready';
-          buttonText = 'Collect in 3D';
+          buttonText = 'Collect';
           buttonDisabled = true;
           buttonAction = '';
         }
 
         const cardClass = animal.state === 'ready' ? 'ready' : '';
-        const hint = animal.state === 'ready' ? `<div class="plot-hint">Go to ${config.name.toLowerCase()} & press X</div>` : '';
+        const location = ANIMAL_LOCATIONS[type] || 'the farm';
+        const hint = animal.state === 'ready' ? `<div class="plot-hint">Visit the ${location}</div>` : '';
 
         return `<div class="animal-card ${cardClass}" data-animal-type="${type}" data-animal-id="${id}">
           <div class="animal-icon">${config.icon}</div>
@@ -1919,17 +1979,12 @@
 
     function renderXP() {
       const totalXP = gameState.xp;
-      const h = gameState.xpHistory;
-
       let html = `
-        <div class="section-title">&#x2B50; XP Breakdown</div>
+        <div class="section-title">&#x2B50; XP Overview</div>
         <div class="xp-summary">
-          <div class="xp-summary-item"><div class="xp-summary-value">${totalXP}</div><div class="xp-summary-label">Total XP</div></div>
-          <div class="xp-summary-item"><div class="xp-summary-value">${h.planting || 0}</div><div class="xp-summary-label">From Planting</div></div>
-          <div class="xp-summary-item"><div class="xp-summary-value">${h.harvesting || 0}</div><div class="xp-summary-label">From Harvesting</div></div>
-          <div class="xp-summary-item"><div class="xp-summary-value">${h.animals || 0}</div><div class="xp-summary-label">From Animals</div></div>
-          <div class="xp-summary-item"><div class="xp-summary-value">${h.crafting || 0}</div><div class="xp-summary-label">From Crafting</div></div>
-          <div class="xp-summary-item"><div class="xp-summary-value">${h.selling || 0}</div><div class="xp-summary-label">From Selling</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">${totalXP}</div><div class="xp-summary-label">Current XP</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">${getXPForNextLevel()}</div><div class="xp-summary-label">XP to Next Level</div></div>
+          <div class="xp-summary-item"><div class="xp-summary-value">Lv.${gameState.level}</div><div class="xp-summary-label">Current Level</div></div>
         </div>
 
         <div class="section-title">Planting XP</div>
@@ -1954,17 +2009,24 @@
 
         <div class="section-title">Crafting XP</div>
         <div class="xp-history">
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F35E; Craft Flour</span><span class="xp-entry-amount">+10 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9C8; Craft Butter</span><span class="xp-entry-amount">+15 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9C0; Craft Cheese</span><span class="xp-entry-amount">+15 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F956; Craft Bread</span><span class="xp-entry-amount">+15 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F9E3; Craft Blanket</span><span class="xp-entry-amount">+20 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F372; Craft Stew</span><span class="xp-entry-amount">+25 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F37A; Craft Mead</span><span class="xp-entry-amount">+25 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F967; Craft Pie</span><span class="xp-entry-amount">+30 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F356; Craft Ragout</span><span class="xp-entry-amount">+30 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F969; Craft Meat Pie</span><span class="xp-entry-amount">+35 XP</span></div>
-          <div class="xp-entry"><span class="xp-entry-activity">&#x1F370; Craft Cake</span><span class="xp-entry-amount">+40 XP</span></div>
+          ${[
+            { icon: '&#x1F35E;', name: 'Flour', base: 10 },
+            { icon: '&#x1F9C8;', name: 'Butter', base: 15 },
+            { icon: '&#x1F9C0;', name: 'Cheese', base: 15 },
+            { icon: '&#x1F956;', name: 'Bread', base: 15 },
+            { icon: '&#x1F9E3;', name: 'Blanket', base: 20 },
+            { icon: '&#x1F372;', name: 'Stew', base: 25 },
+            { icon: '&#x1F37A;', name: 'Mead', base: 25 },
+            { icon: '&#x1F967;', name: 'Pie', base: 30 },
+            { icon: '&#x1F356;', name: 'Ragout', base: 30 },
+            { icon: '&#x1F969;', name: 'Meat Pie', base: 35 },
+            { icon: '&#x1F370;', name: 'Cake', base: 40 }
+          ].map(r => {
+            const t = gameState.talents;
+            const rb = gameState.rebirthBlessings;
+            const xp = r.base + t.keenLearner + (t.artisan || 0) * 3 + (t.seasonedWorker || 0) * 2 + (t.prodigy || 0) * 3 + (rb.artisanTouch || 0) * 3;
+            return '<div class="xp-entry"><span class="xp-entry-activity">' + r.icon + ' Craft ' + r.name + '</span><span class="xp-entry-amount">+' + xp + ' XP</span></div>';
+          }).join('')}
         </div>`;
       document.getElementById('tab-xp').innerHTML = html;
     }
