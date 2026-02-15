@@ -77,6 +77,18 @@
       color: #89CFF0;
     }
 
+    .stat-icon.level-icon {
+      filter: grayscale(1) brightness(1.5) sepia(1) hue-rotate(180deg) saturate(3);
+    }
+
+    .xp-icon {
+      filter: grayscale(1) brightness(1.2) sepia(1) hue-rotate(320deg) saturate(3);
+    }
+
+    .xp-label-color {
+      color: #E8686A;
+    }
+
     .stat-divider {
       width: 2px;
       height: 28px;
@@ -120,7 +132,7 @@
     .xp-text {
       font-size: 20px;
       font-weight: 900;
-      color: #fff;
+      color: #E8686A;
       text-shadow: 2px 2px 0 #000;
       white-space: nowrap;
       line-height: 1;
@@ -257,7 +269,7 @@
 
       <!-- Level -->
       <div class="stat">
-        <span class="stat-icon">&#x2B50;</span>
+        <span class="stat-icon level-icon">&#x2B50;</span>
         <span class="stat-value level-val">Lv.<span id="level-value">0</span></span>
       </div>
 
@@ -265,8 +277,8 @@
 
       <!-- XP -->
       <div class="xp-group">
-        <span class="xp-sparkle">&#x2728;</span>
-        <span class="xp-label">XP</span>
+        <span class="xp-sparkle xp-icon">&#x2728;</span>
+        <span class="xp-label xp-label-color">XP</span>
         <div class="xp-bar">
           <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
         </div>
