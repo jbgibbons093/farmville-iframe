@@ -18,6 +18,9 @@
     .gold-display { display: flex; align-items: center; gap: 8px; background: #000; padding: 10px 18px; border-radius: 14px; border: 4px solid #FFD700; }
     .gold-icon { font-size: 28px; }
     .gold-value { font-size: 30px; font-weight: 900; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.6); }
+    .level-display { display: flex; align-items: center; gap: 6px; background: #000; padding: 10px 14px; border-radius: 14px; border: 4px solid rgba(255,255,255,0.3); }
+    .level-icon { font-size: 22px; }
+    .level-value { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
     .tabs { display: flex; background: #201400; border-bottom: 5px solid #000; }
     .tab { flex: 1; padding: 14px; text-align: center; cursor: pointer; font-weight: 900; font-size: 20px; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); border-bottom: 4px solid transparent; text-transform: uppercase; letter-spacing: 1px; color: #aa8844; }
     .tab:hover { background: rgba(255, 159, 26, 0.15); transform: scale(1.04); color: #ffcc66; }
@@ -36,7 +39,7 @@
     .item-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
     .item-price { font-size: 30px; font-weight: 900; color: #FFD700; white-space: nowrap; text-shadow: 2px 2px 0 #000; }
     .btn-row { display: flex; gap: 8px; }
-    .sell-btn { background: #ff9f1a; border: 5px solid #000; color: #fff; padding: 20px 48px; border-radius: 18px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; box-shadow: 6px 6px 0 #000; text-transform: uppercase; letter-spacing: 2px; min-width: 130px; text-align: center; }
+    .sell-btn { background: #ff9f1a; border: 4px solid #000; color: #fff; padding: 10px 18px; border-radius: 14px; font-size: 17px; font-weight: 900; cursor: pointer; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; box-shadow: 4px 4px 0 #000; text-transform: uppercase; letter-spacing: 1px; min-width: 70px; text-align: center; }
     .sell-btn:hover:not(:disabled) { transform: scale(1.12) translateY(-4px) rotate(-1deg); box-shadow: 8px 10px 0 #000; background: #ffbb44; }
     .sell-btn:active:not(:disabled) { transform: scale(0.93) translateY(4px); box-shadow: 2px 2px 0 #000; }
     .sell-btn:disabled, .sell-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; box-shadow: none; }
@@ -61,6 +64,10 @@
           <div class="gold-display">
             <span class="gold-icon">&#x1FA99;</span>
             <span class="gold-value" id="gold-display">0</span>
+          </div>
+          <div class="level-display">
+            <span class="level-icon">&#x2B50;</span>
+            <span class="level-value" id="level-display">Lv.0</span>
           </div>
           <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
         </div>
@@ -114,7 +121,7 @@
       ]
     };
 
-    let gameState = { gold: 0, inventory: {} };
+    let gameState = { gold: 0, level: 0, inventory: {} };
     let actionPending = false;
 
     function triggerTask(taskName) {
@@ -164,56 +171,70 @@
       } catch (e) { /* audio not supported */ }
     }
 
-    var notifyTimeout = null;
+    var _notifyTimeout = null;
     function notify(msg, soundType) {
       if (soundType) playSound(soundType);
       var el = document.getElementById('notification');
       el.textContent = msg;
       el.style.display = 'block';
-      if (notifyTimeout) clearTimeout(notifyTimeout);
-      notifyTimeout = setTimeout(function() { el.style.display = 'none'; }, 2000);
+      if (_notifyTimeout) clearTimeout(_notifyTimeout);
+      _notifyTimeout = setTimeout(function() { el.style.display = 'none'; }, 2000);
     }
 
-    function sellItem(key, qty, taskPrefix, price) {
+    function sellItem(key, qty, taskPrefix, price, singleOnly) {
       if (actionPending) { notify('Please wait...'); return; }
-
-      const owned = Math.max(0, parseInt(gameState.inventory[key]) || 0);
+      var owned = Math.max(0, parseInt(gameState.inventory[key]) || 0);
       if (owned < qty) { notify('Not enough to sell!', 'error'); return; }
 
       actionPending = true;
-      triggerTask(taskPrefix + '_' + qty);
-      notify('Sold for ' + (price * qty) + 'g!', 'purchase');
+      // Optimistic deduction
+      gameState.inventory[key] = owned - qty;
+      gameState.gold += price * qty;
+      render();
 
-      // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
-      setTimeout(function() { actionPending = false; render(); }, 1500);
+      // Build task queue — use _5 tasks where available (crops), otherwise _1
+      var tasks = [];
+      var remaining = qty;
+      if (!singleOnly) {
+        while (remaining >= 5) { tasks.push(taskPrefix + '_5'); remaining -= 5; }
+      }
+      while (remaining >= 1) { tasks.push(taskPrefix + '_1'); remaining -= 1; }
+
+      // Stagger tasks 250ms apart
+      for (var t = 0; t < tasks.length; t++) {
+        (function(task, delay) {
+          setTimeout(function() { triggerTask(task); }, delay);
+        })(tasks[t], t * 250);
+      }
+
+      notify('Sold ' + qty + ' for ' + (price * qty) + 'g!', 'purchase');
+      setTimeout(function() { actionPending = false; }, Math.max(1500, tasks.length * 250 + 500));
+    }
+
+    function sellAll(key, taskPrefix, price, singleOnly) {
+      var owned = Math.max(0, parseInt(gameState.inventory[key]) || 0);
+      if (owned < 1) { notify('Nothing to sell!', 'error'); return; }
+      sellItem(key, owned, taskPrefix, price, singleOnly);
     }
 
     function renderGrid(items, containerId) {
-      let html = '<div class="grid">';
-      items.forEach(item => {
-        const owned = Math.max(0, parseInt(gameState.inventory[item.key]) || 0);
-        const canSell1 = owned >= 1;
-        const canSell5 = owned >= 5;
+      var html = '<div class="grid">';
+      items.forEach(function(item) {
+        var owned = Math.max(0, parseInt(gameState.inventory[item.key]) || 0);
+        var canSell1 = owned >= 1 && !actionPending;
+        var canSell5 = owned >= 5 && !actionPending;
+        var canSellAll = owned >= 1 && !actionPending;
+        var so = item.singleOnly ? 'true' : 'false';
 
-        let buttonsHtml;
-        if (item.singleOnly) {
-          if (canSell1) {
-            buttonsHtml = '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 1, \'' + item.taskPrefix + '\', ' + item.price + ')">Sell 1</button>';
-          } else {
-            buttonsHtml = '<button class="sell-btn disabled" disabled>Sell 1</button>';
-          }
-        } else {
-          if (canSell1) {
-            buttonsHtml = '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 1, \'' + item.taskPrefix + '\', ' + item.price + ')">Sell 1</button>';
-          } else {
-            buttonsHtml = '<button class="sell-btn disabled" disabled>Sell 1</button>';
-          }
-          if (canSell5) {
-            buttonsHtml += '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 5, \'' + item.taskPrefix + '\', ' + item.price + ')">Sell 5</button>';
-          } else {
-            buttonsHtml += '<button class="sell-btn disabled" disabled>Sell 5</button>';
-          }
-        }
+        var btn1 = canSell1
+          ? '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 1, \'' + item.taskPrefix + '\', ' + item.price + ', ' + so + ')">Sell 1</button>'
+          : '<button class="sell-btn" disabled>Sell 1</button>';
+        var btn5 = canSell5
+          ? '<button class="sell-btn" onclick="sellItem(\'' + item.key + '\', 5, \'' + item.taskPrefix + '\', ' + item.price + ', ' + so + ')">Sell 5</button>'
+          : '<button class="sell-btn" disabled>Sell 5</button>';
+        var btnAll = canSellAll
+          ? '<button class="sell-btn" onclick="sellAll(\'' + item.key + '\', \'' + item.taskPrefix + '\', ' + item.price + ', ' + so + ')">Sell All</button>'
+          : '<button class="sell-btn" disabled>Sell All</button>';
 
         html += '<div class="item ' + (owned === 0 ? 'zero' : '') + '">' +
           '<span class="item-icon">' + item.icon + '</span>' +
@@ -223,7 +244,7 @@
           '</div>' +
           '<div class="item-actions">' +
             '<div class="item-price">' + item.price + 'g each</div>' +
-            '<div class="btn-row">' + buttonsHtml + '</div>' +
+            '<div class="btn-row">' + btn1 + btn5 + btnAll + '</div>' +
           '</div>' +
         '</div>';
       });
@@ -233,6 +254,7 @@
 
     function render() {
       document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
+      document.getElementById('level-display').textContent = 'Lv.' + gameState.level;
       renderGrid(ITEMS.crops, 'tab-crops');
       renderGrid(ITEMS.products, 'tab-products');
       renderGrid(ITEMS.crafted, 'tab-crafted');
@@ -260,9 +282,21 @@
       'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
       'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
       'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
-      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
-      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
-      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
+      'Unspent_Talent_Points': '_skip',
+      'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
+      'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
+      'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
+      'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
+      'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
+      'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
+      'T_KeenLearner': '_skip', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
+      'T_Artisan': '_skip', 'T_SeasonedWorker': '_skip', 'T_BonusPoint1': '_skip',
+      'T_Prodigy': '_skip', 'T_BonusPoint2': '_skip',
+      'T_Contractor1': '_skip', 'T_Contractor2': '_skip', 'T_Contractor3': '_skip',
+      'Contract_1_Done': '_skip', 'Contract_2_Done': '_skip', 'Contract_3_Done': '_skip',
+      'Contract_4_Done': '_skip', 'Contract_5_Done': '_skip', 'Contract_6_Done': '_skip',
+      'Contract_7_Done': '_skip', 'Contract_8_Done': '_skip', 'Contract_9_Done': '_skip',
+      'Contract_10_Done': '_skip',
       'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
       'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
       'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
@@ -321,7 +355,8 @@
       console.log('[Hughberry SellGoods] Received:', msg);
       if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
         const data = parseSyncMessage(msg);
-        gameState.gold = data.gold || 0;
+        gameState.gold = data.gold !== undefined ? data.gold : 0;
+        gameState.level = data.level !== undefined ? data.level : 0;
         gameState.inventory.wheat = data.crop_wheat || 0;
         gameState.inventory.carrot = data.crop_carrot || 0;
         gameState.inventory.corn = data.crop_corn || 0;
@@ -399,6 +434,14 @@
     document.addEventListener('click', _refocusGame);
     document.addEventListener('keydown', _refocusGame);
     setTimeout(_refocusGame, 300);
+
+    // Re-request Sync_Inventory when iframe regains visibility or focus
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) { triggerTask('Sync_Inventory'); }
+    });
+    window.addEventListener('focus', function() {
+      triggerTask('Sync_Inventory');
+    });
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {

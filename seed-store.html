@@ -18,6 +18,9 @@
     .gold-display { display: flex; align-items: center; gap: 8px; background: #000; padding: 10px 18px; border-radius: 14px; border: 4px solid #FFD700; }
     .gold-icon { font-size: 28px; }
     .gold-value { font-size: 30px; font-weight: 900; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.6); }
+    .level-display { display: flex; align-items: center; gap: 6px; background: #000; padding: 10px 14px; border-radius: 14px; border: 4px solid rgba(255,255,255,0.3); }
+    .level-icon { font-size: 22px; }
+    .level-value { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.5); }
     .content { flex: 1; overflow-y: auto; padding: 16px; }
     .section-title { font-size: 24px; color: #5dff8a; font-weight: 900; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 0 #000; }
     .grid { display: flex; flex-direction: column; gap: 10px; }
@@ -27,11 +30,12 @@
     .item-info { flex: 1; }
     .item-name { font-size: 26px; font-weight: 900; text-shadow: 1px 1px 0 #000; }
     .item-stock { font-size: 18px; color: #7dffaa; margin-top: 2px; font-weight: 700; }
-    .item-locked { font-size: 14px; color: #ff5555; font-weight: 800; text-shadow: 1px 1px 0 #000; }
+    .item-locked { font-size: 16px; color: #ff6666; font-weight: 900; text-shadow: 1px 1px 0 #000; text-transform: uppercase; letter-spacing: 1px; }
+    .item.locked { opacity: 0.4; border-color: #555; }
     .item-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
     .item-price { font-size: 30px; font-weight: 900; color: #FFD700; text-shadow: 2px 2px 0 #000; }
     .btn-row { display: flex; gap: 8px; }
-    .buy-btn { background: #2ecc71; border: 5px solid #000; color: #fff; padding: 20px 48px; border-radius: 18px; font-size: 24px; font-weight: 900; cursor: pointer; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 6px 6px 0 #000; text-transform: uppercase; letter-spacing: 2px; min-width: 130px; text-align: center; }
+    .buy-btn { background: #2ecc71; border: 4px solid #000; color: #fff; padding: 10px 18px; border-radius: 14px; font-size: 17px; font-weight: 900; cursor: pointer; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 4px 4px 0 #000; text-transform: uppercase; letter-spacing: 1px; min-width: 70px; text-align: center; }
     .buy-btn:hover:not(:disabled) { transform: scale(1.12) translateY(-4px) rotate(-1deg); box-shadow: 8px 10px 0 #000; background: #3dff7f; }
     .buy-btn:active:not(:disabled) { transform: scale(0.93) translateY(4px); box-shadow: 2px 2px 0 #000; }
     .buy-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
@@ -55,6 +59,10 @@
           <div class="gold-display">
             <span class="gold-icon">&#x1FA99;</span>
             <span class="gold-value" id="gold-display">0</span>
+          </div>
+          <div class="level-display">
+            <span class="level-icon">&#x2B50;</span>
+            <span class="level-value" id="level-display">Lv.0</span>
           </div>
           <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
         </div>
@@ -129,23 +137,30 @@
       } catch (e) { /* audio not supported */ }
     }
 
+    var _notifyTimeout = null;
     function notify(msg, soundType) {
       if (soundType) playSound(soundType);
-      const el = document.getElementById('notification');
+      var el = document.getElementById('notification');
       el.textContent = msg;
       el.style.display = 'block';
-      setTimeout(() => el.style.display = 'none', 2000);
+      if (_notifyTimeout) clearTimeout(_notifyTimeout);
+      _notifyTimeout = setTimeout(function() { el.style.display = 'none'; }, 2000);
     }
 
     function buySeeds(type, qty) {
       if (actionPending) { notify('Please wait...'); return; }
 
-      const seed = SEEDS[type];
-      const cost = seed.cost * qty;
+      var seed = SEEDS[type];
+      var cost = seed.cost * qty;
       if (gameState.gold < cost) { notify('Not enough gold!', 'error'); return; }
       if (gameState.level < seed.unlockLevel) { notify('Level too low!', 'error'); return; }
 
       actionPending = true;
+      // Optimistic deduction
+      gameState.gold -= cost;
+      gameState.seeds[type] = (gameState.seeds[type] || 0) + qty;
+      render();
+
       triggerTask('Buy_Seeds_' + seed.name + '_' + qty);
       notify('Bought ' + qty + ' ' + seed.name + ' seeds!', 'purchase');
 
@@ -155,20 +170,22 @@
 
     function render() {
       document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
+      document.getElementById('level-display').textContent = 'Lv.' + gameState.level;
 
-      let html = '';
-      Object.entries(SEEDS).forEach(([key, seed]) => {
-        const owned = gameState.seeds[key] || 0;
-        const locked = gameState.level < seed.unlockLevel;
-        const canBuy1 = !locked && !actionPending && gameState.gold >= seed.cost;
-        const canBuy5 = !locked && !actionPending && gameState.gold >= seed.cost * 5;
+      var html = '';
+      Object.entries(SEEDS).forEach(function(entry) {
+        var key = entry[0], seed = entry[1];
+        var owned = gameState.seeds[key] || 0;
+        var locked = gameState.level < seed.unlockLevel;
+        var canBuy1 = !locked && !actionPending && gameState.gold >= seed.cost;
+        var canBuy5 = !locked && !actionPending && gameState.gold >= seed.cost * 5;
 
-        html += '<div class="item">' +
+        html += '<div class="item' + (locked ? ' locked' : '') + '">' +
           '<span class="item-icon">' + seed.icon + '</span>' +
           '<div class="item-info">' +
             '<div class="item-name">' + seed.name + ' Seeds</div>' +
             '<div class="item-stock">Owned: ' + owned + '</div>' +
-            (locked ? '<div class="item-locked">Unlocks at Lv.' + seed.unlockLevel + '</div>' : '') +
+            (locked ? '<div class="item-locked">&#x1F512; Unlocks at Lv.' + seed.unlockLevel + '</div>' : '') +
           '</div>' +
           '<div class="item-actions">' +
             '<div class="item-price">' + seed.cost + 'g each</div>' +
@@ -193,9 +210,21 @@
       'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
       'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
       'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
-      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
-      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
-      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
+      'Unspent_Talent_Points': '_skip',
+      'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
+      'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
+      'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
+      'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
+      'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
+      'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
+      'T_KeenLearner': '_skip', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
+      'T_Artisan': '_skip', 'T_SeasonedWorker': '_skip', 'T_BonusPoint1': '_skip',
+      'T_Prodigy': '_skip', 'T_BonusPoint2': '_skip',
+      'T_Contractor1': '_skip', 'T_Contractor2': '_skip', 'T_Contractor3': '_skip',
+      'Contract_1_Done': '_skip', 'Contract_2_Done': '_skip', 'Contract_3_Done': '_skip',
+      'Contract_4_Done': '_skip', 'Contract_5_Done': '_skip', 'Contract_6_Done': '_skip',
+      'Contract_7_Done': '_skip', 'Contract_8_Done': '_skip', 'Contract_9_Done': '_skip',
+      'Contract_10_Done': '_skip',
       'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
       'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
       'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
@@ -254,7 +283,7 @@
       if (typeof msg === 'string' && msg.indexOf('init_') === 0) {
         const parts = msg.split('_');
         gameState.gold = parseInt(parts[1]) || 0;
-        gameState.level = parseInt(parts[2]) || 1;
+        gameState.level = parseInt(parts[2]) || 0;
         render();
       }
       if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
@@ -320,6 +349,14 @@
     document.addEventListener('click', _refocusGame);
     document.addEventListener('keydown', _refocusGame);
     setTimeout(_refocusGame, 300);
+
+    // Re-request Sync_Inventory when iframe regains visibility or focus
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) { triggerTask('Sync_Inventory'); }
+    });
+    window.addEventListener('focus', function() {
+      triggerTask('Sync_Inventory');
+    });
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {
