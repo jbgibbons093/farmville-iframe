@@ -149,7 +149,7 @@
       transform: scale(0.93) translateY(4px);
       box-shadow: 2px 2px 0 #000;
     }
-    .buy-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+    .buy-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; box-shadow: none; }
 
 
 
@@ -174,7 +174,7 @@
     /* --- Notifications --- */
     .notification {
       position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-      background: #000;
+      background: #2a1414;
       border: 5px solid #e74c3c;
       border-radius: 18px;
       padding: 16px 28px;
@@ -220,11 +220,9 @@
       </div>
       <div class="content">
         <div class="tab-content active" id="content-tools">
-          <div class="section-title">Animal Harvesting Tools</div>
           <div class="grid" id="equipment-grid"></div>
         </div>
         <div class="tab-content" id="content-recipes">
-          <div class="section-title">Cooking Recipes</div>
           <div class="grid" id="recipes-grid"></div>
         </div>
       </div>
@@ -251,17 +249,17 @@
     };
 
     const RECIPES = [
-      { id: 'recipe_flour', name: 'Flour Recipe', icon: '&#x1F4DC;', price: 100, unlockLevel: 4, desc: 'Learn to grind wheat into flour', taskName: 'Buy_Recipe_Flour' },
-      { id: 'recipe_butter', name: 'Butter Recipe', icon: '&#x1F4DC;', price: 150, unlockLevel: 8, desc: 'Learn to churn milk into butter', taskName: 'Buy_Recipe_Butter' },
-      { id: 'recipe_cheese', name: 'Cheese Recipe', icon: '&#x1F4DC;', price: 200, unlockLevel: 9, desc: 'Learn to make cheese from milk', taskName: 'Buy_Recipe_Cheese' },
-      { id: 'recipe_bread', name: 'Bread Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 11, desc: 'Learn to bake fresh bread', taskName: 'Buy_Recipe_Bread' },
-      { id: 'recipe_blanket', name: 'Blanket Recipe', icon: '&#x1F4DC;', price: 250, unlockLevel: 14, desc: 'Learn to weave wool into blankets', taskName: 'Buy_Recipe_Blanket' },
-      { id: 'recipe_stew', name: 'Stew Recipe', icon: '&#x1F4DC;', price: 300, unlockLevel: 15, desc: 'Learn to cook hearty vegetable stew', taskName: 'Buy_Recipe_Stew' },
-      { id: 'recipe_ragout', name: 'Ragout Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 19, desc: 'Learn to prepare savory meat ragout', taskName: 'Buy_Recipe_Ragout' },
-      { id: 'recipe_mead', name: 'Mead Recipe', icon: '&#x1F4DC;', price: 450, unlockLevel: 22, desc: 'Learn to brew honey mead', taskName: 'Buy_Recipe_Mead' },
-      { id: 'recipe_pie', name: 'Pie Recipe', icon: '&#x1F4DC;', price: 400, unlockLevel: 24, desc: 'Learn to bake pumpkin pie', taskName: 'Buy_Recipe_Pie' },
-      { id: 'recipe_meat_pie', name: 'Meat Pie Recipe', icon: '&#x1F4DC;', price: 500, unlockLevel: 27, desc: 'Learn to bake savory meat pies', taskName: 'Buy_Recipe_Meat_Pie' },
-      { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F4DC;', price: 600, unlockLevel: 28, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
+      { id: 'recipe_flour', name: 'Flour Recipe', icon: '&#x1F35E;', price: 100, unlockLevel: 4, desc: 'Learn to grind wheat into flour', taskName: 'Buy_Recipe_Flour' },
+      { id: 'recipe_butter', name: 'Butter Recipe', icon: '&#x1F9C8;', price: 150, unlockLevel: 8, desc: 'Learn to churn milk into butter', taskName: 'Buy_Recipe_Butter' },
+      { id: 'recipe_cheese', name: 'Cheese Recipe', icon: '&#x1F9C0;', price: 200, unlockLevel: 9, desc: 'Learn to make cheese from milk', taskName: 'Buy_Recipe_Cheese' },
+      { id: 'recipe_bread', name: 'Bread Recipe', icon: '&#x1F956;', price: 250, unlockLevel: 11, desc: 'Learn to bake fresh bread', taskName: 'Buy_Recipe_Bread' },
+      { id: 'recipe_blanket', name: 'Blanket Recipe', icon: '&#x1F9E3;', price: 250, unlockLevel: 14, desc: 'Learn to weave wool into blankets', taskName: 'Buy_Recipe_Blanket' },
+      { id: 'recipe_stew', name: 'Stew Recipe', icon: '&#x1F372;', price: 300, unlockLevel: 15, desc: 'Learn to cook hearty vegetable stew', taskName: 'Buy_Recipe_Stew' },
+      { id: 'recipe_ragout', name: 'Ragout Recipe', icon: '&#x1F356;', price: 400, unlockLevel: 19, desc: 'Learn to prepare savory meat ragout', taskName: 'Buy_Recipe_Ragout' },
+      { id: 'recipe_mead', name: 'Mead Recipe', icon: '&#x1F37A;', price: 450, unlockLevel: 22, desc: 'Learn to brew honey mead', taskName: 'Buy_Recipe_Mead' },
+      { id: 'recipe_pie', name: 'Pie Recipe', icon: '&#x1F967;', price: 400, unlockLevel: 24, desc: 'Learn to bake pumpkin pie', taskName: 'Buy_Recipe_Pie' },
+      { id: 'recipe_meat_pie', name: 'Meat Pie Recipe', icon: '&#x1F969;', price: 500, unlockLevel: 27, desc: 'Learn to bake savory meat pies', taskName: 'Buy_Recipe_Meat_Pie' },
+      { id: 'recipe_cake', name: 'Cake Recipe', icon: '&#x1F370;', price: 600, unlockLevel: 28, desc: 'Learn to bake delicious cakes', taskName: 'Buy_Recipe_Cake' }
     ];
 
     let gameState = { gold: 0, level: 0, equipment: { milk_pail: 0, basket: 0, beesuit: 0, shearing_kit: 0, butcher_knife: 0, truffle_spade: 0 }, recipes: {} };
@@ -451,27 +449,35 @@
     const SYNC_MAP = {
       'Has_Milk_Pail': 'has_milk_pail', 'Has_Shearing_Kit': 'has_shearing_kit',
       'Has_Butcher_Knife': 'has_butcher_knife', 'Has_Truffle_Spade': 'has_truffle_spade',
-      'Has_Starter_Seeds': 'has_starter_seeds',
-      'Seeds_Wheat': 'seeds_wheat', 'Seeds_Carrot': 'seeds_carrot', 'Seeds_Corn': 'seeds_corn',
-      'Seeds_Potato': 'seeds_potato', 'Seeds_Tomato': 'seeds_tomato', 'Seeds_Pumpkin': 'seeds_pumpkin',
-      'Crop_Wheat': 'crop_wheat', 'Crop_Carrot': 'crop_carrot', 'Crop_Corn': 'crop_corn',
-      'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
-      'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
+      'Has_Starter_Seeds': '_skip',
+      'Seeds_Wheat': '_skip', 'Seeds_Carrot': '_skip', 'Seeds_Corn': '_skip',
+      'Seeds_Potato': '_skip', 'Seeds_Tomato': '_skip', 'Seeds_Pumpkin': '_skip',
+      'Crop_Wheat': '_skip', 'Crop_Carrot': '_skip', 'Crop_Corn': '_skip',
+      'Crop_Potato': '_skip', 'Crop_Tomato': '_skip', 'Crop_Pumpkin': '_skip',
+      'Goat_Meat': '_skip', 'Meat_Pie': '_skip',
       'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
-      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
-      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
-      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
       'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
-      'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
-      'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
-      'Ragout': 'ragout', 'Pie': 'pie', 'Blanket': 'blanket', 'Butter': 'butter',
-      'Cake': 'cake', 'Mead': 'mead',
+      'Milk': '_skip', 'Wool': '_skip', 'Truffle': '_skip', 'Egg': '_skip', 'Honey': '_skip',
+      'Flour': '_skip', 'Bread': '_skip', 'Cheese': '_skip', 'Stew': '_skip',
+      'Ragout': '_skip', 'Pie': '_skip', 'Blanket': '_skip', 'Butter': '_skip',
+      'Cake': '_skip', 'Mead': '_skip',
       'Has_Recipe_Flour': 'has_recipe_flour', 'Has_Recipe_Bread': 'has_recipe_bread',
       'Has_Recipe_Cheese': 'has_recipe_cheese', 'Has_Recipe_Stew': 'has_recipe_stew',
       'Has_Recipe_Ragout': 'has_recipe_ragout', 'Has_Recipe_Pie': 'has_recipe_pie',
       'Has_Recipe_Meat_Pie': 'has_recipe_meat_pie', 'Has_Recipe_Blanket': 'has_recipe_blanket',
       'Has_Recipe_Butter': 'has_recipe_butter', 'Has_Recipe_Cake': 'has_recipe_cake',
       'Has_Recipe_Mead': 'has_recipe_mead',
+      'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
+      'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
+      'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
+      'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
+      'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
+      'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
+      'T_KeenLearner': '_skip', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
+      'T_Artisan': '_skip', 'T_SeasonedWorker': '_skip',
+      'T_BonusPoint1': '_skip', 'T_Prodigy': '_skip', 'T_BonusPoint2': '_skip',
+      'T_Contractor1': '_skip', 'T_Contractor2': '_skip', 'T_Contractor3': '_skip',
+      'Unspent_Talent_Points': '_skip',
       'Rebirth_Shards': '_skip', 'Mystic_Essence': '_skip',
       'RT_FleetHarvest': '_skip', 'RT_SwiftHusbandry': '_skip',
       'RT_QuickContracts': '_skip', 'RT_RushingWinds': '_skip',
@@ -482,7 +488,11 @@
       'RT_NestEgg': '_skip', 'RT_SeedVault': '_skip',
       'RT_Seasoned': '_skip', 'RT_ToolShed': '_skip',
       'RT_RecipeTome': '_skip', 'RT_QuickStart': '_skip',
-      'Rebirth_Count': 'rebirth_count',
+      'Rebirth_Count': '_skip',
+      'Contract_1_Done': '_skip', 'Contract_2_Done': '_skip', 'Contract_3_Done': '_skip',
+      'Contract_4_Done': '_skip', 'Contract_5_Done': '_skip', 'Contract_6_Done': '_skip',
+      'Contract_7_Done': '_skip', 'Contract_8_Done': '_skip', 'Contract_9_Done': '_skip',
+      'Contract_10_Done': '_skip',
       'playerName': '_skip'
     };
 
@@ -495,21 +505,21 @@
         // Try 4-word key first (e.g. Has_Recipe_Meat_Pie)
         if (!matched && i + 4 < parts.length) {
           const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+4]) || 0; i += 5; matched = true; }
+          if (SYNC_MAP[k] !== undefined) { var v4 = parseInt(parts[i+4]); if (SYNC_MAP[k] !== '_skip') data[SYNC_MAP[k]] = isNaN(v4) ? 0 : v4; i += 5; matched = true; }
         }
         // Try 3-word key (e.g. Has_Recipe_Flour, Has_Milk_Pail)
         if (!matched && i + 3 < parts.length) {
           const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
+          if (SYNC_MAP[k] !== undefined) { var v3 = parseInt(parts[i+3]); if (SYNC_MAP[k] !== '_skip') data[SYNC_MAP[k]] = isNaN(v3) ? 0 : v3; i += 4; matched = true; }
         }
         // Try 2-word key (e.g. Seeds_Wheat, Crop_Carrot)
         if (!matched && i + 2 < parts.length) {
           const k = parts[i] + '_' + parts[i+1];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
+          if (SYNC_MAP[k] !== undefined) { var v2 = parseInt(parts[i+2]); if (SYNC_MAP[k] !== '_skip') data[SYNC_MAP[k]] = isNaN(v2) ? 0 : v2; i += 3; matched = true; }
         }
         // Try 1-word key (e.g. Gold, XP, Level)
         if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
-          data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
+          var v1 = parseInt(parts[i+1]); if (SYNC_MAP[parts[i]] !== '_skip') data[SYNC_MAP[parts[i]]] = isNaN(v1) ? 0 : v1; i += 2; matched = true;
         }
         if (!matched) i++;
       }
@@ -522,30 +532,32 @@
       console.log('[Hughberry Blueprints] Received:', msg);
       if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
         const data = parseSyncMessage(msg);
-        gameState.gold = data.gold || 0;
-        gameState.level = data.level || 0;
-        // Equipment (tier values 0-3)
-        gameState.equipment.milk_pail = data.has_milk_pail || 0;
-        gameState.equipment.basket = data.has_basket || 0;
-        gameState.equipment.beesuit = data.has_beesuit || 0;
-        gameState.equipment.shearing_kit = data.has_shearing_kit || 0;
-        gameState.equipment.butcher_knife = data.has_butcher_knife || 0;
-        gameState.equipment.truffle_spade = data.has_truffle_spade || 0;
+        gameState.gold = data.gold !== undefined ? data.gold : 0;
+        gameState.level = data.level !== undefined ? data.level : 0;
+        // Equipment (tier values 0-4)
+        gameState.equipment.milk_pail = data.has_milk_pail !== undefined ? data.has_milk_pail : 0;
+        gameState.equipment.basket = data.has_basket !== undefined ? data.has_basket : 0;
+        gameState.equipment.beesuit = data.has_beesuit !== undefined ? data.has_beesuit : 0;
+        gameState.equipment.shearing_kit = data.has_shearing_kit !== undefined ? data.has_shearing_kit : 0;
+        gameState.equipment.butcher_knife = data.has_butcher_knife !== undefined ? data.has_butcher_knife : 0;
+        gameState.equipment.truffle_spade = data.has_truffle_spade !== undefined ? data.has_truffle_spade : 0;
         // Recipes
-        gameState.recipes.recipe_flour = (data.has_recipe_flour || 0) > 0;
-        gameState.recipes.recipe_bread = (data.has_recipe_bread || 0) > 0;
-        gameState.recipes.recipe_cheese = (data.has_recipe_cheese || 0) > 0;
-        gameState.recipes.recipe_stew = (data.has_recipe_stew || 0) > 0;
-        gameState.recipes.recipe_ragout = (data.has_recipe_ragout || 0) > 0;
-        gameState.recipes.recipe_pie = (data.has_recipe_pie || 0) > 0;
-        gameState.recipes.recipe_meat_pie = (data.has_recipe_meat_pie || 0) > 0;
-        gameState.recipes.recipe_blanket = (data.has_recipe_blanket || 0) > 0;
-        gameState.recipes.recipe_butter = (data.has_recipe_butter || 0) > 0;
-        gameState.recipes.recipe_cake = (data.has_recipe_cake || 0) > 0;
-        gameState.recipes.recipe_mead = (data.has_recipe_mead || 0) > 0;
+        gameState.recipes.recipe_flour = (data.has_recipe_flour !== undefined ? data.has_recipe_flour : 0) > 0;
+        gameState.recipes.recipe_bread = (data.has_recipe_bread !== undefined ? data.has_recipe_bread : 0) > 0;
+        gameState.recipes.recipe_cheese = (data.has_recipe_cheese !== undefined ? data.has_recipe_cheese : 0) > 0;
+        gameState.recipes.recipe_stew = (data.has_recipe_stew !== undefined ? data.has_recipe_stew : 0) > 0;
+        gameState.recipes.recipe_ragout = (data.has_recipe_ragout !== undefined ? data.has_recipe_ragout : 0) > 0;
+        gameState.recipes.recipe_pie = (data.has_recipe_pie !== undefined ? data.has_recipe_pie : 0) > 0;
+        gameState.recipes.recipe_meat_pie = (data.has_recipe_meat_pie !== undefined ? data.has_recipe_meat_pie : 0) > 0;
+        gameState.recipes.recipe_blanket = (data.has_recipe_blanket !== undefined ? data.has_recipe_blanket : 0) > 0;
+        gameState.recipes.recipe_butter = (data.has_recipe_butter !== undefined ? data.has_recipe_butter : 0) > 0;
+        gameState.recipes.recipe_cake = (data.has_recipe_cake !== undefined ? data.has_recipe_cake : 0) > 0;
+        gameState.recipes.recipe_mead = (data.has_recipe_mead !== undefined ? data.has_recipe_mead : 0) > 0;
         actionPending = false;
-        if (_firstXPSync) { _firstXPSync = false; _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
-        else { if ((data.level || 0) === _prevLevel && (data.xp || 0) > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
+        var _xp = data.xp !== undefined ? data.xp : 0;
+        var _lv = data.level !== undefined ? data.level : 0;
+        if (_firstXPSync) { _firstXPSync = false; _prevXP = _xp; _prevLevel = _lv; }
+        else { if (_lv === _prevLevel && _xp > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = _xp; _prevLevel = _lv; }
         render();
       }
     }
