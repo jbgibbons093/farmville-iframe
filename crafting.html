@@ -20,23 +20,27 @@
     .recipe { background: #1a0f08; border: 5px solid #e67e22; border-radius: 18px; padding: 14px 16px; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 4px 4px 0 #000; display: flex; align-items: center; gap: 14px; }
     .recipe.craftable { border-color: #2ecc71; box-shadow: 4px 4px 0 #000, 0 0 20px rgba(46, 204, 113, 0.3); }
     .recipe:hover { transform: translateY(-2px); box-shadow: 6px 8px 0 #000; }
-    .recipe.locked { opacity: 0.4; border-color: #444; }
+    .recipe.locked { opacity: 0.35; border-color: #444; }
+    .recipe.need-items { border-color: #e67e22; }
     .recipe-icon { font-size: 52px; flex-shrink: 0; filter: drop-shadow(2px 2px 0 #000); }
     .recipe-info { flex: 1; min-width: 0; }
     .recipe-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .recipe-name { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 1px 1px 0 #000; }
-    .recipe-xp { font-size: 18px; font-weight: 900; color: #55ccff; margin-left: auto; white-space: nowrap; text-shadow: 0 0 8px rgba(85,204,255,0.5); }
+    .recipe-sell { font-size: 16px; font-weight: 800; color: #FFD700; text-shadow: 0 0 6px rgba(255,215,0,0.4); }
+    .recipe-xp { font-size: 20px; font-weight: 900; color: #FFD700; background: #000; padding: 2px 10px; border-radius: 8px; border: 3px solid #FFD700; margin-left: auto; white-space: nowrap; text-shadow: 0 0 8px rgba(255,215,0,0.5); }
     .recipe-locked-notice { color: #ff5555; font-size: 16px; font-weight: 900; margin-bottom: 4px; text-shadow: 1px 1px 0 #000; }
     .ingredients { display: flex; flex-wrap: wrap; gap: 6px; }
-    .ingredient { background: #000; padding: 6px 14px; border-radius: 12px; font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 6px; border: 4px solid #444; }
+    .ingredient { background: #1a0f08; padding: 6px 14px; border-radius: 12px; font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 6px; border: 4px solid #444; }
     .ingredient.has { border-color: #2ecc71; color: #5dff8a; }
     .ingredient.missing { border-color: #ff4444; color: #ff5555; }
     .ingredient-icon { font-size: 24px; }
     .ingredient-name { text-transform: capitalize; }
-    .craft-btn { flex-shrink: 0; background: #8B4513; border: 5px solid #000; color: #fff; padding: 22px 44px; border-radius: 18px; font-size: 26px; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0 #000; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; min-width: 140px; text-align: center; }
+    .craft-btn { flex-shrink: 0; background: #8B4513; border: 5px solid #000; color: #fff; padding: 22px 44px; border-radius: 18px; font-size: 26px; font-weight: 900; cursor: pointer; box-shadow: 6px 6px 0 #000; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); text-transform: uppercase; letter-spacing: 2px; white-space: nowrap; min-width: 160px; text-align: center; }
     .craft-btn:hover:not(:disabled) { transform: scale(1.12) translateY(-4px) rotate(-1deg); box-shadow: 8px 10px 0 #000; }
     .craft-btn:active:not(:disabled) { transform: scale(0.93) translateY(4px); box-shadow: 2px 2px 0 #000; }
-    .craft-btn:disabled, .craft-btn.disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; font-size: 18px; padding: 22px 20px; }
+    .craft-btn:disabled { cursor: not-allowed; pointer-events: none; box-shadow: none; }
+    .craft-btn.locked-btn { background: #333; opacity: 0.5; }
+    .craft-btn.need-btn { background: #8B4513; opacity: 0.6; }
     .craft-btn.ready { background: #2ecc71; border-color: #000; box-shadow: 6px 6px 0 #000; }
     .craft-btn.ready:hover { box-shadow: 8px 10px 0 #000; background: #3dff7f; transform: scale(1.12) translateY(-4px) rotate(-1deg); }
     .craft-btn.ready:active { transform: scale(0.93) translateY(4px); box-shadow: 2px 2px 0 #000; }
@@ -68,17 +72,17 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const RECIPES = [
-      { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 10, xp: 10, taskName: 'Craft_Flour' },
-      { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter' },
-      { id: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', ingredients: { milk: 2 }, sellPrice: 45, xp: 15, taskName: 'Craft_Cheese' },
-      { id: 'bread', name: 'Bread', icon: '&#x1F956;', ingredients: { flour: 1, egg: 1 }, sellPrice: 35, xp: 15, taskName: 'Craft_Bread' },
-      { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 60, xp: 20, taskName: 'Craft_Blanket' },
-      { id: 'stew', name: 'Stew', icon: '&#x1F372;', ingredients: { potato: 1, carrot: 1, corn: 1 }, sellPrice: 50, xp: 25, taskName: 'Craft_Stew' },
-      { id: 'ragout', name: 'Ragout', icon: '&#x1F356;', ingredients: { goat_meat: 1, potato: 1, carrot: 1 }, sellPrice: 75, xp: 30, taskName: 'Craft_Ragout' },
-      { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 2 }, sellPrice: 100, xp: 25, taskName: 'Craft_Mead' },
-      { id: 'pie', name: 'Pie', icon: '&#x1F967;', ingredients: { flour: 1, pumpkin: 1, egg: 1 }, sellPrice: 100, xp: 30, taskName: 'Craft_Pie' },
-      { id: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', ingredients: { goat_meat: 1, flour: 1, egg: 1 }, sellPrice: 90, xp: 35, taskName: 'Craft_Meat_Pie' },
-      { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 150, xp: 40, taskName: 'Craft_Cake' }
+      { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 10, xp: 10, taskName: 'Craft_Flour', unlockLevel: 4 },
+      { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter', unlockLevel: 8 },
+      { id: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', ingredients: { milk: 2 }, sellPrice: 45, xp: 15, taskName: 'Craft_Cheese', unlockLevel: 9 },
+      { id: 'bread', name: 'Bread', icon: '&#x1F956;', ingredients: { flour: 1, egg: 1 }, sellPrice: 35, xp: 15, taskName: 'Craft_Bread', unlockLevel: 11 },
+      { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 60, xp: 20, taskName: 'Craft_Blanket', unlockLevel: 14 },
+      { id: 'stew', name: 'Stew', icon: '&#x1F372;', ingredients: { potato: 1, carrot: 1, corn: 1 }, sellPrice: 50, xp: 25, taskName: 'Craft_Stew', unlockLevel: 15 },
+      { id: 'ragout', name: 'Ragout', icon: '&#x1F356;', ingredients: { goat_meat: 1, potato: 1, carrot: 1 }, sellPrice: 75, xp: 30, taskName: 'Craft_Ragout', unlockLevel: 19 },
+      { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 2 }, sellPrice: 100, xp: 25, taskName: 'Craft_Mead', unlockLevel: 22 },
+      { id: 'pie', name: 'Pie', icon: '&#x1F967;', ingredients: { flour: 1, pumpkin: 1, egg: 1 }, sellPrice: 100, xp: 30, taskName: 'Craft_Pie', unlockLevel: 24 },
+      { id: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', ingredients: { goat_meat: 1, flour: 1, egg: 1 }, sellPrice: 90, xp: 35, taskName: 'Craft_Meat_Pie', unlockLevel: 27 },
+      { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 150, xp: 40, taskName: 'Craft_Cake', unlockLevel: 28 }
     ];
 
     const INGREDIENT_ICONS = {
@@ -89,7 +93,7 @@
       honey: '&#x1F36F;'
     };
 
-    let gameState = { inventory: {}, recipes: {}, talents: { keenLearner: 0, artisan: 0, seasonedWorker: 0, prodigy: 0 }, rebirthBlessings: { artisanTouch: 0 } };
+    let gameState = { inventory: {}, recipes: {}, level: 0, talents: { keenLearner: 0, artisan: 0, seasonedWorker: 0, prodigy: 0 }, rebirthBlessings: { artisanTouch: 0 } };
     let actionPending = false;
     let notifyTimeout = null;
 
@@ -136,9 +140,9 @@
     }
 
     function getCraftingXP(recipe) {
-      const t = gameState.talents;
-      const rb = gameState.rebirthBlessings;
-      return recipe.xp + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3 + (rb.artisanTouch || 0) * 3;
+      var t = gameState.talents;
+      var rb = gameState.rebirthBlessings;
+      return recipe.xp + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3 + rb.artisanTouch * 3;
     }
 
     // === Sound Effects (MP3 + Web Audio API fallback) ===
@@ -173,18 +177,18 @@
 
     function notify(msg, soundType) {
       if (soundType) playSound(soundType);
-      const el = document.getElementById('notification');
+      var el = document.getElementById('notification');
       if (notifyTimeout) clearTimeout(notifyTimeout);
       el.textContent = msg;
       el.style.display = 'block';
-      notifyTimeout = setTimeout(() => el.style.display = 'none', 2000);
+      notifyTimeout = setTimeout(function() { el.style.display = 'none'; }, 2000);
     }
 
     function craftItem(recipeId) {
       if (actionPending) { notify('Please wait...'); return; }
 
       console.log('[Hughberry Crafting] craftItem called with:', recipeId);
-      const recipe = RECIPES.find(r => r.id === recipeId);
+      var recipe = RECIPES.find(function(r) { return r.id === recipeId; });
       if (!recipe) {
         console.log('[Hughberry Crafting] Recipe not found:', recipeId);
         return;
@@ -198,7 +202,8 @@
       }
 
       // Check ingredients
-      for (const [ing, qty] of Object.entries(recipe.ingredients)) {
+      for (var ing in recipe.ingredients) {
+        var qty = recipe.ingredients[ing];
         if ((gameState.inventory[ing] || 0) < qty) {
           console.log('[Hughberry Crafting] Missing ingredient:', ing, 'have:', gameState.inventory[ing] || 0, 'need:', qty);
           notify('Missing ingredients!', 'error');
@@ -213,14 +218,14 @@
       triggerTask(recipe.taskName);
 
       // Optimistic inventory deduction
-      for (var ing in recipe.ingredients) {
-        gameState.inventory[ing] = Math.max(0, (gameState.inventory[ing] || 0) - recipe.ingredients[ing]);
+      for (var ing2 in recipe.ingredients) {
+        gameState.inventory[ing2] = Math.max(0, (gameState.inventory[ing2] || 0) - recipe.ingredients[ing2]);
       }
       gameState.inventory[recipe.id] = (gameState.inventory[recipe.id] || 0) + 1;
       render();
 
       // Award talent-boosted XP after short delay to avoid message collision
-      const craftXP = getCraftingXP(recipe);
+      var craftXP = getCraftingXP(recipe);
       setTimeout(function() {
         console.log('[Hughberry Crafting] Awarding XP:', craftXP);
         awardXP(craftXP);
@@ -233,18 +238,41 @@
     }
 
     function render() {
-      let html = '';
-      RECIPES.forEach(recipe => {
-        const hasRecipe = gameState.recipes['recipe_' + recipe.id];
-        let canCraft = hasRecipe;
-        let ingredientsHtml = '';
+      // Sort recipes: craftable first, then unlocked-but-missing-items, then locked
+      var sorted = RECIPES.slice().sort(function(a, b) {
+        var aHas = gameState.recipes['recipe_' + a.id];
+        var bHas = gameState.recipes['recipe_' + b.id];
+        var aCraft = aHas && !actionPending;
+        var bCraft = bHas && !actionPending;
+        if (aCraft && bCraft) {
+          // Both have recipe — check if all ingredients available
+          var aReady = true, bReady = true;
+          for (var k in a.ingredients) { if ((gameState.inventory[k] || 0) < a.ingredients[k]) aReady = false; }
+          for (var k2 in b.ingredients) { if ((gameState.inventory[k2] || 0) < b.ingredients[k2]) bReady = false; }
+          if (aReady && !bReady) return -1;
+          if (!aReady && bReady) return 1;
+          return 0;
+        }
+        if (aCraft && !bCraft) return -1;
+        if (!aCraft && bCraft) return 1;
+        if (aHas && !bHas) return -1;
+        if (!aHas && bHas) return 1;
+        return 0;
+      });
 
-        for (const [ing, qty] of Object.entries(recipe.ingredients)) {
-          const has = gameState.inventory[ing] || 0;
-          const enough = has >= qty;
+      var html = '';
+      sorted.forEach(function(recipe) {
+        var hasRecipe = gameState.recipes['recipe_' + recipe.id];
+        var canCraft = hasRecipe && !actionPending;
+        var ingredientsHtml = '';
+
+        for (var ing in recipe.ingredients) {
+          var qty = recipe.ingredients[ing];
+          var has = gameState.inventory[ing] || 0;
+          var enough = has >= qty;
           if (!enough) canCraft = false;
 
-          const icon = INGREDIENT_ICONS[ing] || '&#x1F4E6;';
+          var icon = INGREDIENT_ICONS[ing] || '&#x1F4E6;';
           ingredientsHtml += '<span class="ingredient ' + (enough ? 'has' : 'missing') + '">' +
             '<span class="ingredient-icon">' + icon + '</span>' +
             '<span class="ingredient-name">' + ing.replace('_', ' ') + '</span> ' +
@@ -252,10 +280,10 @@
           '</span>';
         }
 
-        let buttonText = 'CRAFT';
+        var buttonText = 'CRAFT';
         var buttonClass = 'craft-btn';
-        if (!hasRecipe) { buttonText = 'LOCKED'; buttonClass += ' disabled'; }
-        else if (!canCraft) { buttonText = 'NEED ITEMS'; buttonClass += ' disabled'; }
+        if (!hasRecipe) { buttonText = 'LOCKED'; buttonClass += ' locked-btn'; }
+        else if (!canCraft) { buttonText = 'NEED ITEMS'; buttonClass += ' need-btn'; }
         else { buttonClass += ' ready'; }
 
         var buttonHtml;
@@ -265,14 +293,25 @@
           buttonHtml = '<button class="' + buttonClass + '" disabled>' + buttonText + '</button>';
         }
 
-        html += '<div class="recipe ' + (canCraft ? 'craftable' : '') + ' ' + (!hasRecipe ? 'locked' : '') + '">' +
+        var recipeClass = 'recipe';
+        if (canCraft) recipeClass += ' craftable';
+        else if (!hasRecipe) recipeClass += ' locked';
+        else recipeClass += ' need-items';
+
+        var lockedNotice = '';
+        if (!hasRecipe) {
+          lockedNotice = '<div class="recipe-locked-notice">Requires Level ' + recipe.unlockLevel + ' &mdash; Buy from Blueprint Store</div>';
+        }
+
+        html += '<div class="' + recipeClass + '">' +
           '<span class="recipe-icon">' + recipe.icon + '</span>' +
           '<div class="recipe-info">' +
             '<div class="recipe-top">' +
               '<span class="recipe-name">' + recipe.name + '</span>' +
+              '<span class="recipe-sell">Sells: ' + recipe.sellPrice + 'g</span>' +
               '<span class="recipe-xp">+' + getCraftingXP(recipe) + ' XP</span>' +
             '</div>' +
-            (!hasRecipe ? '<div class="recipe-locked-notice">Buy from Blueprint Store</div>' : '') +
+            lockedNotice +
             '<div class="ingredients">' + ingredientsHtml + '</div>' +
           '</div>' +
           buttonHtml +
@@ -283,18 +322,15 @@
 
     // === Standard Sync_Inventory Parser (same in all iframes) ===
     const SYNC_MAP = {
-      'Has_Milk_Pail': 'has_milk_pail', 'Has_Shearing_Kit': 'has_shearing_kit',
-      'Has_Butcher_Knife': 'has_butcher_knife', 'Has_Truffle_Spade': 'has_truffle_spade',
-      'Has_Starter_Seeds': 'has_starter_seeds',
-      'Seeds_Wheat': 'seeds_wheat', 'Seeds_Carrot': 'seeds_carrot', 'Seeds_Corn': 'seeds_corn',
-      'Seeds_Potato': 'seeds_potato', 'Seeds_Tomato': 'seeds_tomato', 'Seeds_Pumpkin': 'seeds_pumpkin',
+      'Has_Milk_Pail': '_skip', 'Has_Shearing_Kit': '_skip',
+      'Has_Butcher_Knife': '_skip', 'Has_Truffle_Spade': '_skip',
+      'Has_Starter_Seeds': '_skip',
+      'Seeds_Wheat': '_skip', 'Seeds_Carrot': '_skip', 'Seeds_Corn': '_skip',
+      'Seeds_Potato': '_skip', 'Seeds_Tomato': '_skip', 'Seeds_Pumpkin': '_skip',
       'Crop_Wheat': 'crop_wheat', 'Crop_Carrot': 'crop_carrot', 'Crop_Corn': 'crop_corn',
       'Crop_Potato': 'crop_potato', 'Crop_Tomato': 'crop_tomato', 'Crop_Pumpkin': 'crop_pumpkin',
       'Goat_Meat': 'goat_meat', 'Meat_Pie': 'meat_pie',
-      'Has_Basket': 'has_basket', 'Has_Beesuit': 'has_beesuit',
-      'Milk_Uncollected': 'milk_uncollected', 'Eggs_Uncollected': 'eggs_uncollected',
-      'Wool_Uncollected': 'wool_uncollected', 'Meat_Uncollected': 'meat_uncollected',
-      'Truffle_Uncollected': 'truffle_uncollected', 'Honey_Uncollected': 'honey_uncollected',
+      'Has_Basket': '_skip', 'Has_Beesuit': '_skip',
       'Gold': 'gold', 'XP': 'xp', 'Level': 'level',
       'Milk': 'milk', 'Wool': 'wool', 'Truffle': 'truffle', 'Egg': 'egg', 'Honey': 'honey',
       'Flour': 'flour', 'Bread': 'bread', 'Cheese': 'cheese', 'Stew': 'stew',
@@ -306,8 +342,22 @@
       'Has_Recipe_Meat_Pie': 'has_recipe_meat_pie', 'Has_Recipe_Blanket': 'has_recipe_blanket',
       'Has_Recipe_Butter': 'has_recipe_butter', 'Has_Recipe_Cake': 'has_recipe_cake',
       'Has_Recipe_Mead': 'has_recipe_mead',
-      'T_KeenLearner': 't_keenlearner', 'T_Artisan': 't_artisan',
-      'T_SeasonedWorker': 't_seasonedworker', 'T_Prodigy': 't_prodigy',
+      'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
+      'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
+      'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
+      'T_CowHerd': '_skip', 'T_ChickenFlock': '_skip', 'T_QuickHands': '_skip',
+      'T_SheepPen': '_skip', 'T_GoatYard': '_skip', 'T_ApiaryExpansion': '_skip',
+      'T_HusbandryKnowledge': '_skip', 'T_PigSty': '_skip', 'T_AnimalMastery': '_skip',
+      'T_KeenLearner': 't_keenlearner', 'T_FarmHand': '_skip', 'T_Stockman': '_skip',
+      'T_Artisan': 't_artisan',
+      'T_SeasonedWorker': 't_seasonedworker', 'T_BonusPoint1': '_skip',
+      'T_Contractor1': '_skip', 'T_Contractor2': '_skip', 'T_Contractor3': '_skip',
+      'T_Prodigy': 't_prodigy', 'T_BonusPoint2': '_skip',
+      'Unspent_Talent_Points': '_skip',
+      'Contract_1_Done': '_skip', 'Contract_2_Done': '_skip', 'Contract_3_Done': '_skip',
+      'Contract_4_Done': '_skip', 'Contract_5_Done': '_skip', 'Contract_6_Done': '_skip',
+      'Contract_7_Done': '_skip', 'Contract_8_Done': '_skip', 'Contract_9_Done': '_skip',
+      'Contract_10_Done': '_skip',
       'RT_ArtisanTouch': 'rt_artisantouch',
       'Rebirth_Shards': '_skip', 'Mystic_Essence': '_skip',
       'RT_FleetHarvest': '_skip', 'RT_SwiftHusbandry': '_skip',
@@ -319,30 +369,30 @@
       'RT_NestEgg': '_skip', 'RT_SeedVault': '_skip',
       'RT_Seasoned': '_skip', 'RT_ToolShed': '_skip',
       'RT_RecipeTome': '_skip', 'RT_QuickStart': '_skip',
-      'Rebirth_Count': 'rebirth_count',
+      'Rebirth_Count': '_skip',
       'playerName': '_skip'
     };
 
     function parseSyncMessage(msg) {
-      const parts = msg.replace('Sync_Inventory_', '').split('_');
-      const data = {};
-      let i = 0;
+      var parts = msg.replace('Sync_Inventory_', '').split('_');
+      var data = {};
+      var i = 0;
       while (i < parts.length) {
-        let matched = false;
+        var matched = false;
         if (!matched && i + 4 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+4]) || 0; i += 5; matched = true; }
+          var k4 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+          if (SYNC_MAP[k4] !== undefined) { var v4 = parseInt(parts[i+4]); if (SYNC_MAP[k4] !== '_skip') data[SYNC_MAP[k4]] = isNaN(v4) ? 0 : v4; i += 5; matched = true; }
         }
         if (!matched && i + 3 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+3]) || 0; i += 4; matched = true; }
+          var k3 = parts[i] + '_' + parts[i+1] + '_' + parts[i+2];
+          if (SYNC_MAP[k3] !== undefined) { var v3 = parseInt(parts[i+3]); if (SYNC_MAP[k3] !== '_skip') data[SYNC_MAP[k3]] = isNaN(v3) ? 0 : v3; i += 4; matched = true; }
         }
         if (!matched && i + 2 < parts.length) {
-          const k = parts[i] + '_' + parts[i+1];
-          if (SYNC_MAP[k] !== undefined) { data[SYNC_MAP[k]] = parseInt(parts[i+2]) || 0; i += 3; matched = true; }
+          var k2 = parts[i] + '_' + parts[i+1];
+          if (SYNC_MAP[k2] !== undefined) { var v2 = parseInt(parts[i+2]); if (SYNC_MAP[k2] !== '_skip') data[SYNC_MAP[k2]] = isNaN(v2) ? 0 : v2; i += 3; matched = true; }
         }
         if (!matched && i + 1 < parts.length && SYNC_MAP[parts[i]] !== undefined) {
-          data[SYNC_MAP[parts[i]]] = parseInt(parts[i+1]) || 0; i += 2; matched = true;
+          var v1 = parseInt(parts[i+1]); if (SYNC_MAP[parts[i]] !== '_skip') data[SYNC_MAP[parts[i]]] = isNaN(v1) ? 0 : v1; i += 2; matched = true;
         }
         if (!matched) i++;
       }
@@ -354,65 +404,69 @@
     function handlePortalsMessage(msg) {
       console.log('[Hughberry Crafting] Received:', msg);
       if (typeof msg === 'string' && msg.indexOf('Sync_Inventory') === 0) {
-        const data = parseSyncMessage(msg);
+        var data = parseSyncMessage(msg);
         // Inventory (crops as ingredients)
-        gameState.inventory.wheat = data.crop_wheat || 0;
-        gameState.inventory.carrot = data.crop_carrot || 0;
-        gameState.inventory.corn = data.crop_corn || 0;
-        gameState.inventory.potato = data.crop_potato || 0;
-        gameState.inventory.tomato = data.crop_tomato || 0;
-        gameState.inventory.pumpkin = data.crop_pumpkin || 0;
+        gameState.inventory.wheat = data.crop_wheat !== undefined ? data.crop_wheat : 0;
+        gameState.inventory.carrot = data.crop_carrot !== undefined ? data.crop_carrot : 0;
+        gameState.inventory.corn = data.crop_corn !== undefined ? data.crop_corn : 0;
+        gameState.inventory.potato = data.crop_potato !== undefined ? data.crop_potato : 0;
+        gameState.inventory.tomato = data.crop_tomato !== undefined ? data.crop_tomato : 0;
+        gameState.inventory.pumpkin = data.crop_pumpkin !== undefined ? data.crop_pumpkin : 0;
         // Animal products
-        gameState.inventory.milk = data.milk || 0;
-        gameState.inventory.wool = data.wool || 0;
-        gameState.inventory.goat_meat = data.goat_meat || 0;
-        gameState.inventory.truffle = data.truffle || 0;
-        gameState.inventory.egg = data.egg || 0;
-        gameState.inventory.honey = data.honey || 0;
+        gameState.inventory.milk = data.milk !== undefined ? data.milk : 0;
+        gameState.inventory.wool = data.wool !== undefined ? data.wool : 0;
+        gameState.inventory.goat_meat = data.goat_meat !== undefined ? data.goat_meat : 0;
+        gameState.inventory.truffle = data.truffle !== undefined ? data.truffle : 0;
+        gameState.inventory.egg = data.egg !== undefined ? data.egg : 0;
+        gameState.inventory.honey = data.honey !== undefined ? data.honey : 0;
         // Crafted items (used as ingredients for other recipes)
-        gameState.inventory.flour = data.flour || 0;
-        gameState.inventory.butter = data.butter || 0;
-        gameState.inventory.bread = data.bread || 0;
-        gameState.inventory.cheese = data.cheese || 0;
-        gameState.inventory.stew = data.stew || 0;
-        gameState.inventory.ragout = data.ragout || 0;
-        gameState.inventory.pie = data.pie || 0;
-        gameState.inventory.meat_pie = data.meat_pie || 0;
-        gameState.inventory.blanket = data.blanket || 0;
-        gameState.inventory.cake = data.cake || 0;
-        gameState.inventory.mead = data.mead || 0;
+        gameState.inventory.flour = data.flour !== undefined ? data.flour : 0;
+        gameState.inventory.butter = data.butter !== undefined ? data.butter : 0;
+        gameState.inventory.bread = data.bread !== undefined ? data.bread : 0;
+        gameState.inventory.cheese = data.cheese !== undefined ? data.cheese : 0;
+        gameState.inventory.stew = data.stew !== undefined ? data.stew : 0;
+        gameState.inventory.ragout = data.ragout !== undefined ? data.ragout : 0;
+        gameState.inventory.pie = data.pie !== undefined ? data.pie : 0;
+        gameState.inventory.meat_pie = data.meat_pie !== undefined ? data.meat_pie : 0;
+        gameState.inventory.blanket = data.blanket !== undefined ? data.blanket : 0;
+        gameState.inventory.cake = data.cake !== undefined ? data.cake : 0;
+        gameState.inventory.mead = data.mead !== undefined ? data.mead : 0;
+        // Level
+        gameState.level = data.level !== undefined ? data.level : 0;
         // Recipes
-        gameState.recipes.recipe_flour = (data.has_recipe_flour || 0) > 0;
-        gameState.recipes.recipe_bread = (data.has_recipe_bread || 0) > 0;
-        gameState.recipes.recipe_cheese = (data.has_recipe_cheese || 0) > 0;
-        gameState.recipes.recipe_stew = (data.has_recipe_stew || 0) > 0;
-        gameState.recipes.recipe_ragout = (data.has_recipe_ragout || 0) > 0;
-        gameState.recipes.recipe_pie = (data.has_recipe_pie || 0) > 0;
-        gameState.recipes.recipe_meat_pie = (data.has_recipe_meat_pie || 0) > 0;
-        gameState.recipes.recipe_blanket = (data.has_recipe_blanket || 0) > 0;
-        gameState.recipes.recipe_butter = (data.has_recipe_butter || 0) > 0;
-        gameState.recipes.recipe_cake = (data.has_recipe_cake || 0) > 0;
-        gameState.recipes.recipe_mead = (data.has_recipe_mead || 0) > 0;
+        gameState.recipes.recipe_flour = (data.has_recipe_flour !== undefined ? data.has_recipe_flour : 0) > 0;
+        gameState.recipes.recipe_bread = (data.has_recipe_bread !== undefined ? data.has_recipe_bread : 0) > 0;
+        gameState.recipes.recipe_cheese = (data.has_recipe_cheese !== undefined ? data.has_recipe_cheese : 0) > 0;
+        gameState.recipes.recipe_stew = (data.has_recipe_stew !== undefined ? data.has_recipe_stew : 0) > 0;
+        gameState.recipes.recipe_ragout = (data.has_recipe_ragout !== undefined ? data.has_recipe_ragout : 0) > 0;
+        gameState.recipes.recipe_pie = (data.has_recipe_pie !== undefined ? data.has_recipe_pie : 0) > 0;
+        gameState.recipes.recipe_meat_pie = (data.has_recipe_meat_pie !== undefined ? data.has_recipe_meat_pie : 0) > 0;
+        gameState.recipes.recipe_blanket = (data.has_recipe_blanket !== undefined ? data.has_recipe_blanket : 0) > 0;
+        gameState.recipes.recipe_butter = (data.has_recipe_butter !== undefined ? data.has_recipe_butter : 0) > 0;
+        gameState.recipes.recipe_cake = (data.has_recipe_cake !== undefined ? data.has_recipe_cake : 0) > 0;
+        gameState.recipes.recipe_mead = (data.has_recipe_mead !== undefined ? data.has_recipe_mead : 0) > 0;
         // Talents
-        gameState.talents.keenLearner = data.t_keenlearner || 0;
-        gameState.talents.artisan = data.t_artisan || 0;
-        gameState.talents.seasonedWorker = data.t_seasonedworker || 0;
-        gameState.talents.prodigy = data.t_prodigy || 0;
-        gameState.rebirthBlessings.artisanTouch = data.rt_artisantouch || 0;
+        gameState.talents.keenLearner = data.t_keenlearner !== undefined ? data.t_keenlearner : 0;
+        gameState.talents.artisan = data.t_artisan !== undefined ? data.t_artisan : 0;
+        gameState.talents.seasonedWorker = data.t_seasonedworker !== undefined ? data.t_seasonedworker : 0;
+        gameState.talents.prodigy = data.t_prodigy !== undefined ? data.t_prodigy : 0;
+        gameState.rebirthBlessings.artisanTouch = data.rt_artisantouch !== undefined ? data.rt_artisantouch : 0;
         actionPending = false;
-        if (_firstXPSync) { _firstXPSync = false; _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
-        else { if ((data.level || 0) === _prevLevel && (data.xp || 0) > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
+        var curXP = data.xp !== undefined ? data.xp : 0;
+        var curLevel = data.level !== undefined ? data.level : 0;
+        if (_firstXPSync) { _firstXPSync = false; _prevXP = curXP; _prevLevel = curLevel; }
+        else { if (curLevel === _prevLevel && curXP > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = curXP; _prevLevel = curLevel; }
         render();
       }
     }
 
     // Message deduplication
-    let lastMessageId = '';
-    let lastMessageTime = 0;
+    var lastMessageId = '';
+    var lastMessageTime = 0;
     function processMessage(msg, source) {
       if(!_uiPopPlayed){_uiPopPlayed=true;try{if(_uiPopCtx&&_uiPopBuf){if(_uiPopCtx.state==='suspended')_uiPopCtx.resume();var _s=_uiPopCtx.createBufferSource();var _g=_uiPopCtx.createGain();_s.buffer=_uiPopBuf;_g.gain.value=0.5;_s.connect(_g);_g.connect(_uiPopCtx.destination);_s.start(0)}}catch(e){}}
-      const now = Date.now();
-      const msgId = msg + '_' + Math.floor(now / 100);
+      var now = Date.now();
+      var msgId = msg + '_' + Math.floor(now / 100);
       if (msgId === lastMessageId && now - lastMessageTime < 200) return;
       lastMessageId = msgId;
       lastMessageTime = now;
@@ -432,6 +486,18 @@
       if (event.data && typeof event.data === 'string') processMessage(event.data, 'postMessage-string');
       else if (event.data && event.data.portalsMessage) processMessage(event.data.portalsMessage, 'postMessage-portals');
       else if (event.data && event.data.message && typeof event.data.message === 'string') processMessage(event.data.message, 'postMessage-message');
+    });
+
+    // Visibility/focus handlers - re-request sync when iframe regains focus
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        console.log('[Hughberry Crafting] Visible - requesting sync');
+        triggerTask('Sync_Inventory');
+      }
+    });
+    window.addEventListener('focus', function() {
+      console.log('[Hughberry Crafting] Focused - requesting sync');
+      triggerTask('Sync_Inventory');
     });
 
     // Initialize
@@ -456,9 +522,7 @@
 
     // Request inventory sync from Portals when iframe loads
     setTimeout(function() {
-      if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
-        PortalsSdk.sendMessageToUnity(JSON.stringify({ TaskName: 'Sync_Inventory', TaskTargetState: 'SetNotActiveToActive' }));
-      }
+      triggerTask('Sync_Inventory');
       console.log('[Hughberry Crafting] Requested Sync_Inventory');
     }, 500);
   </script>
