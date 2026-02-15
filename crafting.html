@@ -142,7 +142,7 @@
     function getCraftingXP(recipe) {
       var t = gameState.talents;
       var rb = gameState.rebirthBlessings;
-      return recipe.xp + t.keenLearner + t.artisan * 3 + t.seasonedWorker * 2 + t.prodigy * 3 + rb.artisanTouch * 3;
+      return recipe.xp + t.keenLearner + (t.artisan || 0) * 3 + (t.seasonedWorker || 0) * 2 + (t.prodigy || 0) * 3 + (rb.artisanTouch || 0) * 3;
     }
 
     // === Sound Effects (MP3 + Web Audio API fallback) ===
@@ -242,8 +242,8 @@
       var sorted = RECIPES.slice().sort(function(a, b) {
         var aHas = gameState.recipes['recipe_' + a.id];
         var bHas = gameState.recipes['recipe_' + b.id];
-        var aCraft = aHas && !actionPending;
-        var bCraft = bHas && !actionPending;
+        var aCraft = aHas;
+        var bCraft = bHas;
         if (aCraft && bCraft) {
           // Both have recipe — check if all ingredients available
           var aReady = true, bReady = true;
@@ -263,7 +263,7 @@
       var html = '';
       sorted.forEach(function(recipe) {
         var hasRecipe = gameState.recipes['recipe_' + recipe.id];
-        var canCraft = hasRecipe && !actionPending;
+        var canCraft = hasRecipe;
         var ingredientsHtml = '';
 
         for (var ing in recipe.ingredients) {
