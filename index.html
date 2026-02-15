@@ -239,7 +239,7 @@
       <div class="menu-header">
         <div class="game-title">HUGHBERRY FARMS</div>
         <div class="header-stats">
-          <div class="stat-box"><span class="stat-icon">&#x1FA99;</span><div><div class="stat-value" id="header-gold">0</div><div class="stat-label">Gold</div></div></div>
+          <div class="stat-box"><span class="stat-icon">&#x1FA99;</span><div><div class="stat-value" id="header-gold">0</div></div></div>
           <div class="stat-box"><span class="stat-icon">&#x2B50;</span><div><div class="stat-value">Lv.<span id="header-level">0</span></div><div class="xp-bar-bg"><div class="xp-bar-fill" id="header-xp-bar" style="width:0%"></div></div></div></div>
         </div>
         <button class="close-btn" onclick="closeMenu()" title="Close (Tab)">&#x2715;</button>
@@ -1660,7 +1660,7 @@
           html += `<div class="plot-card growing"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status">${formatTime(remaining)}</div><div class="plot-progress"><div class="plot-progress-fill" style="width:${Math.min(100, progress)}%"></div></div></div>`;
         } else {
           const c = CONFIG.crops[plot.cropType];
-          html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Go to plot & press X</div></div>`;
+          html += `<div class="plot-card ready"><span class="plot-number">#${num}</span><div class="plot-icon">${c.icon}</div><div class="plot-name">${c.name}</div><div class="plot-status ready">READY!</div><div class="plot-hint">Walk through crop to harvest</div></div>`;
         }
       });
       html += '</div>';
