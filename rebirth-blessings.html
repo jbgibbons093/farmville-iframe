@@ -736,7 +736,8 @@ var BLESSING_TREES = {
     maxPoints: 15,
     tiers: [
       { tier: 1, gate: 0, y: 60 },
-      { tier: 2, gate: 3, y: 200 }
+      { tier: 2, gate: 3, y: 200 },
+      { tier: 3, gate: 8, y: 340 }
     ],
     talents: [
       // Tier 1
@@ -750,13 +751,13 @@ var BLESSING_TREES = {
       { key: 'ToolShed', name: 'Tool Shed', icon: '\u{1F527}', maxRank: 4,
         desc: 'Start with all tools at tier = rank (1-4)', tier: 2, pos: { x: 25, y: 200 },
         requires: { key: 'NestEgg', rank: 2 } },
-      { key: 'RecipeTome', name: 'Recipe Tome', icon: '\u{1F4D6}', maxRank: 1,
-        desc: 'Start each run with all 11 recipes unlocked', tier: 2, pos: { x: 50, y: 200 },
-        requires: { key: 'SeedVault', rank: 2 } },
-      // Tier 3 (no gate needed, only 2 talents in tier 2 w/ 5 max ranks)
       { key: 'QuickStart', name: 'Quick Start', icon: '\u{1F680}', maxRank: 1,
         desc: 'Start each run at Level 3 with 3 talent points', tier: 2, pos: { x: 75, y: 200 },
-        requires: { key: 'Seasoned', rank: 2 } }
+        requires: { key: 'Seasoned', rank: 2 } },
+      // Tier 3
+      { key: 'RecipeTome', name: 'Recipe Tome', icon: '\u{1F4D6}', maxRank: 1,
+        desc: 'Start each run with all 11 recipes unlocked', tier: 3, pos: { x: 50, y: 340 },
+        requiresAll: [{ key: 'ToolShed', rank: 2 }, { key: 'QuickStart', rank: 1 }] }
     ]
   }
 };
