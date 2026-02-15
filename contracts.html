@@ -30,7 +30,30 @@
     .panel-subtitle { font-size: 18px; color: #88cccc; font-weight: 700; margin-top: 2px; }
     .refresh-timer { display: flex; align-items: center; gap: 8px; font-size: 22px; color: #ffcc00; font-weight: 900; text-shadow: 2px 2px 0 #000; background: #000; padding: 8px 16px; border-radius: 12px; border: 3px solid #ffcc00; }
 
-    .slots-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; margin-top: 10px; }
+    /* Carousel */
+    .carousel { flex: 1; display: flex; align-items: center; gap: 10px; overflow: hidden; min-height: 0; margin-top: 10px; }
+    .card-display {
+      flex: 1; min-width: 0;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
+      transform: translateX(0) rotate(0deg); opacity: 1;
+    }
+    .card-display.exit-left { transform: translateX(-115%) rotate(-8deg); opacity: 0; }
+    .card-display.exit-right { transform: translateX(115%) rotate(8deg); opacity: 0; }
+    .card-display.enter-left { transform: translateX(-115%) rotate(-8deg); opacity: 0; transition: none; }
+    .card-display.enter-right { transform: translateX(115%) rotate(8deg); opacity: 0; transition: none; }
+    .nav-btn { background: #00bcd4; border: 5px solid #000; color: #fff; width: 52px; height: 52px; border-radius: 16px; font-size: 22px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 4px 4px 0 #000; transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); flex-shrink: 0; }
+    .nav-btn:hover:not(:disabled) { transform: scale(1.15); box-shadow: 6px 6px 0 #000; background: #33d6e8; }
+    .nav-btn:active:not(:disabled) { transform: scale(0.93) translateY(2px); box-shadow: 2px 2px 0 #000; }
+    .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+    .carousel-footer { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0 4px; }
+    .nav-dots { display: flex; gap: 8px; justify-content: center; }
+    .nav-dot { width: 14px; height: 14px; border-radius: 50%; border: 3px solid #000; cursor: pointer; transition: all 0.2s; box-shadow: 2px 2px 0 #000; }
+    .nav-dot.dot-available { background: #00bcd4; }
+    .nav-dot.dot-active { background: #f39c12; }
+    .nav-dot.dot-filling { background: #e67e22; }
+    .nav-dot.dot-loading { background: #555; }
+    .nav-dot.dot-locked { background: #222; cursor: not-allowed; opacity: 0.4; }
+    .nav-dot.current { transform: scale(1.5); box-shadow: 0 0 10px rgba(0, 188, 212, 0.6); }
 
     /* Slot cards */
     .slot { background: #0e2828; border: 5px solid #1a4040; border-radius: 18px; padding: 18px; transition: all 0.2s; box-shadow: 4px 4px 0 #000; }
@@ -134,7 +157,15 @@
           <span id="refresh-timer">2:00</span>
         </div>
       </div>
-      <div class="slots-list" id="slots-list"></div>
+      <div class="carousel">
+        <button class="nav-btn" id="nav-prev" onclick="navigateSlot(-1)">&#x25C0;</button>
+        <div class="card-display" id="card-display"></div>
+        <button class="nav-btn" id="nav-next" onclick="navigateSlot(1)">&#x25B6;</button>
+      </div>
+      <div class="carousel-footer">
+        <div class="nav-dots" id="nav-dots"></div>
+        <div id="locked-summary-area"></div>
+      </div>
     </div>
   </div>
 
@@ -218,6 +249,8 @@
 
     let actionPending = false;
     let notificationTimeout = null;
+    var currentSlotIndex = 0;
+    var _animating = false;
 
     // ============================================
     // SEEDED PRNG (mulberry32) - deterministic contracts per slot per time window
@@ -779,69 +812,168 @@
       document.getElementById('gold-display').textContent = gameState.gold.toLocaleString();
       document.getElementById('level-display').textContent = gameState.level;
       document.getElementById('slots-unlocked').textContent = getUnlockedSlots();
-      renderSlots();
-    }
 
-    function renderSlots() {
-      var container = document.getElementById('slots-list');
+      // Clamp currentSlotIndex to unlocked range
       var unlockedCount = getUnlockedSlots();
-      var html = '';
-      var lockedCount = 0;
+      if (currentSlotIndex >= unlockedCount) currentSlotIndex = Math.max(0, unlockedCount - 1);
 
-      // Render unlocked slots only
-      slots.forEach(function(slot, i) {
-        var isUnlocked = i < unlockedCount;
-        if (!isUnlocked) { lockedCount++; return; }
-
-        var slotClass = 'slot';
-        if (slot.state === 'active') slotClass += ' has-contract active';
-        else if (slot.state === 'filling') slotClass += ' filling';
-        else if (slot.state === 'available' && slot.contract) slotClass += ' has-contract';
-
-        html += '<div class="' + slotClass + '">';
-
-        // Header
-        html += '<div class="slot-header">';
-        html += '<span class="slot-num">#' + (i + 1) + '</span>';
-        var statusLabel = slot.state;
-        html += '<span class="slot-status status-' + statusLabel + '">' + statusLabel + '</span>';
-        html += '</div>';
-
-        html += '<div class="slot-content">';
-
-        if (slot.state === 'available' && slot.contract) {
-          html += renderSlotContract(slot, i, false);
-          html += '<div class="slot-buttons">' +
-            '<button class="btn btn-accept" onclick="acceptContract(' + i + ')">&#x1F91D; Accept</button>' +
-          '</div>';
-        } else if (slot.state === 'filling') {
-          html += renderSlotContract(slot, i, true);
-          html += '<div class="slot-buttons">' +
-            '<button class="btn btn-fill" disabled>Filling...</button>' +
-          '</div>';
-        } else if (slot.state === 'active' && getActiveContract(slot)) {
-          html += renderSlotContract(slot, i, true);
-          var canFill = canFillContract(slot);
-          html += '<div class="slot-buttons">' +
-            '<button class="btn btn-fill" ' + (canFill && !actionPending ? 'onclick="fillContract(' + i + ')"' : 'disabled') + '>&#x2705; Fill Order</button>' +
-          '</div>';
-        } else {
-          html += '<div class="slot-empty-text">&#x1F4CB; Waiting for contract...</div>';
-        }
-
-        html += '</div></div>';
-      });
-
-      // Compact locked slots summary
-      if (lockedCount > 0) {
-        html += '<div class="locked-summary">';
-        html += '<span class="locked-summary-icon">&#x1F512;</span>';
-        html += '<span class="locked-summary-text">' + lockedCount + ' slot' + (lockedCount > 1 ? 's' : '') + ' locked</span>';
-        html += '<span class="locked-summary-hint">Unlock with Contractor talents</span>';
-        html += '</div>';
+      // Update card content (skip during animation — animation callback handles it)
+      if (!_animating) {
+        document.getElementById('card-display').innerHTML = renderSlotCard(currentSlotIndex);
       }
 
-      container.innerHTML = html;
+      updateDots();
+      updateNavButtons();
+
+      // Locked summary
+      var lockedCount = 10 - unlockedCount;
+      var lockArea = document.getElementById('locked-summary-area');
+      if (lockedCount > 0) {
+        lockArea.innerHTML = '<div class="locked-summary">' +
+          '<span class="locked-summary-icon">&#x1F512;</span>' +
+          '<span class="locked-summary-text">' + lockedCount + ' slot' + (lockedCount > 1 ? 's' : '') + ' locked</span>' +
+          '<span class="locked-summary-hint">Unlock with Contractor talents</span>' +
+        '</div>';
+      } else {
+        lockArea.innerHTML = '';
+      }
+    }
+
+    function renderSlotCard(index) {
+      var slot = slots[index];
+      var unlockedCount = getUnlockedSlots();
+
+      if (index >= unlockedCount) {
+        return '<div class="slot"><div class="slot-empty-text">&#x1F512; Locked</div></div>';
+      }
+
+      var slotClass = 'slot';
+      if (slot.state === 'active') slotClass += ' has-contract active';
+      else if (slot.state === 'filling') slotClass += ' filling';
+      else if (slot.state === 'available' && slot.contract) slotClass += ' has-contract';
+
+      var html = '<div class="' + slotClass + '">';
+
+      html += '<div class="slot-header">';
+      html += '<span class="slot-num">Contract #' + (index + 1) + '</span>';
+      var statusLabel = slot.state;
+      html += '<span class="slot-status status-' + statusLabel + '">' + statusLabel + '</span>';
+      html += '</div>';
+
+      html += '<div class="slot-content">';
+
+      if (slot.state === 'available' && slot.contract) {
+        html += renderSlotContract(slot, index, false);
+        html += '<div class="slot-buttons">' +
+          '<button class="btn btn-accept" onclick="acceptContract(' + index + ')">&#x1F91D; Accept</button>' +
+        '</div>';
+      } else if (slot.state === 'filling') {
+        html += renderSlotContract(slot, index, true);
+        html += '<div class="slot-buttons">' +
+          '<button class="btn btn-fill" disabled>Filling...</button>' +
+        '</div>';
+      } else if (slot.state === 'active' && getActiveContract(slot)) {
+        html += renderSlotContract(slot, index, true);
+        var canFill = canFillContract(slot);
+        html += '<div class="slot-buttons">' +
+          '<button class="btn btn-fill" ' + (canFill && !actionPending ? 'onclick="fillContract(' + index + ')"' : 'disabled') + '>&#x2705; Fill Order</button>' +
+        '</div>';
+      } else {
+        html += '<div class="slot-empty-text">&#x1F4CB; Waiting for contract...</div>';
+      }
+
+      html += '</div></div>';
+      return html;
+    }
+
+    function navigateSlot(direction) {
+      if (_animating) return;
+      var unlockedCount = getUnlockedSlots();
+      var newIndex = currentSlotIndex + direction;
+      if (newIndex < 0 || newIndex >= unlockedCount) return;
+
+      _animating = true;
+      var cardDisplay = document.getElementById('card-display');
+      var exitClass = direction > 0 ? 'exit-left' : 'exit-right';
+      var enterClass = direction > 0 ? 'enter-right' : 'enter-left';
+
+      // Exit animation
+      cardDisplay.classList.add(exitClass);
+
+      setTimeout(function() {
+        currentSlotIndex = newIndex;
+        cardDisplay.innerHTML = renderSlotCard(currentSlotIndex);
+
+        // Instant reposition offscreen
+        cardDisplay.classList.remove(exitClass);
+        cardDisplay.classList.add(enterClass);
+
+        // Force reflow then animate in
+        cardDisplay.offsetHeight;
+        cardDisplay.classList.remove(enterClass);
+
+        updateDots();
+        updateNavButtons();
+
+        setTimeout(function() { _animating = false; }, 400);
+      }, 350);
+    }
+
+    function goToSlot(index) {
+      if (_animating) return;
+      var unlockedCount = getUnlockedSlots();
+      if (index >= unlockedCount || index === currentSlotIndex) return;
+
+      _animating = true;
+      var cardDisplay = document.getElementById('card-display');
+      var direction = index > currentSlotIndex ? 1 : -1;
+      var exitClass = direction > 0 ? 'exit-left' : 'exit-right';
+      var enterClass = direction > 0 ? 'enter-right' : 'enter-left';
+
+      cardDisplay.classList.add(exitClass);
+
+      setTimeout(function() {
+        currentSlotIndex = index;
+        cardDisplay.innerHTML = renderSlotCard(currentSlotIndex);
+
+        cardDisplay.classList.remove(exitClass);
+        cardDisplay.classList.add(enterClass);
+        cardDisplay.offsetHeight;
+        cardDisplay.classList.remove(enterClass);
+
+        updateDots();
+        updateNavButtons();
+
+        setTimeout(function() { _animating = false; }, 400);
+      }, 350);
+    }
+
+    function updateDots() {
+      var unlockedCount = getUnlockedSlots();
+      var html = '';
+      for (var i = 0; i < 10; i++) {
+        var dotClass = 'nav-dot';
+        if (i >= unlockedCount) {
+          dotClass += ' dot-locked';
+        } else if (slots[i].state === 'filling') {
+          dotClass += ' dot-filling';
+        } else if (slots[i].state === 'active') {
+          dotClass += ' dot-active';
+        } else if (slots[i].state === 'available') {
+          dotClass += ' dot-available';
+        } else {
+          dotClass += ' dot-loading';
+        }
+        if (i === currentSlotIndex) dotClass += ' current';
+        html += '<div class="' + dotClass + '" onclick="goToSlot(' + i + ')"></div>';
+      }
+      document.getElementById('nav-dots').innerHTML = html;
+    }
+
+    function updateNavButtons() {
+      var unlockedCount = getUnlockedSlots();
+      document.getElementById('nav-prev').disabled = currentSlotIndex <= 0;
+      document.getElementById('nav-next').disabled = currentSlotIndex >= unlockedCount - 1;
     }
 
     function renderSlotContract(slot, slotIndex, showProgress) {
@@ -944,10 +1076,33 @@
     document.addEventListener('DOMContentLoaded', function() {
       setupMessageListener();
 
-      // ESC to close
+      // ESC to close, arrow keys to navigate
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') { e.preventDefault(); closeIframe(); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); navigateSlot(-1); }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); navigateSlot(1); }
       });
+
+      // Mouse wheel navigation (debounced)
+      var _wheelTimeout = null;
+      var cardEl = document.getElementById('card-display');
+      cardEl.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        if (_wheelTimeout) return;
+        _wheelTimeout = setTimeout(function() { _wheelTimeout = null; }, 600);
+        if (e.deltaY > 0 || e.deltaX > 0) navigateSlot(1);
+        else navigateSlot(-1);
+      }, { passive: false });
+
+      // Touch swipe navigation
+      var _touchStartX = 0;
+      cardEl.addEventListener('touchstart', function(e) {
+        _touchStartX = e.changedTouches[0].clientX;
+      }, { passive: true });
+      cardEl.addEventListener('touchend', function(e) {
+        var dx = e.changedTouches[0].clientX - _touchStartX;
+        if (Math.abs(dx) > 50) navigateSlot(dx < 0 ? 1 : -1);
+      }, { passive: true });
 
       // Refocus game keyboard — skip on interactive elements
       function _refocusGame(e) {
