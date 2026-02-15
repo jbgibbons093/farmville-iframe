@@ -742,11 +742,17 @@ var BLESSING_TREES = {
     talents: [
       // Tier 1
       { key: 'NestEgg', name: 'Nest Egg', icon: '\u{1FA99}', maxRank: 3,
-        desc: 'Start each run with rank*100*Rebirth gold', tier: 1, pos: { x: 25, y: 60 } },
+        desc: 'Start each run with bonus gold (rank \u00D7 100 \u00D7 rebirths)',
+        descFn: function(rank) { var amt = rank * 100 * rebirthCount; return 'Start each run with ' + amt + ' bonus gold (' + rank + ' \u00D7 100 \u00D7 ' + rebirthCount + ')'; },
+        tier: 1, pos: { x: 25, y: 60 } },
       { key: 'SeedVault', name: 'Seed Vault', icon: '\u{1F331}', maxRank: 3,
-        desc: 'Start each run with rank*10*Rebirth wheat seeds', tier: 1, pos: { x: 50, y: 60 } },
+        desc: 'Start each run with bonus wheat seeds (rank \u00D7 10 \u00D7 rebirths)',
+        descFn: function(rank) { var amt = rank * 10 * rebirthCount; return 'Start each run with ' + amt + ' wheat seeds (' + rank + ' \u00D7 10 \u00D7 ' + rebirthCount + ')'; },
+        tier: 1, pos: { x: 50, y: 60 } },
       { key: 'Seasoned', name: 'Seasoned', icon: '\u{1F393}', maxRank: 3,
-        desc: 'Start each run with rank*Rebirth talent points', tier: 1, pos: { x: 75, y: 60 } },
+        desc: 'Start each run with bonus talent points (rank \u00D7 rebirths)',
+        descFn: function(rank) { var amt = rank * rebirthCount; return 'Start each run with ' + amt + ' talent points (' + rank + ' \u00D7 ' + rebirthCount + ')'; },
+        tier: 1, pos: { x: 75, y: 60 } },
       // Tier 2
       { key: 'ToolShed', name: 'Tool Shed', icon: '\u{1F527}', maxRank: 4,
         desc: 'Start with all tools at tier = rank (1-4)', tier: 2, pos: { x: 25, y: 200 },
@@ -766,6 +772,7 @@ var BLESSING_TREES = {
 var blessingState = {};
 var rebirthShards = 0;
 var mysticEssence = 0;
+var rebirthCount = 0;
 var activeTree = 'haste';
 var actionPending = false;
 
@@ -1028,7 +1035,7 @@ function parseAndSyncInventory(msg) {
     'RT_Seasoned': 'Seasoned', 'RT_ToolShed': 'ToolShed',
     'RT_RecipeTome': 'RecipeTome', 'RT_QuickStart': 'QuickStart',
     'Rebirth_Shards': '_shards', 'Mystic_Essence': '_essence',
-    'Rebirth_Count': '_skip',
+    'Rebirth_Count': '_rebirthCount',
     'T_PlotRow2': '_skip', 'T_GreenThumb': '_skip', 'T_EagerPlanter': '_skip',
     'T_PlotRow3': '_skip', 'T_BountifulHarvest': '_skip', 'T_RapidGrowth': '_skip',
     'T_PlotRow4': '_skip', 'T_CropMastery': '_skip',
@@ -1082,6 +1089,8 @@ function parseAndSyncInventory(msg) {
           rebirthShards = val;
         } else if (target === '_essence') {
           mysticEssence = val;
+        } else if (target === '_rebirthCount') {
+          rebirthCount = val;
         } else if (target !== '_skip') {
           blessingState[target] = val;
         }
@@ -1303,7 +1312,12 @@ function showTooltip(event, treeName, talentKey) {
   html += '<span class="tooltip-title">' + talent.name + '</span>';
   html += '</div>';
   html += '<div class="tooltip-rank">Rank: ' + currentRank + ' / ' + talent.maxRank + '</div>';
-  html += '<div class="tooltip-desc">' + talent.desc + '</div>';
+  var descText = (talent.descFn && currentRank > 0) ? talent.descFn(currentRank) : talent.desc;
+  html += '<div class="tooltip-desc">' + descText + '</div>';
+  if (talent.descFn && currentRank < talent.maxRank) {
+    var nextText = talent.descFn(currentRank + 1);
+    html += '<div class="tooltip-desc" style="color:#7ec8e3;margin-top:4px;font-size:12px;">Next rank: ' + nextText.charAt(0).toLowerCase() + nextText.slice(1) + '</div>';
+  }
 
   // Show prerequisite info
   if (talent.requires) {
