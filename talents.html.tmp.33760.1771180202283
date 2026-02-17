@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Hughberry Farms - Talents</title>
+<link href="fonts.css" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: transparent;
+  min-height: 100vh;
+  color: #fff;
+  overflow: hidden;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.talent-container {
+  width: 95vw;
+  max-width: 1100px;
+  max-height: 96vh;
+  background: #0a0518;
+  border: 6px solid #000;
+  border-radius: 28px;
+  box-shadow: 8px 8px 0 #000, 0 0 60px rgba(155, 89, 240, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #fff;
+}
+
+/* ── Header ── */
+.talent-header {
+  background: #9b59b6;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 5px solid #000;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon { font-size: 30px; filter: drop-shadow(2px 2px 0 #000); }
+
+.header-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 38px;
+  color: #fff;
+  text-shadow: 3px 3px 0 #000, -1px -1px 0 #000;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.points-badge {
+  background: #000;
+  border: 4px solid #FFD700;
+  border-radius: 14px;
+  padding: 8px 18px;
+  font-weight: 900;
+  font-size: 20px;
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  white-space: nowrap;
+}
+
+@keyframes shimmer-gold {
+  0%, 100% { text-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+  50% { text-shadow: 0 0 16px rgba(255, 215, 0, 0.7), 0 0 24px rgba(255, 215, 0, 0.3); }
+}
+
+.respec-btn {
+  padding: 12px 24px;
+  border-radius: 14px;
+  border: 4px solid #000;
+  background: #e74c3c;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 4px 4px 0 #000;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.respec-btn:hover {
+  transform: scale(1.1) translateY(-3px) rotate(-1deg);
+  box-shadow: 6px 8px 0 #000;
+  background: #ff5555;
+}
+.respec-btn:active {
+  transform: scale(0.93) translateY(3px);
+  box-shadow: 2px 2px 0 #000;
+}
+.respec-btn:disabled {
+  background: #333;
+  border-color: #222;
+  color: #555;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  pointer-events: none;
+}
+
+.close-btn {
+  background: #ff4444;
+  border: 4px solid #000;
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+  box-shadow: 3px 3px 0 #000;
+}
+.close-btn:hover {
+  transform: scale(1.15) rotate(-5deg);
+  box-shadow: 5px 5px 0 #000; background: #ff6666;
+}
+
+/* ── Info Bar ── */
+.info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #080412;
+  border-bottom: 4px solid #000;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.gold-display {
+  font-weight: 900;
+  font-size: 20px;
+  color: #FFD700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #000;
+  border: 4px solid #FFD700;
+  border-radius: 14px;
+  padding: 8px 16px;
+  text-shadow: 0 0 10px rgba(255,215,0,0.6);
+}
+
+.gold-icon { font-size: 22px; }
+
+.level-display {
+  font-weight: 900;
+  font-size: 20px;
+  color: #cc88ff;
+  background: #000;
+  border: 4px solid #9b59b6;
+  border-radius: 14px;
+  padding: 8px 16px;
+}
+
+.buy-point-btn {
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: 4px solid #000;
+  background: #2ecc71;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 4px 4px 0 #000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.buy-point-btn:hover {
+  transform: scale(1.1) translateY(-3px) rotate(-1deg);
+  box-shadow: 6px 8px 0 #000;
+  background: #3dff7f;
+}
+.buy-point-btn:active {
+  transform: scale(0.93) translateY(3px);
+  box-shadow: 2px 2px 0 #000;
+}
+.buy-point-btn:disabled {
+  background: #333;
+  border-color: #222;
+  color: #555;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  pointer-events: none;
+}
+
+.buy-cost {
+  color: #FFD700;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+/* ── Tree Tabs ── */
+.tree-tabs {
+  display: flex;
+  background: #080412;
+  border-bottom: 5px solid #000;
+  flex-shrink: 0;
+}
+
+.tree-tab {
+  flex: 1;
+  padding: 14px 20px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 20px;
+  color: #886699;
+  border-bottom: 4px solid transparent;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  font-family: 'Nunito', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.tree-tab:hover { color: #cc99ff; background: rgba(155, 89, 240, 0.15); transform: scale(1.04); }
+.tree-tab.active {
+  color: #cc88ff;
+  border-bottom-color: #9b59b6;
+  background: #0e0620;
+}
+
+.tree-tab .tab-icon { font-size: 18px; display: block; margin-bottom: 3px; }
+.tree-tab .tab-label { display: block; }
+.tree-tab .tab-points {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+.tree-tab.active .tab-points { color: #c9a84c; }
+
+/* ── Tree Canvas Container ── */
+.tree-canvas-container {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  padding: 16px;
+}
+
+.tree-canvas-container::-webkit-scrollbar { width: 14px; height: 14px; }
+.tree-canvas-container::-webkit-scrollbar-track { background: #080412; }
+.tree-canvas-container::-webkit-scrollbar-thumb { background: #9b59b6; border-radius: 10px; border: 3px solid #000; }
+
+.tree-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+}
+
+/* ── SVG Lines ── */
+.tree-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tree-line {
+  stroke: #444;
+  stroke-width: 3;
+  fill: none;
+}
+.tree-line.unlocked {
+  stroke: #27ae60;
+  filter: drop-shadow(0 0 3px rgba(46, 204, 113, 0.5));
+}
+.tree-line.maxed {
+  stroke: #FFD700;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+}
+
+/* ── Talent Nodes ── */
+.talent-node {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2;
+  transform: translate(-50%, -50%);
+}
+
+.talent-node:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.node-circle {
+  width: 67px;
+  height: 67px;
+  border-radius: 50%;
+  background: #1a0e30;
+  border: 3px solid #5a3a7a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 31px;
+  transition: all 0.2s;
+  position: relative;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.talent-node.locked .node-circle {
+  opacity: 0.4;
+  filter: grayscale(0.7);
+  border-color: #333;
+}
+
+.talent-node.available .node-circle {
+  border-color: #2ecc71;
+  border-width: 3px;
+  box-shadow: 4px 4px 0 #000, 0 0 12px rgba(46, 204, 113, 0.4);
+  animation: pulse-green 2s infinite;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.talent-node.available:hover .node-circle {
+  box-shadow: 6px 6px 0 #000, 0 0 20px rgba(46, 204, 113, 0.6);
+  transform: scale(1.08) translateY(-2px);
+}
+
+.talent-node.available:active .node-circle {
+  box-shadow: 2px 2px 0 #000;
+  transform: scale(0.97) translateY(2px);
+}
+
+.talent-node.invested .node-circle {
+  border-color: #27ae60;
+  background: #122a1c;
+}
+
+.talent-node.maxed .node-circle {
+  border-color: #FFD700;
+  border-width: 3px;
+  background: #2a2008;
+  box-shadow: 4px 4px 0 #000, 0 0 16px rgba(255, 215, 0, 0.4);
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 4px 4px 0 #000, 0 0 12px rgba(46, 204, 113, 0.4); }
+  50% { box-shadow: 4px 4px 0 #000, 0 0 22px rgba(46, 204, 113, 0.7); }
+}
+
+.node-rank {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background: #1a0e30;
+  border: 2px solid #5a3a7a;
+  border-radius: 8px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #aaa;
+}
+
+.talent-node.invested .node-rank,
+.talent-node.available .node-rank {
+  color: #27ae60;
+  border-color: #27ae60;
+}
+
+.talent-node.maxed .node-rank {
+  color: #FFD700;
+  border-color: #FFD700;
+  background: #2a2008;
+}
+
+.node-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #aaa;
+  text-align: center;
+  margin-top: 5px;
+  max-width: 96px;
+  line-height: 1.15;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+
+.talent-node.available .node-name,
+.talent-node.invested .node-name {
+  color: #ccc;
+}
+
+.talent-node.maxed .node-name {
+  color: #FFD700;
+}
+
+/* ── Tooltip ── */
+.tooltip {
+  position: fixed;
+  background: #140e28;
+  border: 5px solid #9b59b6;
+  border-radius: 18px;
+  padding: 16px 18px;
+  max-width: 290px;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 6px 6px 0 #000;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.tooltip.visible {
+  opacity: 1;
+}
+
+.tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tooltip-icon {
+  font-size: 28px;
+}
+
+.tooltip-title {
+  font-weight: 900;
+  font-size: 18px;
+  color: #FFD700;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.tooltip-rank {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.tooltip-desc {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.tooltip-prereq {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e74c3c;
+  padding: 8px 12px;
+  background: #000;
+  border: 3px solid #e74c3c;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+.tooltip-prereq.met {
+  color: #2ecc71;
+  background: #000;
+  border-color: #2ecc71;
+}
+
+.tooltip-tier {
+  font-size: 12px;
+  color: #888;
+}
+
+/* ── Tier Labels ── */
+.tier-label {
+  position: absolute;
+  left: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #4a3a5a;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  transform: translateY(-50%);
+}
+
+.tier-label.unlocked {
+  color: #7a6a8a;
+}
+
+/* ── Respec Modal ── */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  background: #1e1038;
+  border: 6px solid #000;
+  border-radius: 22px;
+  padding: 28px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 8px 8px 0 #000;
+}
+
+.modal-icon {
+  font-size: 54px;
+  margin-bottom: 14px;
+}
+
+.modal-title {
+  font-family: 'Luckiest Guy', cursive;
+  font-size: 32px;
+  color: #e74c3c;
+  margin-bottom: 14px;
+  text-shadow: 3px 3px 0 #000;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.modal-text {
+  font-size: 16px;
+  color: #ccc;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.modal-cost {
+  font-size: 22px;
+  font-weight: 800;
+  color: #FFD700;
+  margin-bottom: 22px;
+  animation: shimmer-gold 2.5s ease-in-out infinite;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 12px 28px;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-btn.confirm {
+  background: #e74c3c;
+  border: 4px solid #000;
+  color: #fff;
+  box-shadow: 4px 4px 0 #000;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.modal-btn.confirm:hover {
+  background: #ff5555;
+  transform: scale(1.1) translateY(-3px) rotate(-1deg);
+  box-shadow: 6px 8px 0 #000;
+}
+.modal-btn.confirm:active {
+  transform: scale(0.93) translateY(3px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.modal-btn.cancel {
+  background: #333;
+  border: 4px solid #000;
+  color: #aaa;
+  box-shadow: 4px 4px 0 #000;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.modal-btn.cancel:hover {
+  background: #444;
+  color: #fff;
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 6px 6px 0 #000;
+}
+.modal-btn.cancel:active {
+  transform: scale(0.93) translateY(3px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* ── Notifications ── */
+#notifications {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.notification {
+  padding: 14px 28px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 16px;
+  animation: notifIn 0.3s ease, notifOut 0.3s ease 2.7s forwards;
+  text-align: center;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.notification.success {
+  background: #000;
+  border: 4px solid #2ecc71;
+  color: #2ecc71;
+  box-shadow: 4px 4px 0 rgba(46, 204, 113, 0.3);
+}
+.notification.error {
+  background: #000;
+  border: 4px solid #e74c3c;
+  color: #e74c3c;
+  box-shadow: 4px 4px 0 rgba(231, 76, 60, 0.3);
+}
+.notification.info {
+  background: #000;
+  border: 4px solid #9b59b6;
+  color: #cc88ff;
+  box-shadow: 4px 4px 0 rgba(155, 89, 182, 0.3);
+}
+
+@keyframes notifIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes notifOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 550px) {
+  .talent-container { max-height: 96vh; border-radius: 16px; }
+  .talent-header { padding: 12px 14px; }
+  .header-title { font-size: 20px; }
+  .node-circle { width: 56px; height: 56px; font-size: 26px; }
+  .talent-node { width: 72px; height: 72px; }
+  .node-name { font-size: 10px; max-width: 82px; }
+  .tree-tab { padding: 10px 12px; font-size: 12px; }
+  .respec-btn { padding: 8px 14px; font-size: 12px; }
+  .close-btn { width: 36px; height: 36px; font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<script>var _uiPopCtx=null;var _uiPopBuf=null;var _uiPopPlayed=false;try{_uiPopCtx=new(window.AudioContext||window.webkitAudioContext)();fetch('ui-pop.mp3').then(function(r){return r.arrayBuffer()}).then(function(b){return _uiPopCtx.decodeAudioData(b)}).then(function(d){_uiPopBuf=d}).catch(function(){})}catch(e){}</script>
+
+<div class="talent-container">
+  <div class="talent-header">
+    <div class="header-left">
+      <span class="header-icon">&#127793;</span>
+      <span class="header-title">Talents</span>
+    </div>
+    <div class="points-badge" id="pointsBadge">0 Points</div>
+    <button class="respec-btn" id="respecBtn" onclick="showRespecModal()" disabled>
+      <span>&#128260;</span> Respec
+    </button>
+    <button class="close-btn" onclick="closeIframe()" title="Close">&#10005;</button>
+  </div>
+
+  <div class="info-bar">
+    <span class="gold-display"><span class="gold-icon">&#129689;</span> <span id="goldDisplay">0</span></span>
+    <span class="level-display">Level <span id="levelDisplay">0</span></span>
+    <button class="buy-point-btn" id="buyPointBtn" onclick="buyTalentPoint()" disabled>Buy +1 <span class="buy-cost">500g</span></button>
+  </div>
+
+  <div class="tree-tabs">
+    <button class="tree-tab active" data-tree="farming" onclick="switchTree('farming')">
+      <span class="tab-icon">&#127807;</span>
+      <span class="tab-label">Farming</span>
+      <span class="tab-points" id="tabPointsFarming">0 / 32</span>
+    </button>
+    <button class="tree-tab" data-tree="animal" onclick="switchTree('animal')">
+      <span class="tab-icon">&#128004;</span>
+      <span class="tab-label">Animals</span>
+      <span class="tab-points" id="tabPointsAnimal">0 / 38</span>
+    </button>
+    <button class="tree-tab" data-tree="economy" onclick="switchTree('economy')">
+      <span class="tab-icon">&#128218;</span>
+      <span class="tab-label">General</span>
+      <span class="tab-points" id="tabPointsEconomy">0 / 29</span>
+    </button>
+  </div>
+
+  <div class="tree-canvas-container">
+    <div class="tree-canvas" id="treeCanvas"></div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<div class="modal-overlay" id="respecModal">
+  <div class="modal">
+    <div class="modal-icon">&#128260;</div>
+    <div class="modal-title">Respec Talents?</div>
+    <div class="modal-text">This will reset ALL talent points.<br>You will receive <span id="respecRefund">0</span> points back.</div>
+    <div class="modal-cost">Cost: <span id="respecCost">0</span> Gold</div>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="hideRespecModal()">Cancel</button>
+      <button class="modal-btn confirm" onclick="confirmRespec()">Respec</button>
+    </div>
+  </div>
+</div>
+
+<div id="notifications"></div>
+
+<script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
+<script>
+// ── Talent Definitions with Prerequisites and Positions ──
+var TALENT_TREES = {
+  farming: {
+    name: 'Farming',
+    maxPoints: 32,
+    tiers: [
+      { tier: 1, gate: 0, y: 60 },
+      { tier: 2, gate: 5, y: 200 },
+      { tier: 3, gate: 10, y: 340 }
+    ],
+    talents: [
+      // Tier 1
+      { key: 'PlotRow2', name: 'Plot Row 2', icon: '\u{1F331}', maxRank: 6,
+        desc: '+1 plot per rank (7-12)', tier: 1, pos: { x: 25, y: 60 } },
+      { key: 'GreenThumb', name: 'Green Thumb', icon: '\u{1F33F}', maxRank: 3,
+        desc: '-10% crop grow time per rank', tier: 1, pos: { x: 50, y: 60 } },
+      { key: 'EagerPlanter', name: 'Eager Planter', icon: '\u2728', maxRank: 3,
+        desc: '+2 planting XP per rank', tier: 1, pos: { x: 75, y: 60 } },
+      // Tier 2
+      { key: 'PlotRow3', name: 'Plot Row 3', icon: '\u{1F331}', maxRank: 6,
+        desc: '+1 plot per rank (13-18)', tier: 2, pos: { x: 25, y: 200 },
+        requires: { key: 'PlotRow2', rank: 6 } },
+      { key: 'BountifulHarvest', name: 'Bountiful Harvest', icon: '\u{1F33E}', maxRank: 2,
+        desc: '+1 bonus crop per harvest per rank', tier: 2, pos: { x: 50, y: 200 },
+        requires: { key: 'GreenThumb', rank: 3 } },
+      { key: 'RapidGrowth', name: 'Rapid Growth', icon: '\u26A1', maxRank: 3,
+        desc: '-10% crop grow time per rank', tier: 2, pos: { x: 75, y: 200 },
+        requires: { key: 'EagerPlanter', rank: 2 } },
+      // Tier 3
+      { key: 'PlotRow4', name: 'Plot Row 4', icon: '\u{1F331}', maxRank: 6,
+        desc: '+1 plot per rank (19-24)', tier: 3, pos: { x: 30, y: 340 },
+        requires: { key: 'PlotRow3', rank: 6 } },
+      { key: 'CropMastery', name: 'Crop Mastery', icon: '\u{1F3C6}', maxRank: 3,
+        desc: '+3 XP to all crop activities per rank', tier: 3, pos: { x: 70, y: 340 },
+        requires: { key: 'BountifulHarvest', rank: 2 } }
+    ]
+  },
+  animal: {
+    name: 'Animal Husbandry',
+    maxPoints: 38,
+    tiers: [
+      { tier: 1, gate: 0, y: 60 },
+      { tier: 2, gate: 5, y: 200 },
+      { tier: 3, gate: 10, y: 340 }
+    ],
+    talents: [
+      // Tier 1
+      { key: 'CowHerd', name: 'Cow Herd', icon: '\u{1F404}', maxRank: 5,
+        desc: '+1 active cow per rank (1\u21926)', tier: 1, pos: { x: 20, y: 60 } },
+      { key: 'ChickenFlock', name: 'Chicken Flock', icon: '\u{1F414}', maxRank: 5,
+        desc: '+1 active chicken per rank (1\u21926)', tier: 1, pos: { x: 50, y: 60 } },
+      { key: 'QuickHands', name: 'Quick Hands', icon: '\u{1F590}', maxRank: 3,
+        desc: '-10% animal cooldown per rank', tier: 1, pos: { x: 80, y: 60 } },
+      // Tier 2
+      { key: 'SheepPen', name: 'Sheep Pen', icon: '\u{1F411}', maxRank: 5,
+        desc: '+1 active sheep per rank (1\u21926)', tier: 2, pos: { x: 15, y: 200 },
+        requires: { key: 'CowHerd', rank: 3 } },
+      { key: 'GoatYard', name: 'Goat Yard', icon: '\u{1F410}', maxRank: 5,
+        desc: '+1 active goat per rank (1\u21926)', tier: 2, pos: { x: 35, y: 200 },
+        requires: { key: 'ChickenFlock', rank: 3 } },
+      { key: 'ApiaryExpansion', name: 'Apiary', icon: '\u{1F41D}', maxRank: 5,
+        desc: '+1 active beehive per rank (1\u21926)', tier: 2, pos: { x: 55, y: 200 } },
+      { key: 'HusbandryKnowledge', name: 'Husbandry', icon: '\u{1F4DA}', maxRank: 3,
+        desc: '+2 XP per animal collection per rank', tier: 2, pos: { x: 80, y: 200 },
+        requires: { key: 'QuickHands', rank: 2 } },
+      // Tier 3
+      { key: 'PigSty', name: 'Pig Sty', icon: '\u{1F437}', maxRank: 5,
+        desc: '+1 active pig per rank (1\u21926)', tier: 3, pos: { x: 30, y: 340 },
+        requiresOr: [{ key: 'SheepPen', rank: 3 }, { key: 'GoatYard', rank: 3 }] },
+      { key: 'AnimalMastery', name: 'Animal Mastery', icon: '\u{1F3C6}', maxRank: 2,
+        desc: '+1 bonus product per collection per rank', tier: 3, pos: { x: 70, y: 340 },
+        requires: { key: 'HusbandryKnowledge', rank: 3 } }
+    ]
+  },
+  economy: {
+    name: 'General',
+    maxPoints: 29,
+    tiers: [
+      { tier: 1, gate: 0, y: 60 },
+      { tier: 2, gate: 5, y: 200 },
+      { tier: 3, gate: 10, y: 340 }
+    ],
+    talents: [
+      // Tier 1
+      { key: 'KeenLearner', name: 'Keen Learner', icon: '\u{1F4D6}', maxRank: 3,
+        desc: '+1 XP to all activities per rank', tier: 1, pos: { x: 15, y: 60 } },
+      { key: 'FarmHand', name: 'Farm Hand', icon: '\u{1F9D1}\u200D\u{1F33E}', maxRank: 3,
+        desc: '+2 XP to planting & harvesting per rank', tier: 1, pos: { x: 38, y: 60 } },
+      { key: 'Stockman', name: 'Stockman', icon: '\u{1F920}', maxRank: 3,
+        desc: '+2 XP to animal starts & collections per rank', tier: 1, pos: { x: 62, y: 60 } },
+      { key: 'Contractor1', name: 'Contractor I', icon: '\u{1F4CB}', maxRank: 3,
+        desc: '+1 contract slot per rank (slots 2-4)', tier: 1, pos: { x: 85, y: 60 } },
+      // Tier 2
+      { key: 'Artisan', name: 'Artisan', icon: '\u{1F528}', maxRank: 3,
+        desc: '+3 XP to all crafting per rank', tier: 2, pos: { x: 15, y: 200 },
+        requires: { key: 'KeenLearner', rank: 2 } },
+      { key: 'SeasonedWorker', name: 'Seasoned Worker', icon: '\u{1F4AA}', maxRank: 3,
+        desc: '+2 XP to all activities per rank', tier: 2, pos: { x: 38, y: 200 },
+        requiresOr: [{ key: 'FarmHand', rank: 2 }, { key: 'Stockman', rank: 2 }] },
+      { key: 'BonusPoint1', name: 'Bonus Point I', icon: '\u{1F381}', maxRank: 1,
+        desc: 'Gain 1 extra talent point immediately', tier: 2, pos: { x: 62, y: 200 } },
+      { key: 'Contractor2', name: 'Contractor II', icon: '\u{1F4CB}', maxRank: 3,
+        desc: '+1 contract slot per rank (slots 5-7)', tier: 2, pos: { x: 85, y: 200 },
+        requires: { key: 'Contractor1', rank: 3 } },
+      // Tier 3
+      { key: 'Prodigy', name: 'Prodigy', icon: '\u{1F31F}', maxRank: 3,
+        desc: '+3 XP to all activities per rank', tier: 3, pos: { x: 22, y: 340 },
+        requires: { key: 'SeasonedWorker', rank: 3 } },
+      { key: 'BonusPoint2', name: 'Bonus Point II', icon: '\u{1F381}', maxRank: 1,
+        desc: 'Gain 1 extra talent point immediately', tier: 3, pos: { x: 50, y: 340 },
+        requires: { key: 'BonusPoint1', rank: 1 } },
+      { key: 'Contractor3', name: 'Contractor III', icon: '\u{1F4CB}', maxRank: 3,
+        desc: '+1 contract slot per rank (slots 8-10)', tier: 3, pos: { x: 78, y: 340 },
+        requires: { key: 'Contractor2', rank: 3 } }
+    ]
+  }
+};
+
+// Respec cost tiers based on level
+var RESPEC_COSTS = [
+  { minLevel: 0, maxLevel: 9, cost: 200 },
+  { minLevel: 10, maxLevel: 19, cost: 500 },
+  { minLevel: 20, maxLevel: 29, cost: 1000 },
+  { minLevel: 30, maxLevel: 39, cost: 2000 },
+  { minLevel: 40, maxLevel: 50, cost: 3000 }
+];
+
+// ── Game State ──
+var talentState = {};
+var playerLevel = 0;
+var playerGold = 0;
+var playerXP = 0;
+var unspentTalentPoints = 0;
+var activeTree = 'farming';
+var actionPending = false;
+var buyPending = false;
+var tooltipTimeout = null;
+
+// Initialize all talent ranks to 0
+(function() {
+  var trees = ['farming', 'animal', 'economy'];
+  for (var t = 0; t < trees.length; t++) {
+    var talents = TALENT_TREES[trees[t]].talents;
+    for (var i = 0; i < talents.length; i++) {
+      talentState[talents[i].key] = 0;
+    }
+  }
+})();
+
+// ── Respec System ──
+function getRespecCost() {
+  for (var i = 0; i < RESPEC_COSTS.length; i++) {
+    if (playerLevel >= RESPEC_COSTS[i].minLevel && playerLevel <= RESPEC_COSTS[i].maxLevel) {
+      return RESPEC_COSTS[i].cost;
+    }
+  }
+  return 3000;
+}
+
+function getTotalInvested() {
+  var total = 0;
+  for (var key in talentState) {
+    total += talentState[key] || 0;
+  }
+  return total;
+}
+
+function getRefundedPoints() {
+  // Refund = playerLevel (since you get 1 point per level)
+  // Plus any points from BonusPoint talents
+  var bonus = (talentState['BonusPoint1'] || 0) + (talentState['BonusPoint2'] || 0);
+  return playerLevel + bonus;
+}
+
+function showRespecModal() {
+  var cost = getRespecCost();
+  var refund = getRefundedPoints();
+  document.getElementById('respecCost').textContent = cost;
+  document.getElementById('respecRefund').textContent = refund;
+  document.getElementById('respecModal').classList.add('visible');
+}
+
+function hideRespecModal() {
+  document.getElementById('respecModal').classList.remove('visible');
+}
+
+function confirmRespec() {
+  var cost = getRespecCost();
+  if (playerGold < cost) {
+    notify('Need ' + cost + ' gold (have ' + playerGold + ')', 'error');
+    hideRespecModal();
+    return;
+  }
+
+  hideRespecModal();
+  actionPending = true;
+
+  // Determine which respec tier task to trigger
+  var tierTask = 'Respec_Talents_Tier1';
+  if (playerLevel >= 40) tierTask = 'Respec_Talents_Tier5';
+  else if (playerLevel >= 30) tierTask = 'Respec_Talents_Tier4';
+  else if (playerLevel >= 20) tierTask = 'Respec_Talents_Tier3';
+  else if (playerLevel >= 10) tierTask = 'Respec_Talents_Tier2';
+
+  triggerTask(tierTask);
+
+  // Optimistic update
+  playerGold -= cost;
+  var refund = playerLevel; // Points from leveling
+  for (var key in talentState) {
+    talentState[key] = 0;
+  }
+  unspentTalentPoints = refund;
+
+  notify('Talents reset! ' + refund + ' points refunded', 'success');
+  renderAll();
+
+  setTimeout(function() { actionPending = false; }, 1500);
+}
+
+// ── Talent Calculations ──
+function getUnspentPoints() {
+  return unspentTalentPoints;
+}
+
+function getPointsInTree(treeName) {
+  var total = 0;
+  var talents = TALENT_TREES[treeName].talents;
+  for (var i = 0; i < talents.length; i++) {
+    total += talentState[talents[i].key] || 0;
+  }
+  return total;
+}
+
+function isTierUnlocked(treeName, gate) {
+  if (gate === 0) return true;
+  return getPointsInTree(treeName) >= gate;
+}
+
+function isPrereqMet(talent) {
+  // Check single prerequisite
+  if (talent.requires) {
+    var reqRank = talentState[talent.requires.key] || 0;
+    if (reqRank < talent.requires.rank) return false;
+  }
+  // Check OR prerequisites (any one must be met)
+  if (talent.requiresOr) {
+    var anyMet = false;
+    for (var i = 0; i < talent.requiresOr.length; i++) {
+      var req = talent.requiresOr[i];
+      if ((talentState[req.key] || 0) >= req.rank) {
+        anyMet = true;
+        break;
+      }
+    }
+    if (!anyMet) return false;
+  }
+  return true;
+}
+
+function canInvest(treeName, talent) {
+  if (actionPending) return false;
+  if (getUnspentPoints() <= 0) return false;
+
+  // Find talent's tier
+  var tierGate = 0;
+  var tiers = TALENT_TREES[treeName].tiers;
+  for (var i = 0; i < tiers.length; i++) {
+    if (tiers[i].tier === talent.tier) {
+      tierGate = tiers[i].gate;
+      break;
+    }
+  }
+
+  if (!isTierUnlocked(treeName, tierGate)) return false;
+  if (!isPrereqMet(talent)) return false;
+
+  var current = talentState[talent.key] || 0;
+  if (current >= talent.maxRank) return false;
+
+  return true;
+}
+
+// ── Invest Point ──
+function investPoint(treeName, talentKey) {
+  var talent = null;
+  var talents = TALENT_TREES[treeName].talents;
+  for (var i = 0; i < talents.length; i++) {
+    if (talents[i].key === talentKey) {
+      talent = talents[i];
+      break;
+    }
+  }
+
+  if (!talent) return;
+  if (!canInvest(treeName, talent)) {
+    if (getUnspentPoints() <= 0) notify('No talent points available', 'error');
+    else if (!isPrereqMet(talent)) notify('Prerequisite not met', 'error');
+    return;
+  }
+
+  actionPending = true;
+  triggerTask('Invest_' + talentKey);
+  playSound('talent');
+
+  // Optimistic update
+  talentState[talentKey] = (talentState[talentKey] || 0) + 1;
+  // BonusPoint talents give a point back (net zero)
+  if (talentKey !== 'BonusPoint1' && talentKey !== 'BonusPoint2') {
+    unspentTalentPoints = Math.max(0, unspentTalentPoints - 1);
+  }
+  notify(talent.name + ' ' + talentState[talentKey] + '/' + talent.maxRank, 'success');
+  renderAll();
+
+  setTimeout(function() {
+    actionPending = false;
+    triggerTask('Sync_Inventory'); // Request fresh sync after task should be processed
+  }, 1500);
+}
+
+// ── Buy Talent Point ──
+var BUY_POINT_COST = 500;
+
+function buyTalentPoint() {
+  if (buyPending) return;
+  if (playerGold < BUY_POINT_COST) {
+    notify('Need ' + BUY_POINT_COST + ' gold (have ' + playerGold + ')', 'error');
+    return;
+  }
+
+  buyPending = true;
+  triggerTask('Buy_Talent_Point');
+
+  playerGold -= BUY_POINT_COST;
+  unspentTalentPoints += 1;
+  notify('Purchased 1 Talent Point for ' + BUY_POINT_COST + 'g', 'success');
+  renderAll();
+
+  setTimeout(function() {
+    buyPending = false;
+    triggerTask('Sync_Inventory'); // Request fresh sync
+  }, 1000);
+}
+
+// ── Portals SDK ──
+function triggerTask(taskName, targetState) {
+  targetState = targetState || 'SetNotActiveToActive';
+  console.log('[Talents] triggerTask:', taskName, 'targetState:', targetState);
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.sendMessageToUnity) {
+    var msg = JSON.stringify({
+      TaskName: taskName,
+      TaskTargetState: targetState
+    });
+    console.log('[Talents] Sending to Portals:', msg);
+    PortalsSdk.sendMessageToUnity(msg);
+  } else {
+    console.error('[Talents] PortalsSdk not available!');
+  }
+}
+
+function closeIframe() {
+  playSound('click');
+  console.log('[Talents] Close requested');
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.closeIframe) {
+    PortalsSdk.closeIframe();
+  }
+}
+
+// Keyboard controls
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('respecModal').classList.contains('visible')) {
+      hideRespecModal();
+    } else {
+      closeIframe();
+    }
+  }
+});
+
+// ── Message Handling ──
+var lastMessageId = '';
+var lastMessageTime = 0;
+
+function processMessage(msg, source) {
+  if(!_uiPopPlayed){_uiPopPlayed=true;try{if(_uiPopCtx&&_uiPopBuf){if(_uiPopCtx.state==='suspended')_uiPopCtx.resume();var _s=_uiPopCtx.createBufferSource();var _g=_uiPopCtx.createGain();_s.buffer=_uiPopBuf;_g.gain.value=0.5;_s.connect(_g);_g.connect(_uiPopCtx.destination);_s.start(0)}}catch(e){}}
+  var now = Date.now();
+  var msgId = msg + '_' + Math.floor(now / 100);
+  if (msgId === lastMessageId && now - lastMessageTime < 200) {
+    return;
+  }
+  lastMessageId = msgId;
+  lastMessageTime = now;
+  handlePortalsMessage(msg);
+}
+
+var _prevXP = -1, _prevLevel = -1, _firstXPSync = true;
+function handlePortalsMessage(msg) {
+  if (typeof msg !== 'string') return;
+  if (msg.indexOf('Sync_Inventory') === 0) {
+    // Skip sync if action is pending - wait for the authoritative sync after task completes
+    if (actionPending || buyPending) {
+      console.log('[Talents] Skipping stale sync while action pending');
+      return;
+    }
+    parseAndSyncInventory(msg);
+    if (_firstXPSync) { _firstXPSync = false; _prevXP = playerXP; _prevLevel = playerLevel; }
+    else { if (playerLevel === _prevLevel && playerXP > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = playerXP; _prevLevel = playerLevel; }
+    renderAll();
+  }
+}
+
+function parseAndSyncInventory(msg) {
+  msg = msg.replace('Sync_Inventory_', '');
+  var parts = msg.split('_');
+  var i = 0;
+
+  var twoWordKeys = {
+    'T_PlotRow2': 'PlotRow2', 'T_GreenThumb': 'GreenThumb', 'T_EagerPlanter': 'EagerPlanter',
+    'T_PlotRow3': 'PlotRow3', 'T_BountifulHarvest': 'BountifulHarvest', 'T_RapidGrowth': 'RapidGrowth',
+    'T_PlotRow4': 'PlotRow4', 'T_CropMastery': 'CropMastery',
+    'T_CowHerd': 'CowHerd', 'T_ChickenFlock': 'ChickenFlock', 'T_QuickHands': 'QuickHands',
+    'T_SheepPen': 'SheepPen', 'T_GoatYard': 'GoatYard', 'T_ApiaryExpansion': 'ApiaryExpansion',
+    'T_HusbandryKnowledge': 'HusbandryKnowledge', 'T_PigSty': 'PigSty', 'T_AnimalMastery': 'AnimalMastery',
+    'T_KeenLearner': 'KeenLearner', 'T_FarmHand': 'FarmHand', 'T_Stockman': 'Stockman',
+    'T_Artisan': 'Artisan', 'T_SeasonedWorker': 'SeasonedWorker', 'T_BonusPoint1': 'BonusPoint1',
+    'T_Prodigy': 'Prodigy', 'T_BonusPoint2': 'BonusPoint2',
+    'T_Contractor1': 'Contractor1', 'T_Contractor2': 'Contractor2', 'T_Contractor3': 'Contractor3',
+    'Rebirth_Shards': '_skip', 'Mystic_Essence': '_skip',
+    'RT_FleetHarvest': '_skip', 'RT_SwiftHusbandry': '_skip',
+    'RT_QuickContracts': '_skip', 'RT_RushingWinds': '_skip',
+    'RT_NimbleHands': '_skip', 'RT_TimeWarp': '_skip',
+    'RT_Windfall': '_skip', 'RT_GreenFingers': '_skip',
+    'RT_Stockpiler': '_skip', 'RT_ArtisanTouch': '_skip',
+    'RT_Fortune': '_skip', 'RT_Cornucopia': '_skip',
+    'RT_NestEgg': '_skip', 'RT_SeedVault': '_skip',
+    'RT_Seasoned': '_skip', 'RT_ToolShed': '_skip',
+    'RT_RecipeTome': '_skip', 'RT_QuickStart': '_skip',
+    'Rebirth_Count': '_skip'
+  };
+
+  while (i < parts.length) {
+    // Four-word key
+    if (i + 4 < parts.length) {
+      var fourWord = parts[i] + '_' + parts[i+1] + '_' + parts[i+2] + '_' + parts[i+3];
+      if (fourWord === 'Has_Recipe_Meat_Pie') { i += 5; continue; }
+    }
+    // Three-word key
+    if (i + 3 < parts.length) {
+      var threeWord = parts[i] + '_' + parts[i + 1] + '_' + parts[i + 2];
+      if (threeWord === 'Unspent_Talent_Points') {
+        var val = parseInt(parts[i + 3]);
+        unspentTalentPoints = isNaN(val) ? 0 : val;
+        i += 4; continue;
+      }
+      var threeWordSkip = ['Has_Milk_Pail','Has_Shearing_Kit','Has_Butcher_Knife',
+        'Has_Truffle_Spade','Has_Starter_Seeds','Has_Bee_Suit',
+        'Has_Recipe_Flour','Has_Recipe_Bread','Has_Recipe_Cheese','Has_Recipe_Stew',
+        'Has_Recipe_Ragout','Has_Recipe_Pie','Has_Recipe_Blanket','Has_Recipe_Butter',
+        'Has_Recipe_Cake','Has_Recipe_Mead'];
+      if (threeWordSkip.indexOf(threeWord) !== -1) { i += 4; continue; }
+    }
+    // Two-word key
+    if (i + 2 < parts.length) {
+      var twoWord = parts[i] + '_' + parts[i + 1];
+      if (twoWordKeys[twoWord] !== undefined) {
+        var v = parseInt(parts[i + 2]);
+        if (twoWordKeys[twoWord] !== '_skip') {
+          talentState[twoWordKeys[twoWord]] = isNaN(v) ? 0 : v;
+        }
+        i += 3; continue;
+      }
+    }
+    // One-word keys
+    if (parts[i] === 'Gold' && i + 1 < parts.length) {
+      var g = parseInt(parts[i + 1]);
+      playerGold = isNaN(g) ? 0 : g;
+      i += 2; continue;
+    }
+    if (parts[i] === 'Level' && i + 1 < parts.length) {
+      var l = parseInt(parts[i + 1]);
+      playerLevel = isNaN(l) ? 0 : l;
+      i += 2; continue;
+    }
+    if (parts[i] === 'XP' && i + 1 < parts.length) {
+      var xv = parseInt(parts[i + 1]);
+      playerXP = isNaN(xv) ? 0 : xv;
+      i += 2; continue;
+    }
+    if (parts[i] === 'playerName' && i + 1 < parts.length) { i += 2; continue; }
+    i++;
+  }
+}
+
+function setupMessageListener() {
+  if (typeof PortalsSdk !== 'undefined' && PortalsSdk.setMessageListener) {
+    PortalsSdk.setMessageListener(function(msg) {
+      processMessage(msg, 'SDK');
+    });
+    console.log('[Talents] SDK listener registered');
+  } else {
+    setTimeout(setupMessageListener, 200);
+  }
+}
+
+window.addEventListener('message', function(event) {
+  if (event.data && typeof event.data === 'string') {
+    processMessage(event.data, 'postMessage-string');
+  }
+  else if (event.data && event.data.portalsMessage) {
+    processMessage(event.data.portalsMessage, 'postMessage-portals');
+  }
+  else if (event.data && event.data.message && typeof event.data.message === 'string') {
+    processMessage(event.data.message, 'postMessage-message');
+  }
+});
+
+setupMessageListener();
+setTimeout(function() { triggerTask('Sync_Inventory'); }, 500);
+
+
+// ── Visibility/Focus Handlers ──
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) { triggerTask('Sync_Inventory'); }
+});
+window.addEventListener('focus', function() {
+  triggerTask('Sync_Inventory');
+});
+
+// ── UI Rendering ──
+function switchTree(treeName) {
+  activeTree = treeName;
+  var tabs = document.querySelectorAll('.tree-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.toggle('active', tabs[i].getAttribute('data-tree') === treeName);
+  }
+  renderTree();
+}
+
+function renderAll() {
+  // Points badge
+  var pts = getUnspentPoints();
+  document.getElementById('pointsBadge').textContent = pts + (pts === 1 ? ' Point' : ' Points');
+
+  // Gold & level display
+  document.getElementById('goldDisplay').textContent = playerGold;
+  document.getElementById('levelDisplay').textContent = playerLevel;
+
+  // Buy button
+  var buyBtn = document.getElementById('buyPointBtn');
+  if (playerGold >= BUY_POINT_COST && !buyPending) {
+    buyBtn.disabled = false;
+    buyBtn.onclick = buyTalentPoint;
+  } else {
+    buyBtn.disabled = true;
+    buyBtn.onclick = null;
+  }
+
+  // Respec button - enabled if any points invested and have enough gold
+  var respecBtn = document.getElementById('respecBtn');
+  var totalInvested = getTotalInvested();
+  var respecCost = getRespecCost();
+  if (totalInvested > 0 && playerGold >= respecCost && !actionPending) {
+    respecBtn.disabled = false;
+    respecBtn.innerHTML = '<span>&#128260;</span> Respec (' + respecCost + 'g)';
+  } else {
+    respecBtn.disabled = true;
+    respecBtn.innerHTML = '<span>&#128260;</span> Respec';
+  }
+
+  // Tab point counters
+  document.getElementById('tabPointsFarming').textContent = getPointsInTree('farming') + ' / 32';
+  document.getElementById('tabPointsAnimal').textContent = getPointsInTree('animal') + ' / 38';
+  document.getElementById('tabPointsEconomy').textContent = getPointsInTree('economy') + ' / 29';
+
+  renderTree();
+}
+
+function renderTree() {
+  var tree = TALENT_TREES[activeTree];
+  var container = document.getElementById('treeCanvas');
+  var treePoints = getPointsInTree(activeTree);
+
+  // Calculate canvas height based on tiers
+  var maxY = 0;
+  for (var t = 0; t < tree.talents.length; t++) {
+    if (tree.talents[t].pos.y > maxY) maxY = tree.talents[t].pos.y;
+  }
+  container.style.minHeight = (maxY + 100) + 'px';
+
+  var html = '';
+
+  // SVG for connecting lines
+  html += '<svg class="tree-lines" viewBox="0 0 100 ' + (maxY + 100) + '" preserveAspectRatio="none">';
+
+  // Draw lines for prerequisites
+  for (var i = 0; i < tree.talents.length; i++) {
+    var talent = tree.talents[i];
+    var prereqs = [];
+
+    if (talent.requires) {
+      prereqs.push(talent.requires);
+    }
+    if (talent.requiresOr) {
+      prereqs = prereqs.concat(talent.requiresOr);
+    }
+
+    for (var p = 0; p < prereqs.length; p++) {
+      var prereq = prereqs[p];
+      // Find prereq talent position
+      var prereqTalent = null;
+      var allTrees = ['farming', 'animal', 'economy'];
+      for (var tt = 0; tt < allTrees.length; tt++) {
+        var treeTalents = TALENT_TREES[allTrees[tt]].talents;
+        for (var j = 0; j < treeTalents.length; j++) {
+          if (treeTalents[j].key === prereq.key) {
+            prereqTalent = treeTalents[j];
+            break;
+          }
+        }
+        if (prereqTalent) break;
+      }
+
+      if (prereqTalent && TALENT_TREES[activeTree].talents.indexOf(prereqTalent) !== -1) {
+        // Line state
+        var lineClass = 'tree-line';
+        var prereqRank = talentState[prereq.key] || 0;
+        var talentRank = talentState[talent.key] || 0;
+
+        if (talentRank >= talent.maxRank) {
+          lineClass += ' maxed';
+        } else if (prereqRank >= prereq.rank) {
+          lineClass += ' unlocked';
+        }
+
+        // Draw curved path
+        var x1 = prereqTalent.pos.x;
+        var y1 = prereqTalent.pos.y + 4;
+        var x2 = talent.pos.x;
+        var y2 = talent.pos.y - 4;
+        var midY = (y1 + y2) / 2;
+
+        html += '<path class="' + lineClass + '" d="M' + x1 + ',' + y1 +
+                ' C' + x1 + ',' + midY + ' ' + x2 + ',' + midY + ' ' + x2 + ',' + y2 + '"/>';
+      }
+    }
+  }
+
+  html += '</svg>';
+
+  // Tier labels
+  for (var ti = 0; ti < tree.tiers.length; ti++) {
+    var tierData = tree.tiers[ti];
+    var tierUnlocked = isTierUnlocked(activeTree, tierData.gate);
+    var tierY = tierData.y;
+    var labelText = 'Tier ' + tierData.tier;
+    if (tierData.gate > 0) {
+      labelText += ' (' + tierData.gate + ' pts)';
+    }
+    html += '<div class="tier-label' + (tierUnlocked ? ' unlocked' : '') + '" style="top:' + tierY + 'px">' + labelText + '</div>';
+  }
+
+  // Render talent nodes
+  for (var n = 0; n < tree.talents.length; n++) {
+    var talent = tree.talents[n];
+    var currentRank = talentState[talent.key] || 0;
+    var isMaxed = currentRank >= talent.maxRank;
+
+    // Check tier unlock
+    var tierGate = 0;
+    for (var ti = 0; ti < tree.tiers.length; ti++) {
+      if (tree.tiers[ti].tier === talent.tier) {
+        tierGate = tree.tiers[ti].gate;
+        break;
+      }
+    }
+    var tierUnlocked = isTierUnlocked(activeTree, tierGate);
+    var prereqMet = isPrereqMet(talent);
+
+    var nodeClass = 'talent-node';
+    if (isMaxed) nodeClass += ' maxed';
+    else if (canInvest(activeTree, talent)) nodeClass += ' available';
+    else if (currentRank > 0) nodeClass += ' invested';
+    else if (!tierUnlocked || !prereqMet) nodeClass += ' locked';
+
+    html += '<div class="' + nodeClass + '" style="left:' + talent.pos.x + '%;top:' + talent.pos.y + 'px" ' +
+            'onclick="investPoint(\'' + activeTree + '\',\'' + talent.key + '\')" ' +
+            'onmouseenter="showTooltip(event,\'' + activeTree + '\',\'' + talent.key + '\')" ' +
+            'onmouseleave="hideTooltip()" ' +
+            'ontouchstart="showTooltip(event,\'' + activeTree + '\',\'' + talent.key + '\')">';
+    html += '<div class="node-circle">' + talent.icon + '<div class="node-rank">' + currentRank + '/' + talent.maxRank + '</div></div>';
+    html += '<div class="node-name">' + talent.name + '</div>';
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ── Tooltip ──
+function showTooltip(event, treeName, talentKey) {
+  var talent = null;
+  var talents = TALENT_TREES[treeName].talents;
+  for (var i = 0; i < talents.length; i++) {
+    if (talents[i].key === talentKey) {
+      talent = talents[i];
+      break;
+    }
+  }
+  if (!talent) return;
+
+  var currentRank = talentState[talent.key] || 0;
+  var tooltip = document.getElementById('tooltip');
+
+  var html = '<div class="tooltip-header">';
+  html += '<span class="tooltip-icon">' + talent.icon + '</span>';
+  html += '<span class="tooltip-title">' + talent.name + '</span>';
+  html += '</div>';
+  html += '<div class="tooltip-rank">Rank: ' + currentRank + ' / ' + talent.maxRank + '</div>';
+  html += '<div class="tooltip-desc">' + talent.desc + '</div>';
+
+  // Show prerequisite info
+  if (talent.requires) {
+    var prereqRank = talentState[talent.requires.key] || 0;
+    var met = prereqRank >= talent.requires.rank;
+    var prereqName = talent.requires.key;
+    // Find display name
+    for (var j = 0; j < talents.length; j++) {
+      if (talents[j].key === talent.requires.key) {
+        prereqName = talents[j].name;
+        break;
+      }
+    }
+    html += '<div class="tooltip-prereq' + (met ? ' met' : '') + '">';
+    html += (met ? '&#10003; ' : '&#10007; ') + 'Requires: ' + prereqName + ' ' + prereqRank + '/' + talent.requires.rank;
+    html += '</div>';
+  }
+
+  if (talent.requiresOr) {
+    var anyMet = false;
+    var prereqText = 'Requires one of: ';
+    for (var k = 0; k < talent.requiresOr.length; k++) {
+      var req = talent.requiresOr[k];
+      var rRank = talentState[req.key] || 0;
+      if (rRank >= req.rank) anyMet = true;
+      var rName = req.key;
+      for (var j = 0; j < talents.length; j++) {
+        if (talents[j].key === req.key) {
+          rName = talents[j].name;
+          break;
+        }
+      }
+      if (k > 0) prereqText += ' OR ';
+      prereqText += rName + ' ' + rRank + '/' + req.rank;
+    }
+    html += '<div class="tooltip-prereq' + (anyMet ? ' met' : '') + '">';
+    html += (anyMet ? '&#10003; ' : '&#10007; ') + prereqText;
+    html += '</div>';
+  }
+
+  // Tier info
+  var tierGate = 0;
+  for (var ti = 0; ti < TALENT_TREES[treeName].tiers.length; ti++) {
+    if (TALENT_TREES[treeName].tiers[ti].tier === talent.tier) {
+      tierGate = TALENT_TREES[treeName].tiers[ti].gate;
+      break;
+    }
+  }
+  if (tierGate > 0) {
+    var tierUnlocked = isTierUnlocked(treeName, tierGate);
+    html += '<div class="tooltip-tier">' + (tierUnlocked ? '&#10003;' : '&#10007;') + ' Tier ' + talent.tier + ' requires ' + tierGate + ' points in tree</div>';
+  }
+
+  tooltip.innerHTML = html;
+
+  // Position tooltip
+  var rect = event.target.getBoundingClientRect();
+  var tooltipRect = tooltip.getBoundingClientRect();
+  var x = rect.right + 10;
+  var y = rect.top;
+
+  // Keep on screen
+  if (x + 260 > window.innerWidth) {
+    x = rect.left - 270;
+  }
+  if (y + 200 > window.innerHeight) {
+    y = window.innerHeight - 210;
+  }
+  if (y < 10) y = 10;
+
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+  tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+// ── Sound Effects ──
+var _mp3Sounds = {};
+(function() {
+  var files = { purchase: 'purchase.mp3', harvest: 'harvest.mp3', craft: 'harvest.mp3', levelup: 'levelup.mp3', click: 'click.mp3', talent: 'talent.mp3', xp: 'xp-gain.mp3' };
+  for (var k in files) { var a = new Audio(files[k]); a.preload = 'auto'; a.volume = (k === 'click' || k === 'talent') ? 0.6 : 0.3; _mp3Sounds[k] = a; }
+})();
+var _audioCtx = null;
+function _getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+function playSound(type) {
+  try {
+    if (_mp3Sounds[type]) { _mp3Sounds[type].currentTime = 0; _mp3Sounds[type].play().catch(function(){}); return; }
+    var ctx = _getAudioCtx(); var g = ctx.createGain(); g.connect(ctx.destination); var t = ctx.currentTime;
+    if (type === 'success') {
+      var o = ctx.createOscillator(); o.type = 'sine'; o.connect(g);
+      o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + 0.1);
+      g.gain.setValueAtTime(0.18, t); g.gain.linearRampToValueAtTime(0, t + 0.2);
+      o.start(t); o.stop(t + 0.2);
+    } else if (type === 'error') {
+      var o = ctx.createOscillator(); o.type = 'square'; o.connect(g);
+      o.frequency.setValueAtTime(180, t);
+      g.gain.setValueAtTime(0.15, t); g.gain.linearRampToValueAtTime(0, t + 0.15);
+      o.start(t); o.stop(t + 0.15);
+    }
+  } catch (e) {}
+}
+
+var notifCount = 0;
+function notify(msg, type) {
+  type = type || 'success';
+  playSound(type);
+  var container = document.getElementById('notifications');
+
+  // Cap at 5 notifications
+  while (container.children.length >= 5) {
+    container.removeChild(container.firstChild);
+  }
+
+  var notif = document.createElement('div');
+  notif.className = 'notification ' + (type === 'success' || type === 'error' ? type : 'success');
+  notif.textContent = msg;
+  container.appendChild(notif);
+  setTimeout(function() { if (notif.parentNode) notif.remove(); }, 3000);
+}
+
+// Initial render
+renderAll();
+</script>
+</body>
+</html>

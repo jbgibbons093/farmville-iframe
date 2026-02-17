@@ -367,6 +367,10 @@
       if (gameState.gold < recipe.price) { notify('Not enough gold!', 'error'); return; }
 
       actionPending = true;
+      // Optimistic update to prevent double-buy
+      gameState.gold -= recipe.price;
+      gameState.recipes[id] = true;
+      render();
       triggerTask(recipe.taskName);
       notify('Purchased ' + recipe.name + '!', 'purchase');
 
