@@ -1144,7 +1144,11 @@
       plot.plantedAt = Date.now();
       plot.readyAt = Date.now() + (getCropGrowTime(crop) * 1000);
 
-      triggerTask(`Plant_Plot_${plotId}`);
+      // Tell Portals which crop is being planted BEFORE firing Plant_Plot_N
+      // so the Plant effect chain (writes Plot_N_CropType, dispatches Emerge_<Crop>_Plot_N)
+      // sees Last_Planted_Crop set to the right value.
+      triggerTask(`Set_Last_Planted_${crop.name}`);
+      setTimeout(function() { triggerTask(`Plant_Plot_${plotId}`); }, 150);
       triggerTask(`Sub_Seeds_${crop.name}_1`);
 
       const plantXP = getPlantingXP(crop);
@@ -1206,12 +1210,16 @@
 
       plantingInProgress = true;
 
-      // Stagger Portals tasks 300ms apart
+      // Stagger Portals tasks 300ms apart. For each plot, set Last_Planted_Crop
+      // first then fire Plant_Plot_N ~150ms later so the dispatcher sees it.
       plantQueue.forEach(function(item, i) {
+        setTimeout(function() {
+          triggerTask('Set_Last_Planted_' + item.crop.name);
+        }, i * 300);
         setTimeout(function() {
           triggerTask('Plant_Plot_' + (item.idx + 1));
           triggerTask('Sub_Seeds_' + item.crop.name + '_1');
-        }, i * 300);
+        }, i * 300 + 150);
       });
 
       setTimeout(function() { awardXP(totalXP); }, plantQueue.length * 300);
