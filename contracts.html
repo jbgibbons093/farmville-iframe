@@ -127,6 +127,20 @@
     ::-webkit-scrollbar { width: 12px; }
     ::-webkit-scrollbar-track { background: #0a1818; }
     ::-webkit-scrollbar-thumb { background: #00bcd4; border-radius: 6px; border: 3px solid #000; }
+  
+    /* ── EMOJI IMAGE ICONS (auto-applied by patch_iframe_emojis.py) ── */
+    .item-icon img.emojimg,
+    .gold-icon img.emojimg, .level-icon img.emojimg,
+    .tab-icon img.emojimg, .title-icon img.emojimg,
+    .package-icon img.emojimg, .coming-soon-icon img.emojimg {
+      display: inline-block; vertical-align: middle;
+      width: 1em; height: 1em; object-fit: contain;
+      filter: drop-shadow(2px 2px 0 #000);
+    }
+    .item-icon { display: inline-flex; align-items: center; justify-content: center; }
+    .item-icon > img.emojimg { width: 1em; height: 1em; }
+    img.emojimg.standalone { width: 1.2em; height: 1.2em; vertical-align: middle; }
+
   </style>
 </head>
 <body>
@@ -136,11 +150,11 @@
       <div class="title">CONTRACTS</div>
       <div class="header-stats">
         <div class="stat-box">
-          <span class="stat-icon">&#x1FA99;</span>
+          <span class="stat-icon"><img class="emojimg" src="emoji/gold.png" alt=""></span>
           <span class="stat-value" id="gold-display">0</span>
         </div>
         <div class="stat-box">
-          <span class="stat-icon">&#x2B50;</span>
+          <span class="stat-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
           <span class="stat-value">Lv.<span id="level-display">0</span></span>
         </div>
         <button class="close-btn" onclick="closeIframe()">&#x2715;</button>
@@ -184,29 +198,29 @@
 
     // Items with their properties
     const ITEMS = {
-      wheat: { name: 'Wheat', icon: '&#x1F33E;', value: 5, unlockLevel: 0, deductTask: 'Deduct_Crop_Wheat_1' },
-      carrot: { name: 'Carrot', icon: '&#x1F955;', value: 10, unlockLevel: 7, deductTask: 'Deduct_Crop_Carrot_1' },
-      corn: { name: 'Corn', icon: '&#x1F33D;', value: 8, unlockLevel: 3, deductTask: 'Deduct_Crop_Corn_1' },
-      potato: { name: 'Potato', icon: '&#x1F954;', value: 12, unlockLevel: 10, deductTask: 'Deduct_Crop_Potato_1' },
-      tomato: { name: 'Tomato', icon: '&#x1F345;', value: 15, unlockLevel: 16, deductTask: 'Deduct_Crop_Tomato_1' },
-      pumpkin: { name: 'Pumpkin', icon: '&#x1F383;', value: 30, unlockLevel: 23, deductTask: 'Deduct_Crop_Pumpkin_1' },
-      milk: { name: 'Milk', icon: '&#x1F95B;', value: 12, unlockLevel: 2, deductTask: 'Deduct_Milk_1' },
-      egg: { name: 'Egg', icon: '&#x1F95A;', value: 8, unlockLevel: 6, deductTask: 'Deduct_Egg_1' },
-      wool: { name: 'Wool', icon: '&#x1F9F6;', value: 15, unlockLevel: 13, deductTask: 'Deduct_Wool_1' },
-      goat_meat: { name: 'Goat Meat', icon: '&#x1F356;', value: 20, unlockLevel: 18, deductTask: 'Deduct_Goat_Meat_1' },
-      honey: { name: 'Honey', icon: '&#x1F36F;', value: 25, unlockLevel: 21, deductTask: 'Deduct_Honey_1' },
-      truffle: { name: 'Truffle', icon: '&#x1F344;', value: 50, unlockLevel: 26, deductTask: 'Deduct_Truffle_1' },
-      flour: { name: 'Flour', icon: '&#x1F35E;', value: 10, unlockLevel: 4, deductTask: 'Deduct_Flour_1' },
-      butter: { name: 'Butter', icon: '&#x1F9C8;', value: 30, unlockLevel: 8, deductTask: 'Deduct_Butter_1' },
-      cheese: { name: 'Cheese', icon: '&#x1F9C0;', value: 45, unlockLevel: 9, deductTask: 'Deduct_Cheese_1' },
-      bread: { name: 'Bread', icon: '&#x1F956;', value: 35, unlockLevel: 11, deductTask: 'Deduct_Bread_1' },
-      blanket: { name: 'Blanket', icon: '&#x1F9E3;', value: 60, unlockLevel: 14, deductTask: 'Deduct_Blanket_1' },
-      stew: { name: 'Stew', icon: '&#x1F372;', value: 50, unlockLevel: 15, deductTask: 'Deduct_Stew_1' },
-      ragout: { name: 'Ragout', icon: '&#x1F356;', value: 75, unlockLevel: 19, deductTask: 'Deduct_Ragout_1' },
-      mead: { name: 'Mead', icon: '&#x1F37A;', value: 100, unlockLevel: 22, deductTask: 'Deduct_Mead_1' },
-      pie: { name: 'Pie', icon: '&#x1F967;', value: 100, unlockLevel: 24, deductTask: 'Deduct_Pie_1' },
-      meat_pie: { name: 'Meat Pie', icon: '&#x1F969;', value: 90, unlockLevel: 27, deductTask: 'Deduct_Meat_Pie_1' },
-      cake: { name: 'Cake', icon: '&#x1F370;', value: 150, unlockLevel: 28, deductTask: 'Deduct_Cake_1' }
+      wheat: { name: 'Wheat', icon: '<img class="emojimg" src="emoji/wheat.png" alt="">', value: 5, unlockLevel: 0, deductTask: 'Deduct_Crop_Wheat_1' },
+      carrot: { name: 'Carrot', icon: '<img class="emojimg" src="emoji/carrot.png" alt="">', value: 10, unlockLevel: 7, deductTask: 'Deduct_Crop_Carrot_1' },
+      corn: { name: 'Corn', icon: '<img class="emojimg" src="emoji/corn.png" alt="">', value: 8, unlockLevel: 3, deductTask: 'Deduct_Crop_Corn_1' },
+      potato: { name: 'Potato', icon: '<img class="emojimg" src="emoji/potato.png" alt="">', value: 12, unlockLevel: 10, deductTask: 'Deduct_Crop_Potato_1' },
+      tomato: { name: 'Tomato', icon: '<img class="emojimg" src="emoji/tomato.png" alt="">', value: 15, unlockLevel: 16, deductTask: 'Deduct_Crop_Tomato_1' },
+      pumpkin: { name: 'Pumpkin', icon: '<img class="emojimg" src="emoji/pumpkin.png" alt="">', value: 30, unlockLevel: 23, deductTask: 'Deduct_Crop_Pumpkin_1' },
+      milk: { name: 'Milk', icon: '<img class="emojimg" src="emoji/milk.png" alt="">', value: 12, unlockLevel: 2, deductTask: 'Deduct_Milk_1' },
+      egg: { name: 'Egg', icon: '<img class="emojimg" src="emoji/egg.png" alt="">', value: 8, unlockLevel: 6, deductTask: 'Deduct_Egg_1' },
+      wool: { name: 'Wool', icon: '<img class="emojimg" src="emoji/wool.png" alt="">', value: 15, unlockLevel: 13, deductTask: 'Deduct_Wool_1' },
+      goat_meat: { name: 'Goat Meat', icon: '<img class="emojimg" src="emoji/goat_meat.png" alt="">', value: 20, unlockLevel: 18, deductTask: 'Deduct_Goat_Meat_1' },
+      honey: { name: 'Honey', icon: '<img class="emojimg" src="emoji/honey.png" alt="">', value: 25, unlockLevel: 21, deductTask: 'Deduct_Honey_1' },
+      truffle: { name: 'Truffle', icon: '<img class="emojimg" src="emoji/truffle.png" alt="">', value: 50, unlockLevel: 26, deductTask: 'Deduct_Truffle_1' },
+      flour: { name: 'Flour', icon: '<img class="emojimg" src="emoji/flour.png" alt="">', value: 10, unlockLevel: 4, deductTask: 'Deduct_Flour_1' },
+      butter: { name: 'Butter', icon: '<img class="emojimg" src="emoji/butter.png" alt="">', value: 30, unlockLevel: 8, deductTask: 'Deduct_Butter_1' },
+      cheese: { name: 'Cheese', icon: '<img class="emojimg" src="emoji/cheese.png" alt="">', value: 45, unlockLevel: 9, deductTask: 'Deduct_Cheese_1' },
+      bread: { name: 'Bread', icon: '<img class="emojimg" src="emoji/bread.png" alt="">', value: 35, unlockLevel: 11, deductTask: 'Deduct_Bread_1' },
+      blanket: { name: 'Blanket', icon: '<img class="emojimg" src="emoji/blanket.png" alt="">', value: 60, unlockLevel: 14, deductTask: 'Deduct_Blanket_1' },
+      stew: { name: 'Stew', icon: '<img class="emojimg" src="emoji/stew.png" alt="">', value: 50, unlockLevel: 15, deductTask: 'Deduct_Stew_1' },
+      ragout: { name: 'Ragout', icon: '<img class="emojimg" src="emoji/ragout.png" alt="">', value: 75, unlockLevel: 19, deductTask: 'Deduct_Ragout_1' },
+      mead: { name: 'Mead', icon: '<img class="emojimg" src="emoji/mead.png" alt="">', value: 100, unlockLevel: 22, deductTask: 'Deduct_Mead_1' },
+      pie: { name: 'Pie', icon: '<img class="emojimg" src="emoji/pie.png" alt="">', value: 100, unlockLevel: 24, deductTask: 'Deduct_Pie_1' },
+      meat_pie: { name: 'Meat Pie', icon: '<img class="emojimg" src="emoji/meat_pie.png" alt="">', value: 90, unlockLevel: 27, deductTask: 'Deduct_Meat_Pie_1' },
+      cake: { name: 'Cake', icon: '<img class="emojimg" src="emoji/cake.png" alt="">', value: 150, unlockLevel: 28, deductTask: 'Deduct_Cake_1' }
     };
 
     const TIER_CONFIG = {
@@ -877,10 +891,10 @@
         html += renderSlotContract(slot, index, true);
         var canFill = canFillContract(slot);
         html += '<div class="slot-buttons">' +
-          '<button class="btn btn-fill" ' + (canFill && !actionPending ? 'onclick="fillContract(' + index + ')"' : 'disabled') + '>&#x2705; Fill Order</button>' +
+          '<button class="btn btn-fill" ' + (canFill && !actionPending ? 'onclick="fillContract(' + index + ')"' : 'disabled') + '><img class="emojimg standalone" src="emoji/check_green.png" alt=""> Fill Order</button>' +
         '</div>';
       } else {
-        html += '<div class="slot-empty-text">&#x1F4CB; Waiting for contract...</div>';
+        html += '<div class="slot-empty-text"><img class="emojimg standalone" src="emoji/clipboard.png" alt=""> Waiting for contract...</div>';
       }
 
       html += '</div></div>';
@@ -987,8 +1001,8 @@
       // Reward banner at top
       html += '<div class="reward-banner">';
       html += '<span class="tier-badge ' + tierClass + '">T' + contract.tier + '</span>';
-      html += '<span class="reward-item reward-gold"><span class="reward-icon">&#x1FA99;</span> ' + contract.goldReward + 'g</span>';
-      html += '<span class="reward-item reward-xp"><span class="reward-icon">&#x2B50;</span> ' + contract.xpReward + ' XP</span>';
+      html += '<span class="reward-item reward-gold"><span class="reward-icon"><img class="emojimg" src="emoji/gold.png" alt=""></span> ' + contract.goldReward + 'g</span>';
+      html += '<span class="reward-item reward-xp"><span class="reward-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span> ' + contract.xpReward + ' XP</span>';
       html += '</div>';
 
       // Items

@@ -54,6 +54,20 @@
     ::-webkit-scrollbar { width: 12px; }
     ::-webkit-scrollbar-track { background: #1a0f00; }
     ::-webkit-scrollbar-thumb { background: #ff9f1a; border-radius: 6px; border: 3px solid #000; }
+  
+    /* ── EMOJI IMAGE ICONS (auto-applied by patch_iframe_emojis.py) ── */
+    .item-icon img.emojimg,
+    .gold-icon img.emojimg, .level-icon img.emojimg,
+    .tab-icon img.emojimg, .title-icon img.emojimg,
+    .package-icon img.emojimg, .coming-soon-icon img.emojimg {
+      display: inline-block; vertical-align: middle;
+      width: 1em; height: 1em; object-fit: contain;
+      filter: drop-shadow(2px 2px 0 #000);
+    }
+    .item-icon { display: inline-flex; align-items: center; justify-content: center; }
+    .item-icon > img.emojimg { width: 1em; height: 1em; }
+    img.emojimg.standalone { width: 1.2em; height: 1.2em; vertical-align: middle; }
+
   </style>
 </head>
 <body>
@@ -64,11 +78,11 @@
         <div class="title">SELL GOODS</div>
         <div style="display: flex; align-items: center; gap: 10px;">
           <div class="gold-display">
-            <span class="gold-icon">&#x1FA99;</span>
+            <span class="gold-icon"><img class="emojimg" src="emoji/gold.png" alt=""></span>
             <span class="gold-value" id="gold-display">0</span>
           </div>
           <div class="level-display">
-            <span class="level-icon">&#x2B50;</span>
+            <span class="level-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
             <span class="level-value" id="level-display">Lv.0</span>
           </div>
           <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
@@ -93,33 +107,33 @@
     const ITEMS = {
       // Prices must match Excel Sell tasks
       crops: [
-        { key: 'wheat', name: 'Wheat', icon: '&#x1F33E;', price: 5, taskPrefix: 'Sell_Crop_Wheat' },
-        { key: 'corn', name: 'Corn', icon: '&#x1F33D;', price: 8, taskPrefix: 'Sell_Crop_Corn' },
-        { key: 'carrot', name: 'Carrot', icon: '&#x1F955;', price: 10, taskPrefix: 'Sell_Crop_Carrot' },
-        { key: 'potato', name: 'Potato', icon: '&#x1F954;', price: 12, taskPrefix: 'Sell_Crop_Potato' },
-        { key: 'tomato', name: 'Tomato', icon: '&#x1F345;', price: 15, taskPrefix: 'Sell_Crop_Tomato' },
-        { key: 'pumpkin', name: 'Pumpkin', icon: '&#x1F383;', price: 30, taskPrefix: 'Sell_Crop_Pumpkin' }
+        { key: 'wheat', name: 'Wheat', icon: '<img class="emojimg" src="emoji/wheat.png" alt="">', price: 5, taskPrefix: 'Sell_Crop_Wheat' },
+        { key: 'corn', name: 'Corn', icon: '<img class="emojimg" src="emoji/corn.png" alt="">', price: 8, taskPrefix: 'Sell_Crop_Corn' },
+        { key: 'carrot', name: 'Carrot', icon: '<img class="emojimg" src="emoji/carrot.png" alt="">', price: 10, taskPrefix: 'Sell_Crop_Carrot' },
+        { key: 'potato', name: 'Potato', icon: '<img class="emojimg" src="emoji/potato.png" alt="">', price: 12, taskPrefix: 'Sell_Crop_Potato' },
+        { key: 'tomato', name: 'Tomato', icon: '<img class="emojimg" src="emoji/tomato.png" alt="">', price: 15, taskPrefix: 'Sell_Crop_Tomato' },
+        { key: 'pumpkin', name: 'Pumpkin', icon: '<img class="emojimg" src="emoji/pumpkin.png" alt="">', price: 30, taskPrefix: 'Sell_Crop_Pumpkin' }
       ],
       products: [
-        { key: 'milk', name: 'Milk', icon: '&#x1F95B;', price: 12, taskPrefix: 'Sell_Milk', singleOnly: true },
-        { key: 'wool', name: 'Wool', icon: '&#x1F9F6;', price: 15, taskPrefix: 'Sell_Wool', singleOnly: true },
-        { key: 'goat_meat', name: 'Goat Meat', icon: '&#x1F356;', price: 20, taskPrefix: 'Sell_Goat_Meat', singleOnly: true },
-        { key: 'truffle', name: 'Truffle', icon: '&#x1F344;', price: 50, taskPrefix: 'Sell_Truffle', singleOnly: true },
-        { key: 'egg', name: 'Egg', icon: '&#x1F95A;', price: 8, taskPrefix: 'Sell_Egg', singleOnly: true },
-        { key: 'honey', name: 'Honey', icon: '&#x1F36F;', price: 25, taskPrefix: 'Sell_Honey', singleOnly: true }
+        { key: 'milk', name: 'Milk', icon: '<img class="emojimg" src="emoji/milk.png" alt="">', price: 12, taskPrefix: 'Sell_Milk', singleOnly: true },
+        { key: 'wool', name: 'Wool', icon: '<img class="emojimg" src="emoji/wool.png" alt="">', price: 15, taskPrefix: 'Sell_Wool', singleOnly: true },
+        { key: 'goat_meat', name: 'Goat Meat', icon: '<img class="emojimg" src="emoji/goat_meat.png" alt="">', price: 20, taskPrefix: 'Sell_Goat_Meat', singleOnly: true },
+        { key: 'truffle', name: 'Truffle', icon: '<img class="emojimg" src="emoji/truffle.png" alt="">', price: 50, taskPrefix: 'Sell_Truffle', singleOnly: true },
+        { key: 'egg', name: 'Egg', icon: '<img class="emojimg" src="emoji/egg.png" alt="">', price: 8, taskPrefix: 'Sell_Egg', singleOnly: true },
+        { key: 'honey', name: 'Honey', icon: '<img class="emojimg" src="emoji/honey.png" alt="">', price: 25, taskPrefix: 'Sell_Honey', singleOnly: true }
       ],
       crafted: [
-        { key: 'flour', name: 'Flour', icon: '&#x1F35E;', price: 10, taskPrefix: 'Sell_Flour', singleOnly: true },
-        { key: 'bread', name: 'Bread', icon: '&#x1F956;', price: 35, taskPrefix: 'Sell_Bread', singleOnly: true },
-        { key: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', price: 45, taskPrefix: 'Sell_Cheese', singleOnly: true },
-        { key: 'stew', name: 'Stew', icon: '&#x1F372;', price: 50, taskPrefix: 'Sell_Stew', singleOnly: true },
-        { key: 'ragout', name: 'Ragout', icon: '&#x1F356;', price: 75, taskPrefix: 'Sell_Ragout', singleOnly: true },
-        { key: 'pie', name: 'Pie', icon: '&#x1F967;', price: 100, taskPrefix: 'Sell_Pie', singleOnly: true },
-        { key: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', price: 90, taskPrefix: 'Sell_Meat_Pie', singleOnly: true },
-        { key: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', price: 60, taskPrefix: 'Sell_Blanket', singleOnly: true },
-        { key: 'butter', name: 'Butter', icon: '&#x1F9C8;', price: 30, taskPrefix: 'Sell_Butter', singleOnly: true },
-        { key: 'cake', name: 'Cake', icon: '&#x1F370;', price: 150, taskPrefix: 'Sell_Cake', singleOnly: true },
-        { key: 'mead', name: 'Mead', icon: '&#x1F37A;', price: 100, taskPrefix: 'Sell_Mead', singleOnly: true }
+        { key: 'flour', name: 'Flour', icon: '<img class="emojimg" src="emoji/flour.png" alt="">', price: 10, taskPrefix: 'Sell_Flour', singleOnly: true },
+        { key: 'bread', name: 'Bread', icon: '<img class="emojimg" src="emoji/bread.png" alt="">', price: 35, taskPrefix: 'Sell_Bread', singleOnly: true },
+        { key: 'cheese', name: 'Cheese', icon: '<img class="emojimg" src="emoji/cheese.png" alt="">', price: 45, taskPrefix: 'Sell_Cheese', singleOnly: true },
+        { key: 'stew', name: 'Stew', icon: '<img class="emojimg" src="emoji/stew.png" alt="">', price: 50, taskPrefix: 'Sell_Stew', singleOnly: true },
+        { key: 'ragout', name: 'Ragout', icon: '<img class="emojimg" src="emoji/ragout.png" alt="">', price: 75, taskPrefix: 'Sell_Ragout', singleOnly: true },
+        { key: 'pie', name: 'Pie', icon: '<img class="emojimg" src="emoji/pie.png" alt="">', price: 100, taskPrefix: 'Sell_Pie', singleOnly: true },
+        { key: 'meat_pie', name: 'Meat Pie', icon: '<img class="emojimg" src="emoji/meat_pie.png" alt="">', price: 90, taskPrefix: 'Sell_Meat_Pie', singleOnly: true },
+        { key: 'blanket', name: 'Blanket', icon: '<img class="emojimg" src="emoji/blanket.png" alt="">', price: 60, taskPrefix: 'Sell_Blanket', singleOnly: true },
+        { key: 'butter', name: 'Butter', icon: '<img class="emojimg" src="emoji/butter.png" alt="">', price: 30, taskPrefix: 'Sell_Butter', singleOnly: true },
+        { key: 'cake', name: 'Cake', icon: '<img class="emojimg" src="emoji/cake.png" alt="">', price: 150, taskPrefix: 'Sell_Cake', singleOnly: true },
+        { key: 'mead', name: 'Mead', icon: '<img class="emojimg" src="emoji/mead.png" alt="">', price: 100, taskPrefix: 'Sell_Mead', singleOnly: true }
       ]
     };
 

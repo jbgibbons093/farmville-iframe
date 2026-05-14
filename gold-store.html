@@ -337,7 +337,21 @@ body {
   .package-action { width: 100%; flex-direction: row; justify-content: space-between; }
   .buy-btn { font-size: 20px; padding: 16px 32px; }
 }
-</style>
+
+    /* ── EMOJI IMAGE ICONS (auto-applied by patch_iframe_emojis.py) ── */
+    .item-icon img.emojimg,
+    .gold-icon img.emojimg, .level-icon img.emojimg,
+    .tab-icon img.emojimg, .title-icon img.emojimg,
+    .package-icon img.emojimg, .coming-soon-icon img.emojimg {
+      display: inline-block; vertical-align: middle;
+      width: 1em; height: 1em; object-fit: contain;
+      filter: drop-shadow(2px 2px 0 #000);
+    }
+    .item-icon { display: inline-flex; align-items: center; justify-content: center; }
+    .item-icon > img.emojimg { width: 1em; height: 1em; }
+    img.emojimg.standalone { width: 1.2em; height: 1.2em; vertical-align: middle; }
+
+  </style>
 </head>
 <body>
 <script>var _uiPopCtx=null;var _uiPopBuf=null;var _uiPopPlayed=false;try{_uiPopCtx=new(window.AudioContext||window.webkitAudioContext)();fetch('ui-pop.mp3').then(function(r){return r.arrayBuffer()}).then(function(b){return _uiPopCtx.decodeAudioData(b)}).then(function(d){_uiPopBuf=d}).catch(function(){})}catch(e){}</script>
@@ -346,12 +360,12 @@ body {
   <div class="container">
     <div class="header">
       <div class="title">
-        <span class="title-icon">&#x1FA99;</span>
+        <span class="title-icon"><img class="emojimg" src="emoji/gold.png" alt=""></span>
         Gold Store
       </div>
       <div class="header-right">
         <div class="gold-display">
-          <span class="gold-icon">&#x1FA99;</span>
+          <span class="gold-icon"><img class="emojimg" src="emoji/gold.png" alt=""></span>
           <span class="gold-value" id="gold-display">0</span>
         </div>
         <button class="close-btn" onclick="closeIframe()" title="Close">&#10005;</button>
@@ -368,7 +382,7 @@ body {
         <!-- Starter Pack -->
         <div class="package-card starter">
           <div class="package-info">
-            <span class="package-icon">&#x1FA99;</span>
+            <span class="package-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
             <div class="package-details">
               <div class="package-name">Starter Pack</div>
               <div class="package-gold"><span>1,000</span> Gold</div>
@@ -384,7 +398,7 @@ body {
         <!-- Farmer's Bundle -->
         <div class="package-card bundle">
           <div class="package-info">
-            <span class="package-icon">&#x1FA99;</span>
+            <span class="package-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
             <div class="package-details">
               <div class="package-name">Farmer's Bundle</div>
               <div class="package-gold"><span>5,000</span> Gold</div>
@@ -401,7 +415,7 @@ body {
         <!-- Tycoon Pack -->
         <div class="package-card tycoon">
           <div class="package-info">
-            <span class="package-icon">&#x1F451;</span>
+            <span class="package-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
             <div class="package-details">
               <div class="package-name">Tycoon Pack</div>
               <div class="package-gold"><span>15,000</span> Gold</div>

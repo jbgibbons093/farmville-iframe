@@ -54,6 +54,20 @@
     ::-webkit-scrollbar { width: 12px; }
     ::-webkit-scrollbar-track { background: #1a0f08; }
     ::-webkit-scrollbar-thumb { background: #e67e22; border-radius: 6px; border: 3px solid #000; }
+  
+    /* ── EMOJI IMAGE ICONS (auto-applied by patch_iframe_emojis.py) ── */
+    .item-icon img.emojimg,
+    .gold-icon img.emojimg, .level-icon img.emojimg,
+    .tab-icon img.emojimg, .title-icon img.emojimg,
+    .package-icon img.emojimg, .coming-soon-icon img.emojimg {
+      display: inline-block; vertical-align: middle;
+      width: 1em; height: 1em; object-fit: contain;
+      filter: drop-shadow(2px 2px 0 #000);
+    }
+    .item-icon { display: inline-flex; align-items: center; justify-content: center; }
+    .item-icon > img.emojimg { width: 1em; height: 1em; }
+    img.emojimg.standalone { width: 1.2em; height: 1.2em; vertical-align: middle; }
+
   </style>
 </head>
 <body>
@@ -74,25 +88,25 @@
   <script src="https://portals-labs.github.io/portals-sdk/portals-sdk.js"></script>
   <script>
     const RECIPES = [
-      { id: 'flour', name: 'Flour', icon: '&#x1F35E;', ingredients: { wheat: 3 }, sellPrice: 10, xp: 10, taskName: 'Craft_Flour', unlockLevel: 4 },
-      { id: 'butter', name: 'Butter', icon: '&#x1F9C8;', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter', unlockLevel: 8 },
-      { id: 'cheese', name: 'Cheese', icon: '&#x1F9C0;', ingredients: { milk: 2 }, sellPrice: 45, xp: 15, taskName: 'Craft_Cheese', unlockLevel: 9 },
-      { id: 'bread', name: 'Bread', icon: '&#x1F956;', ingredients: { flour: 1, egg: 1 }, sellPrice: 35, xp: 15, taskName: 'Craft_Bread', unlockLevel: 11 },
-      { id: 'blanket', name: 'Blanket', icon: '&#x1F9E3;', ingredients: { wool: 3 }, sellPrice: 60, xp: 20, taskName: 'Craft_Blanket', unlockLevel: 14 },
-      { id: 'stew', name: 'Stew', icon: '&#x1F372;', ingredients: { potato: 1, carrot: 1, corn: 1 }, sellPrice: 50, xp: 25, taskName: 'Craft_Stew', unlockLevel: 15 },
-      { id: 'ragout', name: 'Ragout', icon: '&#x1F356;', ingredients: { goat_meat: 1, potato: 1, carrot: 1 }, sellPrice: 75, xp: 30, taskName: 'Craft_Ragout', unlockLevel: 19 },
-      { id: 'mead', name: 'Mead', icon: '&#x1F37A;', ingredients: { honey: 2 }, sellPrice: 100, xp: 25, taskName: 'Craft_Mead', unlockLevel: 22 },
-      { id: 'pie', name: 'Pie', icon: '&#x1F967;', ingredients: { flour: 1, pumpkin: 1, egg: 1 }, sellPrice: 100, xp: 30, taskName: 'Craft_Pie', unlockLevel: 24 },
-      { id: 'meat_pie', name: 'Meat Pie', icon: '&#x1F969;', ingredients: { goat_meat: 1, flour: 1, egg: 1 }, sellPrice: 90, xp: 35, taskName: 'Craft_Meat_Pie', unlockLevel: 27 },
-      { id: 'cake', name: 'Cake', icon: '&#x1F370;', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 150, xp: 40, taskName: 'Craft_Cake', unlockLevel: 28 }
+      { id: 'flour', name: 'Flour', icon: '<img class="emojimg" src="emoji/flour.png" alt="">', ingredients: { wheat: 3 }, sellPrice: 10, xp: 10, taskName: 'Craft_Flour', unlockLevel: 4 },
+      { id: 'butter', name: 'Butter', icon: '<img class="emojimg" src="emoji/butter.png" alt="">', ingredients: { milk: 2 }, sellPrice: 30, xp: 15, taskName: 'Craft_Butter', unlockLevel: 8 },
+      { id: 'cheese', name: 'Cheese', icon: '<img class="emojimg" src="emoji/cheese.png" alt="">', ingredients: { milk: 2 }, sellPrice: 45, xp: 15, taskName: 'Craft_Cheese', unlockLevel: 9 },
+      { id: 'bread', name: 'Bread', icon: '<img class="emojimg" src="emoji/bread.png" alt="">', ingredients: { flour: 1, egg: 1 }, sellPrice: 35, xp: 15, taskName: 'Craft_Bread', unlockLevel: 11 },
+      { id: 'blanket', name: 'Blanket', icon: '<img class="emojimg" src="emoji/blanket.png" alt="">', ingredients: { wool: 3 }, sellPrice: 60, xp: 20, taskName: 'Craft_Blanket', unlockLevel: 14 },
+      { id: 'stew', name: 'Stew', icon: '<img class="emojimg" src="emoji/stew.png" alt="">', ingredients: { potato: 1, carrot: 1, corn: 1 }, sellPrice: 50, xp: 25, taskName: 'Craft_Stew', unlockLevel: 15 },
+      { id: 'ragout', name: 'Ragout', icon: '<img class="emojimg" src="emoji/ragout.png" alt="">', ingredients: { goat_meat: 1, potato: 1, carrot: 1 }, sellPrice: 75, xp: 30, taskName: 'Craft_Ragout', unlockLevel: 19 },
+      { id: 'mead', name: 'Mead', icon: '<img class="emojimg" src="emoji/mead.png" alt="">', ingredients: { honey: 2 }, sellPrice: 100, xp: 25, taskName: 'Craft_Mead', unlockLevel: 22 },
+      { id: 'pie', name: 'Pie', icon: '<img class="emojimg" src="emoji/pie.png" alt="">', ingredients: { flour: 1, pumpkin: 1, egg: 1 }, sellPrice: 100, xp: 30, taskName: 'Craft_Pie', unlockLevel: 24 },
+      { id: 'meat_pie', name: 'Meat Pie', icon: '<img class="emojimg" src="emoji/meat_pie.png" alt="">', ingredients: { goat_meat: 1, flour: 1, egg: 1 }, sellPrice: 90, xp: 35, taskName: 'Craft_Meat_Pie', unlockLevel: 27 },
+      { id: 'cake', name: 'Cake', icon: '<img class="emojimg" src="emoji/cake.png" alt="">', ingredients: { flour: 1, egg: 2, butter: 1 }, sellPrice: 150, xp: 40, taskName: 'Craft_Cake', unlockLevel: 28 }
     ];
 
     const INGREDIENT_ICONS = {
-      wheat: '&#x1F33E;', carrot: '&#x1F955;', corn: '&#x1F33D;',
-      potato: '&#x1F954;', tomato: '&#x1F345;', pumpkin: '&#x1F383;',
-      milk: '&#x1F95B;', wool: '&#x1F9F6;', goat_meat: '&#x1F356;',
-      truffle: '&#x1F344;', egg: '&#x1F95A;', flour: '&#x1F35E;', butter: '&#x1F9C8;',
-      honey: '&#x1F36F;'
+      wheat: '<img class="emojimg" src="emoji/wheat.png" alt="">', carrot: '<img class="emojimg" src="emoji/carrot.png" alt="">', corn: '<img class="emojimg" src="emoji/corn.png" alt="">',
+      potato: '<img class="emojimg" src="emoji/potato.png" alt="">', tomato: '<img class="emojimg" src="emoji/tomato.png" alt="">', pumpkin: '<img class="emojimg" src="emoji/pumpkin.png" alt="">',
+      milk: '<img class="emojimg" src="emoji/milk.png" alt="">', wool: '<img class="emojimg" src="emoji/wool.png" alt="">', goat_meat: '<img class="emojimg" src="emoji/goat_meat.png" alt="">',
+      truffle: '<img class="emojimg" src="emoji/truffle.png" alt="">', egg: '<img class="emojimg" src="emoji/egg.png" alt="">', flour: '<img class="emojimg" src="emoji/flour.png" alt="">', butter: '<img class="emojimg" src="emoji/butter.png" alt="">',
+      honey: '<img class="emojimg" src="emoji/honey.png" alt="">'
     };
 
     let gameState = { inventory: {}, recipes: {}, level: 0, talents: { keenLearner: 0, artisan: 0, seasonedWorker: 0, prodigy: 0 }, rebirthBlessings: { artisanTouch: 0 } };
@@ -274,7 +288,7 @@
           var enough = has >= qty;
           if (!enough) canCraft = false;
 
-          var icon = INGREDIENT_ICONS[ing] || '&#x1F4E6;';
+          var icon = INGREDIENT_ICONS[ing] || '<img class="emojimg" src="emoji/chest.png" alt="">';
           ingredientsHtml += '<span class="ingredient ' + (enough ? 'has' : 'missing') + '">' +
             '<span class="ingredient-icon">' + icon + '</span>' +
             '<span class="ingredient-name">' + ing.replace('_', ' ') + '</span> ' +

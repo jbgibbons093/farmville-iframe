@@ -49,6 +49,20 @@
     ::-webkit-scrollbar { width: 12px; }
     ::-webkit-scrollbar-track { background: #142e1c; }
     ::-webkit-scrollbar-thumb { background: #2ecc71; border-radius: 6px; border: 3px solid #000; }
+  
+    /* ── EMOJI IMAGE ICONS (auto-applied by patch_iframe_emojis.py) ── */
+    .item-icon img.emojimg,
+    .gold-icon img.emojimg, .level-icon img.emojimg,
+    .tab-icon img.emojimg, .title-icon img.emojimg,
+    .package-icon img.emojimg, .coming-soon-icon img.emojimg {
+      display: inline-block; vertical-align: middle;
+      width: 1em; height: 1em; object-fit: contain;
+      filter: drop-shadow(2px 2px 0 #000);
+    }
+    .item-icon { display: inline-flex; align-items: center; justify-content: center; }
+    .item-icon > img.emojimg { width: 1em; height: 1em; }
+    img.emojimg.standalone { width: 1.2em; height: 1.2em; vertical-align: middle; }
+
   </style>
 </head>
 <body>
@@ -59,11 +73,11 @@
         <div class="title">SEED STORE</div>
         <div style="display: flex; align-items: center; gap: 10px;">
           <div class="gold-display">
-            <span class="gold-icon">&#x1FA99;</span>
+            <span class="gold-icon"><img class="emojimg" src="emoji/gold.png" alt=""></span>
             <span class="gold-value" id="gold-display">0</span>
           </div>
           <div class="level-display">
-            <span class="level-icon">&#x2B50;</span>
+            <span class="level-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
             <span class="level-value" id="level-display">Lv.0</span>
           </div>
           <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
@@ -81,12 +95,12 @@
   <script>
     // Prices must match Excel Buy_Seeds tasks: wheat=2, carrot=5, corn=3, potato=6, tomato=8, pumpkin=15
     const SEEDS = {
-      wheat: { name: 'Wheat', icon: '&#x1F33E;', cost: 2, unlockLevel: 0 },
-      corn: { name: 'Corn', icon: '&#x1F33D;', cost: 3, unlockLevel: 3 },
-      carrot: { name: 'Carrot', icon: '&#x1F955;', cost: 5, unlockLevel: 7 },
-      potato: { name: 'Potato', icon: '&#x1F954;', cost: 6, unlockLevel: 10 },
-      tomato: { name: 'Tomato', icon: '&#x1F345;', cost: 8, unlockLevel: 16 },
-      pumpkin: { name: 'Pumpkin', icon: '&#x1F383;', cost: 15, unlockLevel: 23 }
+      wheat: { name: 'Wheat', icon: '<img class="emojimg" src="emoji/wheat_seed.png" alt="">', cost: 2, unlockLevel: 0 },
+      corn: { name: 'Corn', icon: '<img class="emojimg" src="emoji/corn_seed.png" alt="">', cost: 3, unlockLevel: 3 },
+      carrot: { name: 'Carrot', icon: '<img class="emojimg" src="emoji/carrot_seed.png" alt="">', cost: 5, unlockLevel: 7 },
+      potato: { name: 'Potato', icon: '<img class="emojimg" src="emoji/potato_seed.png" alt="">', cost: 6, unlockLevel: 10 },
+      tomato: { name: 'Tomato', icon: '<img class="emojimg" src="emoji/tomato_seed.png" alt="">', cost: 8, unlockLevel: 16 },
+      pumpkin: { name: 'Pumpkin', icon: '<img class="emojimg" src="emoji/pumpkin_seed.png" alt="">', cost: 15, unlockLevel: 23 }
     };
 
     let gameState = { gold: 0, level: 0, seeds: {} };
