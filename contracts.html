@@ -157,7 +157,7 @@
           <span class="stat-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
           <span class="stat-value">Lv.<span id="level-display">0</span></span>
         </div>
-        <button class="close-btn" onclick="closeIframe()">&#x2715;</button>
+        <button class="close-btn" onclick="closeIframe()"><img class="emojimg" src="emoji/x_red.png" alt=""></button>
       </div>
     </div>
 
@@ -168,14 +168,14 @@
           <div class="panel-subtitle"><span id="slots-unlocked">1</span> / 10 slots unlocked</div>
         </div>
         <div class="refresh-timer">
-          <span>&#x1F504;</span>
+          <span><img class="emojimg" src="emoji/rebirth.png" alt=""></span>
           <span id="refresh-timer">2:00</span>
         </div>
       </div>
       <div class="carousel">
-        <button class="nav-btn" id="nav-prev" onclick="navigateSlot(-1)">&#x25C0;</button>
+        <button class="nav-btn" id="nav-prev" onclick="navigateSlot(-1)"><img class="emojimg" src="emoji/minus_red.png" alt=""></button>
         <div class="card-display" id="card-display"></div>
-        <button class="nav-btn" id="nav-next" onclick="navigateSlot(1)">&#x25B6;</button>
+        <button class="nav-btn" id="nav-next" onclick="navigateSlot(1)"><img class="emojimg" src="emoji/plus_green.png" alt=""></button>
       </div>
       <div class="carousel-footer">
         <div class="nav-dots" id="nav-dots"></div>
@@ -845,7 +845,7 @@
       var lockArea = document.getElementById('locked-summary-area');
       if (lockedCount > 0) {
         lockArea.innerHTML = '<div class="locked-summary">' +
-          '<span class="locked-summary-icon">&#x1F512;</span>' +
+          '<span class="locked-summary-icon"><img class="emojimg" src="emoji/padlock.png" alt=""></span>' +
           '<span class="locked-summary-text">' + lockedCount + ' slot' + (lockedCount > 1 ? 's' : '') + ' locked</span>' +
           '<span class="locked-summary-hint">Unlock with Contractor talents</span>' +
         '</div>';
@@ -859,7 +859,7 @@
       var unlockedCount = getUnlockedSlots();
 
       if (index >= unlockedCount) {
-        return '<div class="slot"><div class="slot-empty-text">&#x1F512; Locked</div></div>';
+        return '<div class="slot"><div class="slot-empty-text"><img class="emojimg" src="emoji/padlock.png" alt=""> Locked</div></div>';
       }
 
       var slotClass = 'slot';
@@ -880,7 +880,7 @@
       if (slot.state === 'available' && slot.contract) {
         html += renderSlotContract(slot, index, false);
         html += '<div class="slot-buttons">' +
-          '<button class="btn btn-accept" onclick="acceptContract(' + index + ')">&#x1F91D; Accept</button>' +
+          '<button class="btn btn-accept" onclick="acceptContract(' + index + ')"><img class="emojimg" src="emoji/shield_check.png" alt=""> Accept</button>' +
         '</div>';
       } else if (slot.state === 'filling') {
         html += renderSlotContract(slot, index, true);

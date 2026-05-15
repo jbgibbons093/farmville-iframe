@@ -80,7 +80,7 @@
             <span class="level-icon"><img class="emojimg" src="emoji/badge_star.png" alt=""></span>
             <span class="level-value" id="level-display">Lv.0</span>
           </div>
-          <button class="close-btn" onclick="closeIframe()" title="Close">&#x2715;</button>
+          <button class="close-btn" onclick="closeIframe()" title="Close"><img class="emojimg" src="emoji/x_red.png" alt=""></button>
         </div>
       </div>
       <div class="content">
@@ -201,7 +201,7 @@
           '<div class="item-info">' +
             '<div class="item-name">' + seed.name + ' Seeds</div>' +
             '<div class="item-stock">Owned: ' + owned + '</div>' +
-            (locked ? '<div class="item-locked">&#x1F512; Unlocks at Lv.' + seed.unlockLevel + '</div>' : '') +
+            (locked ? '<div class="item-locked"><img class="emojimg" src="emoji/padlock.png" alt=""> Unlocks at Lv.' + seed.unlockLevel + '</div>' : '') +
           '</div>' +
           '<div class="item-actions">' +
             '<div class="item-price">' + seed.cost + 'g each</div>' +
