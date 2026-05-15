@@ -711,7 +711,7 @@ var BLESSING_TREES = {
         desc: '-4% crop & animal time per rank', tier: 2, pos: { x: 70, y: 200 },
         requires: { key: 'SwiftHusbandry', rank: 2 } },
       // Tier 3
-      { key: 'TimeWarp', name: 'Time Warp', icon: '\u231B', maxRank: 2,
+      { key: 'TimeWarp', name: 'Time Warp', icon: '<img src="emoji/hourglass.png" class="emojimg" alt="">', maxRank: 2,
         desc: '-5% ALL timers per rank (crops, animals, contracts)', tier: 3, pos: { x: 50, y: 340 },
         requiresAll: [{ key: 'RushingWinds', rank: 2 }, { key: 'NimbleHands', rank: 2 }] }
     ]
@@ -733,14 +733,14 @@ var BLESSING_TREES = {
       { key: 'Stockpiler', name: 'Stockpiler', icon: '<img src="emoji/treasure.png" class="emojimg" alt="">', maxRank: 3,
         desc: '+2 animal start & collect XP per rank', tier: 1, pos: { x: 75, y: 60 } },
       // Tier 2
-      { key: 'ArtisanTouch', name: 'Artisan Touch', icon: '<img src="emoji/pickaxe.png" class="emojimg" alt="">', maxRank: 3,
+      { key: 'ArtisanTouch', name: 'Artisan Touch', icon: '<img src="emoji/hammer.png" class="emojimg" alt="">', maxRank: 3,
         desc: '+3 crafting XP per rank', tier: 2, pos: { x: 30, y: 200 },
         requires: { key: 'GreenFingers', rank: 2 } },
       { key: 'Fortune', name: 'Fortune', icon: '<img src="emoji/gem.png" class="emojimg" alt="">', maxRank: 2,
         desc: '+50 gold per level-up per rank', tier: 2, pos: { x: 70, y: 200 },
         requires: { key: 'Windfall', rank: 2 } },
       // Tier 3
-      { key: 'Cornucopia', name: 'Cornucopia', icon: '<img src="emoji/clover.png" class="emojimg" alt="">', maxRank: 1,
+      { key: 'Cornucopia', name: 'Cornucopia', icon: '<img src="emoji/cornucopia.png" class="emojimg" alt="">', maxRank: 1,
         desc: '+1 bonus crop per harvest & +1 bonus animal product',
         tier: 3, pos: { x: 50, y: 340 },
         requiresCombined: { required: { key: 'Fortune', rank: 2 }, oneOf: [{ key: 'GreenFingers', rank: 2 }, { key: 'Stockpiler', rank: 2 }] } }
@@ -756,7 +756,7 @@ var BLESSING_TREES = {
     ],
     talents: [
       // Tier 1
-      { key: 'NestEgg', name: 'Nest Egg', icon: '<img src="emoji/gold.png" class="emojimg" alt="">', maxRank: 3,
+      { key: 'NestEgg', name: 'Nest Egg', icon: '<img src="emoji/cracked_egg.png" class="emojimg" alt="">', maxRank: 3,
         desc: 'Start each run with bonus gold (rank \u00D7 100 \u00D7 rebirths)',
         descFn: function(rank) { var amt = rank * 100 * rebirthCount; return 'Start each run with ' + amt + ' bonus gold (' + rank + ' \u00D7 100 \u00D7 ' + rebirthCount + ')'; },
         tier: 1, pos: { x: 25, y: 60 } },
@@ -764,7 +764,7 @@ var BLESSING_TREES = {
         desc: 'Start each run with bonus wheat seeds (rank \u00D7 10 \u00D7 rebirths)',
         descFn: function(rank) { var amt = rank * 10 * rebirthCount; return 'Start each run with ' + amt + ' wheat seeds (' + rank + ' \u00D7 10 \u00D7 ' + rebirthCount + ')'; },
         tier: 1, pos: { x: 50, y: 60 } },
-      { key: 'Seasoned', name: 'Seasoned', icon: '<img src="emoji/star.png" class="emojimg" alt="">', maxRank: 3,
+      { key: 'Seasoned', name: 'Seasoned', icon: '<img src="emoji/grad_cap.png" class="emojimg" alt="">', maxRank: 3,
         desc: 'Start each run with bonus talent points (rank \u00D7 rebirths)',
         descFn: function(rank) { var amt = rank * rebirthCount; return 'Start each run with ' + amt + ' talent points (' + rank + ' \u00D7 ' + rebirthCount + ')'; },
         tier: 1, pos: { x: 75, y: 60 } },
@@ -772,11 +772,11 @@ var BLESSING_TREES = {
       { key: 'ToolShed', name: 'Tool Shed', icon: '<img src="emoji/wrench.png" class="emojimg" alt="">', maxRank: 4,
         desc: 'Start with all tools at tier = rank (1-4)', tier: 2, pos: { x: 25, y: 200 },
         requires: { key: 'NestEgg', rank: 2 } },
-      { key: 'QuickStart', name: 'Quick Start', icon: '<img src="emoji/flag.png" class="emojimg" alt="">', maxRank: 1,
+      { key: 'QuickStart', name: 'Quick Start', icon: '<img src="emoji/rocket.png" class="emojimg" alt="">', maxRank: 1,
         desc: 'Start each run at Level 3 with 3 talent points', tier: 2, pos: { x: 75, y: 200 },
         requires: { key: 'Seasoned', rank: 2 } },
       // Tier 3
-      { key: 'RecipeTome', name: 'Recipe Tome', icon: '<img src="emoji/book_red.png" class="emojimg" alt="">', maxRank: 1,
+      { key: 'RecipeTome', name: 'Recipe Tome', icon: '<img src="emoji/scroll.png" class="emojimg" alt="">', maxRank: 1,
         desc: 'Start each run with all 11 recipes unlocked', tier: 3, pos: { x: 50, y: 340 },
         requiresAll: [{ key: 'ToolShed', rank: 2 }, { key: 'QuickStart', rank: 1 }] }
     ]
