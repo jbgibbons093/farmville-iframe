@@ -345,6 +345,7 @@
           button.className = view.buttonClass;
           button.textContent = view.buttonText;
           button.disabled = !(view.canCraft && !actionPending);
+          button.onclick = (view.canCraft && !actionPending) ? function() { craftItem(recipe.id); } : null;
         }
       });
     }
