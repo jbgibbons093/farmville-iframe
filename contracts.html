@@ -91,7 +91,7 @@
     .contract-items { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
     .contract-item { display: flex; align-items: center; gap: 10px; background: #102e2e; padding: 10px 14px; border-radius: 14px; border: 4px solid #1a4a4a; flex: 1; min-width: 140px; transition: border-color 0.2s; }
     .slot.active .contract-item { border-color: #3a3010; }
-    .contract-item-icon { font-size: 38px; filter: drop-shadow(2px 2px 0 #000); }
+    .contract-item-icon { font-size: 38px; filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(2px 2px 0 #000); image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
     .contract-item-name { font-size: 20px; font-weight: 900; color: #fff; text-shadow: 1px 1px 0 #000; }
     .contract-item-qty { font-size: 26px; font-weight: 900; color: #fff; letter-spacing: 1px; margin-left: auto; text-shadow: 2px 2px 0 #000; }
     .contract-item-qty.has-enough { color: #3dff7f; }
@@ -135,7 +135,7 @@
     .package-icon img.emojimg, .coming-soon-icon img.emojimg {
       display: inline-block; vertical-align: middle;
       width: 1em; height: 1em; object-fit: contain;
-      filter: drop-shadow(2px 2px 0 #000);
+      filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(2px 2px 0 #000); image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;
     }
     .item-icon { display: inline-flex; align-items: center; justify-content: center; }
     .item-icon > img.emojimg { width: 1em; height: 1em; }
@@ -244,6 +244,7 @@
     let refreshEndTime = getRefreshWindow().endTime;
     let lastWindowSeed = null;
     let syncReceived = false; // Don't render slots until first Sync_Inventory
+    const CONTRACT_STORAGE_KEY = 'hughberry_contract_slots_v1';
 
     // Player's 10 slots — state is derived from Contract_X_Done + deterministic seed
     // States: 'loading' (waiting for sync), 'available' (has a contract to accept),
@@ -258,7 +259,8 @@
         endTime: null,
         windowSeed: null, // which 2-min window generated this slot's contract
         frozenLevel: null, // level when contract was accepted — used for restore
-        fillCount: 0 // incremented on each fill — changes the seed for next contract
+        fillCount: 0, // incremented on each fill — changes the seed for next contract
+        restoredFromStorage: false
       });
     }
 
@@ -266,6 +268,64 @@
     let notificationTimeout = null;
     var currentSlotIndex = 0;
     var _animating = false;
+
+    function loadPersistedContracts() {
+      try {
+        var raw = window.localStorage && window.localStorage.getItem(CONTRACT_STORAGE_KEY);
+        if (!raw) return;
+        var saved = JSON.parse(raw);
+        if (!saved || !saved.slots) return;
+        for (var i = 0; i < slots.length; i++) {
+          var persisted = saved.slots[String(i + 1)];
+          if (!persisted || !persisted.contract) continue;
+          slots[i].state = 'active';
+          slots[i].contract = JSON.parse(JSON.stringify(persisted.contract));
+          slots[i].frozenContract = JSON.parse(JSON.stringify(persisted.contract));
+          slots[i].windowSeed = Number(persisted.windowSeed) || null;
+          slots[i].frozenLevel = Number(persisted.frozenLevel) || 0;
+          slots[i].fillCount = Number(persisted.fillCount) || 0;
+          slots[i].endTime = null;
+          slots[i].restoredFromStorage = true;
+        }
+      } catch (e) {
+        console.warn('[Contracts] Could not load persisted contracts', e);
+      }
+    }
+
+    function persistContracts() {
+      try {
+        if (!window.localStorage) return;
+        var saved = { version: 1, slots: {} };
+        for (var i = 0; i < slots.length; i++) {
+          var slot = slots[i];
+          if (slot.state === 'active' && slot.frozenContract) {
+            saved.slots[String(i + 1)] = {
+              contract: slot.frozenContract,
+              windowSeed: slot.windowSeed,
+              frozenLevel: slot.frozenLevel,
+              fillCount: slot.fillCount || 0
+            };
+          }
+        }
+        window.localStorage.setItem(CONTRACT_STORAGE_KEY, JSON.stringify(saved));
+      } catch (e) {
+        console.warn('[Contracts] Could not persist contracts', e);
+      }
+    }
+
+    function clearPersistedContract(slotIndex) {
+      try {
+        if (!window.localStorage) return;
+        var raw = window.localStorage.getItem(CONTRACT_STORAGE_KEY);
+        if (!raw) return;
+        var saved = JSON.parse(raw);
+        if (!saved || !saved.slots) return;
+        delete saved.slots[String(slotIndex + 1)];
+        window.localStorage.setItem(CONTRACT_STORAGE_KEY, JSON.stringify(saved));
+      } catch (e) {
+        console.warn('[Contracts] Could not clear persisted contract', e);
+      }
+    }
 
     // ============================================
     // SEEDED PRNG (mulberry32) - deterministic contracts per slot per time window
@@ -610,12 +670,24 @@
         if (si >= unlockedCount) {
           slot.state = 'locked';
           slot.contract = null;
+          slot.frozenContract = null;
+          slot.frozenLevel = null;
           slot.endTime = null;
+          clearPersistedContract(si);
           continue;
         }
 
         if (slot.state === 'filling') {
           // Currently being fulfilled — don't touch
+        } else if (slot.state === 'active' && slot.frozenContract && slot.restoredFromStorage && gameState.contractDone[si] !== 1) {
+          slot.state = 'available';
+          slot.contract = getSlotContract(si, win.seed);
+          slot.frozenContract = null;
+          slot.frozenLevel = null;
+          slot.restoredFromStorage = false;
+          slot.windowSeed = win.seed;
+          slot.endTime = null;
+          clearPersistedContract(si);
         } else if (slot.state === 'active' && slot.frozenContract) {
           // Slot is locally accepted with a frozen contract — NEVER touch it
           // Doesn't matter what Contract_X_Done says
@@ -632,12 +704,14 @@
             slot.frozenContract = JSON.parse(JSON.stringify(slot.contract));
             slot.windowSeed = contractSeed;
           }
+          slot.restoredFromStorage = false;
           slot.endTime = null;
         } else {
           // Contract_X_Done = 0 and not locally active
           if (slot.state === 'active') {
             // Edge case: was active but frozenContract is null (shouldn't happen)
             // Keep active to be safe
+            if (slot.frozenContract) persistContracts();
           } else {
             // Available or loading — show a contract to accept
             var wasLoading = (slot.state === 'loading');
@@ -674,6 +748,8 @@
       // Freeze a deep copy of the contract — this copy is NEVER regenerated
       slot.frozenContract = JSON.parse(JSON.stringify(slot.contract));
       slot.frozenLevel = gameState.level;
+      slot.restoredFromStorage = false;
+      persistContracts();
 
       // Tell Portals this slot is taken
       triggerTask('Complete_Contract_' + (slotIndex + 1));
@@ -750,6 +826,8 @@
         slot.state = 'available';
         slot.frozenContract = null;
         slot.frozenLevel = null;
+        slot.restoredFromStorage = false;
+        clearPersistedContract(slotIndex);
         slot.fillCount = (slot.fillCount || 0) + 1;
         slot.contract = getSlotContract(slotIndex, win.seed);
         slot.windowSeed = win.seed;
@@ -1089,6 +1167,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+      loadPersistedContracts();
       setupMessageListener();
 
       // ESC to close, arrow keys to navigate
