@@ -357,6 +357,8 @@
     var prevInventory = {};
     var firstSync = true; // Skip notifications on initial load
     var recentNotifications = {};
+    var pendingXpDelta = 0;
+    var pendingXpTimer = null;
 
     // Item display names and icons for notifications
     var ITEM_INFO = {
@@ -439,6 +441,22 @@
       }, dur);
     }
 
+    function queueXpNotification(delta) {
+      pendingXpDelta += delta;
+      if (pendingXpTimer) clearTimeout(pendingXpTimer);
+      pendingXpTimer = setTimeout(function() {
+        var total = pendingXpDelta;
+        pendingXpDelta = 0;
+        pendingXpTimer = null;
+        if (total <= 0) return;
+        showHudNotification(
+          '<span class="notif-icon">\u{2728}</span> +' + total + ' XP',
+          'xp-gain', 3000
+        );
+        playXpSound();
+      }, 900);
+    }
+
     function checkDeltas(data) {
       if (firstSync) {
         // Store initial values, don't show notifications
@@ -503,11 +521,7 @@
         var levelChanged = data.level !== undefined && prevLevel >= 0 && data.level !== prevLevel;
         if (!levelChanged && data.xp > prevXP) {
           var xpDelta = data.xp - prevXP;
-          showHudNotification(
-            '<span class="notif-icon">\u{2728}</span> +' + xpDelta + ' XP',
-            'xp-gain', 3000
-          );
-          playXpSound();
+          queueXpNotification(xpDelta);
         }
       }
 
