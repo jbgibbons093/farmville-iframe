@@ -137,6 +137,8 @@
     let pendingRecipeId = null;
     let lastRenderSignature = '';
     let notifyTimeout = null;
+    let lastNotifyKey = '';
+    let lastNotifyTime = 0;
 
     function triggerTask(taskName) {
       const message = JSON.stringify({ TaskName: taskName, TaskTargetState: 'SetNotActiveToActive' });
@@ -217,6 +219,11 @@
     }
 
     function notify(msg, soundType) {
+      var now = Date.now();
+      var key = msg + '|' + (soundType || '');
+      if (key === lastNotifyKey && now - lastNotifyTime < 1000) return;
+      lastNotifyKey = key;
+      lastNotifyTime = now;
       if (soundType) playSound(soundType);
       var el = document.getElementById('notification');
       if (notifyTimeout) clearTimeout(notifyTimeout);
@@ -273,7 +280,7 @@
         awardXP(craftXP);
       }, 250);
 
-      notify('Crafted ' + recipe.name + '! +' + craftXP + ' XP', 'craft');
+      playSound('craft');
 
       // Safety timeout: reset actionPending if Sync_Inventory doesn't arrive
       setTimeout(function() {

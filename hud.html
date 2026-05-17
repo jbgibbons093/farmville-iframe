@@ -356,6 +356,7 @@
     var prevLevel = -1;
     var prevInventory = {};
     var firstSync = true; // Skip notifications on initial load
+    var recentNotifications = {};
 
     // Item display names and icons for notifications
     var ITEM_INFO = {
@@ -417,6 +418,12 @@
 
     function showHudNotification(html, type, duration) {
       var container = document.getElementById('hud-notifications');
+      var now = Date.now();
+      var key = type + '|' + html;
+      if (recentNotifications[key] && now - recentNotifications[key] < 1500) {
+        return;
+      }
+      recentNotifications[key] = now;
       // Cap at 6 notifications
       while (container.children.length >= 6) {
         container.removeChild(container.firstChild);
