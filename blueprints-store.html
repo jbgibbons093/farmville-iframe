@@ -580,7 +580,7 @@
         var _xp = data.xp !== undefined ? data.xp : 0;
         var _lv = data.level !== undefined ? data.level : 0;
         if (_firstXPSync) { _firstXPSync = false; _prevXP = _xp; _prevLevel = _lv; }
-        else { if (_lv === _prevLevel && _xp > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = _xp; _prevLevel = _lv; }
+        else { _prevXP = _xp; _prevLevel = _lv; }
         render();
       }
     }

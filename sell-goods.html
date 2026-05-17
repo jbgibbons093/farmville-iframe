@@ -398,7 +398,7 @@
         gameState.inventory.mead = data.mead || 0;
         actionPending = false;
         if (_firstXPSync) { _firstXPSync = false; _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
-        else { if ((data.level || 0) === _prevLevel && (data.xp || 0) > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
+        else { _prevXP = data.xp || 0; _prevLevel = data.level || 0; }
         render();
       }
     }

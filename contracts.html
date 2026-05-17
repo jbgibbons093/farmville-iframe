@@ -754,7 +754,7 @@
 
       // XP sound delta tracking
       if (_firstXPSync) { _firstXPSync = false; _prevXP = gameState.xp; _prevLevel = gameState.level; }
-      else { if (gameState.level === _prevLevel && gameState.xp > _prevXP) { setTimeout(function() { try { _xpSound.currentTime = 0; _xpSound.play().catch(function(){}); } catch(e) {} }, 500); } _prevXP = gameState.xp; _prevLevel = gameState.level; }
+      else { _prevXP = gameState.xp; _prevLevel = gameState.level; }
 
       actionPending = false;
       render();

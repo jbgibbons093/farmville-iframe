@@ -1049,7 +1049,7 @@ function handlePortalsMessage(msg) {
     parseAndSyncInventory(msg);
     renderAll();
     if (_firstXPSync) { _firstXPSync = false; _prevXP = _parsedXP; _prevLevel = _parsedLevel; }
-    else { if (_parsedLevel === _prevLevel && _parsedXP > _prevXP) { setTimeout(function() { playSound('xp'); }, 500); } _prevXP = _parsedXP; _prevLevel = _parsedLevel; }
+    else { _prevXP = _parsedXP; _prevLevel = _parsedLevel; }
   }
 }
 

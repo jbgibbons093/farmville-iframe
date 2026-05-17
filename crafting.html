@@ -594,7 +594,7 @@
         var curXP = data.xp !== undefined ? data.xp : 0;
         var curLevel = data.level !== undefined ? data.level : 0;
         if (_firstXPSync) { _firstXPSync = false; _prevXP = curXP; _prevLevel = curLevel; }
-        else { if (curLevel === _prevLevel && curXP > _prevXP) setTimeout(function(){playSound('xp')}, 500); _prevXP = curXP; _prevLevel = curLevel; }
+        else { _prevXP = curXP; _prevLevel = curLevel; }
         render();
       }
     }
