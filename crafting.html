@@ -283,6 +283,72 @@
       }, 1500);
     }
 
+    function getRecipeView(recipe) {
+      var hasRecipe = !!gameState.recipes['recipe_' + recipe.id];
+      var canCraft = hasRecipe;
+      var ingredients = {};
+      for (var ing in recipe.ingredients) {
+        var qty = recipe.ingredients[ing];
+        var has = gameState.inventory[ing] || 0;
+        var enough = has >= qty;
+        if (!enough) canCraft = false;
+        ingredients[ing] = { has: has, qty: qty, enough: enough };
+      }
+
+      var buttonText = 'CRAFT';
+      var buttonClass = 'craft-btn';
+      if (!hasRecipe) { buttonText = 'LOCKED'; buttonClass += ' locked-btn'; }
+      else if (!canCraft) { buttonText = 'NEED ITEMS'; buttonClass += ' need-btn'; }
+      else { buttonClass += ' ready'; }
+      if (actionPending && pendingRecipeId === recipe.id) buttonText = 'CRAFTING';
+
+      var recipeClass = 'recipe';
+      if (canCraft) recipeClass += ' craftable';
+      else if (!hasRecipe) recipeClass += ' locked';
+      else recipeClass += ' need-items';
+
+      return {
+        hasRecipe: hasRecipe,
+        canCraft: canCraft,
+        ingredients: ingredients,
+        buttonText: buttonText,
+        buttonClass: buttonClass,
+        recipeClass: recipeClass,
+        xp: getCraftingXP(recipe)
+      };
+    }
+
+    function updateRecipeRows(grid) {
+      RECIPES.forEach(function(recipe) {
+        var view = getRecipeView(recipe);
+        var row = grid.querySelector('[data-recipe="' + recipe.id + '"]');
+        if (!row) return;
+        row.className = view.recipeClass;
+
+        var xpEl = row.querySelector('[data-role="xp"]');
+        if (xpEl) xpEl.textContent = '+' + view.xp + ' XP';
+
+        var notice = row.querySelector('[data-role="locked-notice"]');
+        if (notice) notice.style.display = view.hasRecipe ? 'none' : 'block';
+
+        Object.keys(recipe.ingredients).forEach(function(ing) {
+          var ingredient = view.ingredients[ing];
+          var ingEl = row.querySelector('[data-ing="' + ing + '"]');
+          if (!ingEl) return;
+          ingEl.className = 'ingredient ' + (ingredient.enough ? 'has' : 'missing');
+          var countEl = ingEl.querySelector('[data-role="ingredient-count"]');
+          if (countEl) countEl.textContent = ingredient.has + '/' + ingredient.qty;
+        });
+
+        var button = row.querySelector('[data-role="craft-button"]');
+        if (button) {
+          button.className = view.buttonClass;
+          button.textContent = view.buttonText;
+          button.disabled = !(view.canCraft && !actionPending);
+        }
+      });
+    }
+
     function render() {
       var signature = JSON.stringify({
         inventory: gameState.inventory,
@@ -323,57 +389,52 @@
 
       var contentEl = document.querySelector('.content');
       var scrollTop = contentEl ? contentEl.scrollTop : 0;
+      var grid = document.getElementById('recipes-grid');
+      if (grid && grid.dataset.ready === '1') {
+        updateRecipeRows(grid);
+        if (contentEl) contentEl.scrollTop = scrollTop;
+        return;
+      }
+
       var html = '';
       sorted.forEach(function(recipe) {
-        var hasRecipe = gameState.recipes['recipe_' + recipe.id];
-        var canCraft = hasRecipe;
+        var view = getRecipeView(recipe);
+        var hasRecipe = view.hasRecipe;
+        var canCraft = view.canCraft;
         var ingredientsHtml = '';
 
         for (var ing in recipe.ingredients) {
-          var qty = recipe.ingredients[ing];
-          var has = gameState.inventory[ing] || 0;
-          var enough = has >= qty;
-          if (!enough) canCraft = false;
+          var ingredient = view.ingredients[ing];
 
           var icon = INGREDIENT_ICONS[ing] || '<img class="emojimg" src="emoji/chest.png" alt="">';
-          ingredientsHtml += '<span class="ingredient ' + (enough ? 'has' : 'missing') + '">' +
+          ingredientsHtml += '<span class="ingredient ' + (ingredient.enough ? 'has' : 'missing') + '" data-ing="' + ing + '">' +
             '<span class="ingredient-icon">' + icon + '</span>' +
             '<span class="ingredient-name">' + ing.replace('_', ' ') + '</span> ' +
-            has + '/' + qty +
+            '<span data-role="ingredient-count">' + ingredient.has + '/' + ingredient.qty + '</span>' +
           '</span>';
         }
 
-        var buttonText = 'CRAFT';
-        var buttonClass = 'craft-btn';
-        if (!hasRecipe) { buttonText = 'LOCKED'; buttonClass += ' locked-btn'; }
-        else if (!canCraft) { buttonText = 'NEED ITEMS'; buttonClass += ' need-btn'; }
-        else { buttonClass += ' ready'; }
-        if (actionPending && pendingRecipeId === recipe.id) buttonText = 'CRAFTING';
+        var buttonText = view.buttonText;
+        var buttonClass = view.buttonClass;
 
         var buttonHtml;
         if (canCraft && !actionPending) {
-          buttonHtml = '<button class="' + buttonClass + '" onclick="craftItem(\'' + recipe.id + '\')">' + buttonText + '</button>';
+          buttonHtml = '<button class="' + buttonClass + '" data-role="craft-button" onclick="craftItem(\'' + recipe.id + '\')">' + buttonText + '</button>';
         } else {
-          buttonHtml = '<button class="' + buttonClass + '" disabled>' + buttonText + '</button>';
+          buttonHtml = '<button class="' + buttonClass + '" data-role="craft-button" disabled>' + buttonText + '</button>';
         }
 
-        var recipeClass = 'recipe';
-        if (canCraft) recipeClass += ' craftable';
-        else if (!hasRecipe) recipeClass += ' locked';
-        else recipeClass += ' need-items';
+        var recipeClass = view.recipeClass;
 
-        var lockedNotice = '';
-        if (!hasRecipe) {
-          lockedNotice = '<div class="recipe-locked-notice">Requires Level ' + recipe.unlockLevel + ' &mdash; Buy from Blueprint Store</div>';
-        }
+        var lockedNotice = '<div class="recipe-locked-notice" data-role="locked-notice" style="display:' + (hasRecipe ? 'none' : 'block') + '">Requires Level ' + recipe.unlockLevel + ' &mdash; Buy from Blueprint Store</div>';
 
-        html += '<div class="' + recipeClass + '">' +
+        html += '<div class="' + recipeClass + '" data-recipe="' + recipe.id + '">' +
           '<span class="recipe-icon">' + recipe.icon + '</span>' +
           '<div class="recipe-info">' +
             '<div class="recipe-top">' +
               '<span class="recipe-name">' + recipe.name + '</span>' +
               '<span class="recipe-sell">Sells: ' + recipe.sellPrice + 'g</span>' +
-              '<span class="recipe-xp">+' + getCraftingXP(recipe) + ' XP</span>' +
+              '<span class="recipe-xp" data-role="xp">+' + view.xp + ' XP</span>' +
             '</div>' +
             lockedNotice +
             '<div class="ingredients">' + ingredientsHtml + '</div>' +
@@ -381,7 +442,8 @@
           buttonHtml +
         '</div>';
       });
-      document.getElementById('recipes-grid').innerHTML = html;
+      grid.innerHTML = html;
+      grid.dataset.ready = '1';
       if (contentEl) contentEl.scrollTop = scrollTop;
     }
 
