@@ -359,6 +359,7 @@
     var recentNotifications = {};
     var pendingXpDelta = 0;
     var pendingXpTimer = null;
+    var xpNotificationState = null;
 
     // Item display names and icons for notifications
     var ITEM_INFO = {
@@ -457,6 +458,17 @@
       }, 900);
     }
 
+    function queueXpDeltaFromState(currentXP, currentLevel) {
+      if (!xpNotificationState || xpNotificationState.level !== currentLevel) {
+        xpNotificationState = { xp: currentXP, level: currentLevel };
+        return;
+      }
+      if (currentXP <= xpNotificationState.xp) return;
+      var delta = currentXP - xpNotificationState.xp;
+      xpNotificationState.xp = currentXP;
+      queueXpNotification(delta);
+    }
+
     function checkDeltas(data) {
       if (firstSync) {
         // Store initial values, don't show notifications
@@ -520,8 +532,7 @@
         // XP can reset on level up, so only show gain if level didn't change
         var levelChanged = data.level !== undefined && prevLevel >= 0 && data.level !== prevLevel;
         if (!levelChanged && data.xp > prevXP) {
-          var xpDelta = data.xp - prevXP;
-          queueXpNotification(xpDelta);
+          queueXpDeltaFromState(data.xp, data.level);
         }
       }
 
