@@ -263,7 +263,8 @@
       inventory: {},
       talents: { contractor1: 0, contractor2: 0, contractor3: 0 },
       rebirthBlessings: { quickContracts: 0, timeWarp: 0 },
-      contractDone: [0,0,0,0,0,0,0,0,0,0] // Contract_1_Done through Contract_10_Done
+      contractDone: [0,0,0,0,0,0,0,0,0,0], // Contract_1_Done through Contract_10_Done
+      contractFillCounts: [0,0,0,0,0,0,0,0,0,0] // Contract_1_FillCount through Contract_10_FillCount
     };
 
     let refreshEndTime = getRefreshWindow().endTime;
@@ -665,7 +666,12 @@
       'Contract_3_Done': { target: 'cd3' }, 'Contract_4_Done': { target: 'cd4' },
       'Contract_5_Done': { target: 'cd5' }, 'Contract_6_Done': { target: 'cd6' },
       'Contract_7_Done': { target: 'cd7' }, 'Contract_8_Done': { target: 'cd8' },
-      'Contract_9_Done': { target: 'cd9' }, 'Contract_10_Done': { target: 'cd10' }
+      'Contract_9_Done': { target: 'cd9' }, 'Contract_10_Done': { target: 'cd10' },
+      'Contract_1_FillCount': { target: 'cfc1' }, 'Contract_2_FillCount': { target: 'cfc2' },
+      'Contract_3_FillCount': { target: 'cfc3' }, 'Contract_4_FillCount': { target: 'cfc4' },
+      'Contract_5_FillCount': { target: 'cfc5' }, 'Contract_6_FillCount': { target: 'cfc6' },
+      'Contract_7_FillCount': { target: 'cfc7' }, 'Contract_8_FillCount': { target: 'cfc8' },
+      'Contract_9_FillCount': { target: 'cfc9' }, 'Contract_10_FillCount': { target: 'cfc10' }
     };
 
     function parseSyncInventory(msg) {
@@ -758,6 +764,8 @@
       for (var ci = 0; ci < 10; ci++) {
         var key = 'cd' + (ci + 1);
         gameState.contractDone[ci] = data[key] !== undefined ? data[key] : 0;
+        var fillKey = 'cfc' + (ci + 1);
+        gameState.contractFillCounts[ci] = data[fillKey] !== undefined ? Math.max(0, data[fillKey]) : 0;
       }
 
       console.log('[Contracts] Contract done flags:', gameState.contractDone);
@@ -781,6 +789,13 @@
           slot.endTime = null;
           clearPersistedContract(si);
           continue;
+        }
+
+        if (slot.state !== 'filling') {
+          var syncedFillCount = gameState.contractFillCounts[si] || 0;
+          if (!slot.frozenContract || slot.restoredFromStorage) {
+            slot.fillCount = Math.max(slot.fillCount || 0, syncedFillCount);
+          }
         }
 
         if (wasRecentlyCompleted(si) && gameState.contractDone[si] === 1) {
@@ -924,7 +939,7 @@
       xpTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
 
       // Clear the contract done flag in Portals
-      setTimeout(function() { triggerTask('Clear_Contract_' + (slotIndex + 1)); }, delay);
+      setTimeout(function() { triggerTask('Advance_Contract_' + (slotIndex + 1)); }, delay);
       delay += STAGGER;
 
       notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
