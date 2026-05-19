@@ -934,6 +934,7 @@
       var delay = 0;
       var STAGGER = 200;
 
+      triggerTask('Begin_Contract_Spend');
       deductTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
       goldTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
       xpTasks.forEach(function(task) { setTimeout(function() { triggerTask(task); }, delay); delay += STAGGER; });
@@ -941,11 +942,13 @@
       // Clear the contract done flag in Portals
       setTimeout(function() { triggerTask('Advance_Contract_' + (slotIndex + 1)); }, delay);
       delay += STAGGER;
+      setTimeout(function() { triggerTask('End_Contract_Spend'); }, delay);
+      delay += STAGGER;
 
       notify('Contract fulfilled! +' + contract.goldReward + 'g +' + contract.xpReward + ' XP', 'success');
 
       // Keep slot in 'filling' state until ALL tasks have fired, THEN unlock
-      var totalTasks = deductTasks.length + goldTasks.length + xpTasks.length + 1;
+      var totalTasks = deductTasks.length + goldTasks.length + xpTasks.length + 3;
       var unlockDelay = (totalTasks * STAGGER) + 500;
       setTimeout(function() {
         var win = getRefreshWindow();
